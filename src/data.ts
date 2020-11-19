@@ -120,7 +120,7 @@ const data = {
     },
     translation: {
         money: '金钱',
-        health: '健康',
+        health: '体力',
         magic: '魔力',
         strength: '力量',
         dexterity: '敏捷',

@@ -3,6 +3,7 @@ import LivingEntity, { LivingEntityData } from "./LivingEntity";
 import Item from "../items/Item";
 import ItemEntity from "./ItemEntity";
 import UniqueMap from "../UniqueMap";
+import { num2strWithSign } from "../../utils/strings";
 
 interface PlayerEntityData extends LivingEntityData {
     money: number;
@@ -37,7 +38,7 @@ class PlayerEntity extends LivingEntity {
             case 'insight': this.insight += delta; break;
             case 'dexterity': this.dexterity += delta; break;
         }
-        game.appendText((reason || '') + key + ' ' + (delta >= 0 ? '+' + delta : String(delta)));
+        game.appendText(`${this.name} ${reason || ''} ${game.translate(key)} ${num2strWithSign(delta)}`);
         if (!this.isAlive()) {
             game.gameOver('失血过多');
         }

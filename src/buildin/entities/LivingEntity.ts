@@ -1,4 +1,5 @@
 import { Dice, Game, Item, MeleeWeapon, Site } from "../../interfaces/interfaces";
+import { num2strWithSign } from "../../utils/strings";
 import Entity, { EntityData } from "./Entity";
 
 interface LivingEntityData extends EntityData {
@@ -35,7 +36,7 @@ class LivingEntity extends Entity {
             case 'strength': this.strength += delta; break;
             case 'dexterity': this.dexterity += delta; break;
         }
-        game.appendText((reason || '') + key + ' ' + (delta >= 0 ? '+' + delta : String(delta)));
+        game.appendText(`${this.name} ${reason || ''} ${game.translate(key)} ${num2strWithSign(delta)}`);
         if (!this.isAlive()) {
             game.appendText(`${this.name}死亡`);
             this.site.removeEntity(this, game);
