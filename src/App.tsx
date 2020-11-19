@@ -146,14 +146,12 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
   reset() {
     this.resetting = true;
     this.currentState = this.props.data.initialize();
-    this.setState(() => Object.assign({}, this.currentState, { 
-      textList: [],
-      showOptions: true,
-    }));
-    this.showPortOptions();
+    this.setState(this.currentState);
+    this.refreshOptions();
     this.resetting = false;
     this.appendText('开始游戏', 'system');
     this.props.data.start(this);
+    this.applyChange();
   }
   
   takeScreenshot() {
@@ -177,7 +175,9 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
     this.showPortOptions();
     const s = this.currentState;
 
-    if (s.events.length > 0) {
+    if (option.tag === '__reset__') {
+      this.reset();
+    } else if (s.events.length > 0) {
       const event = s.events[s.events.length - 1];
       event.onInput(option, this);
     } else if (option.entityUid) {
@@ -195,7 +195,7 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
       this.appendText(this.gameOverMessage, 'system');
       this.setOptions([{
         text: '重来',
-        tag: ['reset']
+        tag: '__reset__'
       }]);
     }
 
