@@ -33,3 +33,14 @@ button {
 .item > * {
   margin: .5em;
 }
+
+.option {
+  position: relative;
+}
+
+.option-right-text {
+  position: absolute;
+  right: 1em;
+  font-size: 0.8em;
+  color: grey;
+}

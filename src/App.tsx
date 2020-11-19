@@ -1,7 +1,17 @@
-import React, { RefObject } from 'react';
+import React, { MouseEventHandler, RefObject } from 'react';
 import './App.css';
 import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
 import { copy, findByPath } from './utils/objects';
+
+function OptionBtn(props: { option: Option, className: string, onClick: MouseEventHandler }) {
+  const { className, option, onClick } = props;
+  return (
+    <button className={className} onClick={onClick}>
+      {option.text}
+      {option.rightText ? <span className="option-right-text">{option.rightText}</span> : null}
+    </button>
+  );
+}
 
 interface AppState extends GameState {
   textList: Array<Text>;
@@ -59,11 +69,12 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
 
           <div className="option-panel">
             {this.state.showOptions ? this.state.options.map((o, i) => (
-              <button
+              <OptionBtn
                 key={i} 
                 className="option"
+                option={o}
                 onClick={this.handleClickOption.bind(this, o, i)}
-              >{o.text}</button>
+              />
             )) 
             : <button className="option"onClick={this.flushText.bind(this, true)}> -=跳过=- </button>
             }
