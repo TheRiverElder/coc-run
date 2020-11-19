@@ -17,6 +17,7 @@ interface Text {
 
 interface Option {
     text: string;
+    leftText?: string;
     rightText?: string;
     tag?: any;
     entityUid?: number;

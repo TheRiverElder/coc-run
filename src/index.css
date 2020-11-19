@@ -38,9 +38,16 @@ button {
   position: relative;
 }
 
-.option-right-text {
+.option-side-text {
   position: absolute;
-  right: 1em;
   font-size: 0.8em;
   color: grey;
+}
+
+.option-side-text.left {
+  left: 1em;
+}
+
+.option-side-text.right {
+  right: 1em;
 }

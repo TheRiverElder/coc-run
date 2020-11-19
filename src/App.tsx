@@ -7,8 +7,9 @@ function OptionBtn(props: { option: Option, className: string, onClick: MouseEve
   const { className, option, onClick } = props;
   return (
     <button className={className} onClick={onClick}>
+      {option.leftText ? <span className="option-side-text left">{option.leftText}</span> : null}
       {option.text}
-      {option.rightText ? <span className="option-right-text">{option.rightText}</span> : null}
+      {option.rightText ? <span className="option-side-text right">{option.rightText}</span> : null}
     </button>
   );
 }
@@ -176,7 +177,7 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
     this.showPortOptions();
     const s = this.currentState;
 
-    if (s.events.length < 0) {
+    if (s.events.length > 0) {
       const event = s.events[s.events.length - 1];
       event.onInput(option, this);
     } else if (option.entityUid) {

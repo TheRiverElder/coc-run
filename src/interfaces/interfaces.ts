@@ -35,6 +35,8 @@ interface Game {
 
     getPlayer(): PlayerEntity;
     getMap(): Map<string, Site>;
+
+    translate(key: string): string;
 }
 
 interface GameData {
