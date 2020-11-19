@@ -3,10 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import data from './data';
+import polyfill from './utils/polyfill'
+
+polyfill();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App data={data}/>
   </React.StrictMode>,
   document.getElementById('root')
 );

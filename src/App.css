@@ -1,16 +1,17 @@
+html, body, #root, .App {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  display: flex;
+  flex-direction: column;
 }
 
 .App-header {
@@ -24,15 +25,135 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+@keyframes glitter {
+  0% {
+    filter: invert(0%)
+  }
+  20% {
+    filter: invert(100%)
+  }
+  50% {
+    filter: invert(50%)
+  }
+  100% {
+    filter: invert(0)
+  }
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.state-bar {
+  padding: .5em 1em;
+  font-size: 0.8em;
+  flex: 0 0 0;
+  border-bottom: .1em dashed black;
+}
+
+.state-bar .values {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.state-bar .values > .value {
+  padding: .1em .5em;
+  margin: .1em .5em;
+  background-color: #eeeeee;
+  border-radius: .2em;
+  border: 1px solid #dddddd;
+}
+
+.panel {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.text-panel,
+.option-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  overflow: auto;
+}
+
+.text-panel {
+  padding: .5em;
+  flex: 1;
+}
+
+.option-panel {
+  padding: .5em 1em;
+  flex-basis: 1;
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 30%;
+  background-color: #282c34;
+}
+
+.text, .option {
+  box-sizing: border-box;
+  text-align: center;
+  margin: .2em 0;
+  padding: .2em 1em;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.text {
+  text-align: start;
+  width: 100%;
+  word-break: break-all;
+}
+
+.text > .content {
+  font-family: 'Times New Roman', Times, serif;
+  padding: .2em .5em;
+  border-radius: .2em;
+  background-color: white;
+  animation: .618s glitter;
+}
+
+.option {
+  font-size: 1.2em;
+  border-radius: 1em;
+  width: 100%;
+  background-color: white;
+}
+
+.text.self {
+  text-align: end;
+  opacity: 0.5;
+}
+
+.text.good {
+  color: green;
+}
+
+.text.bad {
+  color: red;
+}
+
+.text.mutate {
+  text-align: center;
+  font-size: .8em;
+  opacity: 0.5;
+}
+
+.text.system {
+  text-align: center;
+  border-top: rgb(204, 204, 204) solid 1px;
+  border-bottom: rgb(204, 204, 204) solid 1px;
+}
+
+.no-break {
+  word-break: unset;
+  white-space: unset;
+  word-wrap: none;
+}
+
+p {
+  padding: .5em 0;
+  margin: 0;
 }
