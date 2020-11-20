@@ -4,7 +4,7 @@ import { genUid } from "../../utils/math";
 import LivingEntity from "../entities/LivingEntity";
 
 interface ItemData {
-    id: string;
+    id?: string;
     uid?: number;
     name: string;
 }
@@ -15,7 +15,7 @@ class Item implements Identical, Unique, Named {
     name: string;
 
     constructor(data: ItemData) {
-        this.id = data.id;
+        this.id = data.id || 'item';
         this.uid = data.uid || genUid();
         this.name = data.name;
     }

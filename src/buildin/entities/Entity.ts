@@ -27,23 +27,28 @@ class Entity implements Identical, Unique, Named {
         // empty
     }
 
-    goToSite(newSite: Site, game: Game): void {
+    goToSite(newSite: Site, game: Game, silient: boolean = false): void {
         this.site.removeEntity(this, game);
-        newSite.addEntity(this, game);
+        if (silient) {
+            newSite.entities.add(this);
+        } else {
+            newSite.addEntity(this, game);
+        }
         this.site = newSite;
     }
 
     getInteractions(game: Game): Array<Option> {
-        return [{
-            text: this.name,
-            tag: this.uid,
-        }];
+        // return [{
+        //     text: this.name,
+        //     tag: this.uid,
+        // }];
+        return [];
     }
 
     onInteract(option: Option, game: Game): void {
-        if (option.tag === this.uid) {
-            game.appendText(this.name);
-        }
+        // if (option.tag === this.uid) {
+        //     game.appendText(this.name);
+        // }
     }
 }
 

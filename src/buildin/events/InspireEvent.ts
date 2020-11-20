@@ -1,10 +1,20 @@
-import { Game, GameEvent, MeleeWeapon, Option } from "../../interfaces/interfaces";
+import { Game, GameEvent, Item, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 
-const eventTreasure: GameEvent = {
-    id: 'treasure',
-    priority: 1,
-    uid: 4,
+interface InspireEventData {
+    item: Item;
+}
+
+class InspireEvent extends GameEvent {
+    item: Item;
+
+    constructor(data: InspireEventData) {
+        super({
+            id: 'inspire',
+            priority: 10,
+        });
+        this.item = data.item;
+    }
 
     onStart(game: Game) {
         game.appendText('你感受到了附近有什么值得注意的东西');
@@ -12,23 +22,18 @@ const eventTreasure: GameEvent = {
             { text: '探索周围', tag: 'investigate' },
             { text: '无视', tag: 'ignore' },
         ]);
-    },
+    }
 
     onRender() {
         return []
-    },
+    }
 
     onInput(opt: Option, game: Game) {
         const p = game.getPlayer();
         if (opt.tag === 'investigate') {
             if (test(p.insight)) {
-                game.appendText('泥发现了一个看起来有意思的东西');
-                const weapon = new MeleeWeapon({
-                    id: 'melee',
-                    name: '带血屠刀',
-                    damage: { faces: 3, times: 2, fix: 1 },
-                });
-                p.holdItem(weapon, game);
+                game.appendText('你发现了一个看起来有意思的东西');
+                p.holdItem(this.item, game);
             } else {
                 game.appendText('可惜啥都没发现');
             }
@@ -36,7 +41,10 @@ const eventTreasure: GameEvent = {
             game.appendText('于是继续向前走去');
         }
         game.endEvent(this);
-    },
+    }
 }
 
-export default eventTreasure;
+export default InspireEvent;
+export type {
+    InspireEventData,
+}

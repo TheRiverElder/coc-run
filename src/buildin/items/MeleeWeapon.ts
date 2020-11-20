@@ -12,7 +12,10 @@ class MeleeWeapon extends Item {
     damage: number | Dice;
 
     constructor(data: MeleeWeaponData) {
-        super(data);
+        super({
+            ...data,
+            id: data.id || 'melee_weapon'
+        });
         this.damage = data.damage;
     }
 

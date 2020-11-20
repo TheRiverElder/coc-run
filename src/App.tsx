@@ -51,7 +51,7 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
           <p>
             <span>第{Math.floor(s.time / 24) + 1}天{s.time % 24}点钟，</span>
             <span>在{s.player.site.name}，</span>
-            <span>{s.player.holdingItem ? `手持${s.player.holdingItem.name}` : '两手空空'}</span>
+            <span>{s.player.holdingItem ? `手持${s.player.holdingItem.name}(${s.player.holdingItem.previewDamage(s.player, this)})` : '两手空空'}</span>
           </p>
           
           <p className="values">
@@ -146,6 +146,8 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
   reset() {
     this.resetting = true;
     this.currentState = this.props.data.initialize();
+    const player = this.currentState.player;
+    player.site.addEntity(player, this);
     this.setState(this.currentState);
     this.refreshOptions();
     this.resetting = false;

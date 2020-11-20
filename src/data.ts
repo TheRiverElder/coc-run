@@ -1,10 +1,10 @@
 import MonsterEntity from "./buildin/entities/MonsterEntity";
 import eventPurse from "./buildin/events/purse";
 import eventRob from "./buildin/events/rob";
-import eventTreasure from "./buildin/events/treasure";
 import { Game, GameData, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "./interfaces/interfaces";
 import { testChance } from "./utils/game-utils";
 import { randInt } from "./utils/math";
+import SiteInvestigationEntity from "./buildin/entities/SiteInvestigationEntity";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -54,8 +54,15 @@ const data = {
             new Site({
                 id: 'wang_house',
                 name: '王屠户家',
-                entities: [new PortEntity({ target: 'main_streat' })],
-                onEnter: eventTreasure,
+                entities: [
+                    new PortEntity({ target: 'main_streat' }),
+                    new SiteInvestigationEntity({
+                        results: [new ItemEntity({item: new MeleeWeapon({
+                            name: '杀猪刀',
+                            damage: { faces: 3, times: 2, fix: -1 },
+                        }), autoEquip: true })]
+                    }),
+                ],
             }),
             new Site({
                 id: 'temple',

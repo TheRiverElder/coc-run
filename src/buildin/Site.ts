@@ -42,17 +42,19 @@ class Site implements Identical, Named {
         }
     }
 
-    addEntity(entity: Entity, game: Game): Site {
+    addEntity(entity: Entity, game: Game, silent: boolean = false): Site {
         this.entities.add(entity);
         if (entity.site !== this) {
             entity.site = this;
-            this.entities.values().forEach(e => e.onDetect(entity, this, game));
+            if (!silent) {
+                this.entities.values().forEach(e => e.onDetect(entity, this, game));
+            }
         }
         return this;
     }
 
-    addEntities(entities: Array<Entity>, game: Game): Site {
-        entities.forEach(e => this.addEntity(e, game));
+    addEntities(entities: Array<Entity>, game: Game, silent: boolean = false): Site {
+        entities.forEach(e => this.addEntity(e, game, silent));
         return this;
     }
 
