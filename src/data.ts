@@ -7,6 +7,8 @@ import { randInt } from "./utils/math";
 import SiteInvestigationEntity from "./buildin/entities/SiteInvestigationEntity";
 import EventTriggerEntity from "./buildin/entities/EventTriggerEntity";
 import TextDisplayEvent from "./buildin/events/TextDisplayEvent";
+import SequenceEvent from "./buildin/events/SequenceEvent";
+import GameOverEvent from "./buildin/events/GameOverEvent";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -81,7 +83,7 @@ const data = {
                     new PortEntity({ target: 'temple' }),
                     new MonsterEntity({
                         name: '触手怪',
-                        baseDamage: { faces: 2, fix: 2 },
+                        baseDamage: { faces: 2, fix: 1 },
                         baseWeaponName: '爪子',
                         health: 10,
                         maxHealth: 10,
@@ -97,9 +99,14 @@ const data = {
                 id: 'dark_river',
                 name: '漆黑之河',
                 entities: [
+                    new PortEntity({ target: 'temple_basement' }),
                     new EventTriggerEntity({
-                        event: new TextDisplayEvent({
-                            texts: [{ text: 'end_text' }]
+                        option: { text: '跳入其中', leftText: '🏊‍' },
+                        event: new SequenceEvent({
+                            events:[
+                                new TextDisplayEvent({ texts: [{ text: 'end_text', translated: true }] }),
+                                new GameOverEvent({ reason: '完美通关' })
+                            ]
                         })
                     }),
                 ],

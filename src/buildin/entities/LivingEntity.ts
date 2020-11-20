@@ -42,6 +42,7 @@ class LivingEntity extends Entity {
         game.appendText(`${this.name} ${reason || ''} ${game.translate(key)} ${num2strWithSign(delta)}`);
         if (!this.isAlive()) {
             game.appendText(`${this.name}死亡`);
+            this.site.addEntities(this.loots, game);
             this.site.removeEntity(this, game);
         }
     }
