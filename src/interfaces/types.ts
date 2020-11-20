@@ -12,6 +12,7 @@ interface Named {
 
 interface Text {
     text: string;
+    translated?: boolean;
     types?: Array<string>;
 }
 

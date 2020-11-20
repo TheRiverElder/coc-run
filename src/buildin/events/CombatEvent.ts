@@ -25,8 +25,18 @@ class CombatEvent extends GameEvent {
         const player = game.getPlayer();
         const previewDamage = player.getWeapon().previewDamage(this.enemy, game);
         return [
-            { text: `攻击`, rightText: `${previewDamage}♥`, tag: 'attack' },
-            { text: `逃跑`, rightText: `${player.dexterity}%`, tag: 'escape' },
+            { 
+                text: `攻击`,
+                leftText: '🗡',
+                rightText: `${previewDamage}♥`,
+                tag: 'attack',
+            },
+            { 
+                text: `逃跑`,
+                leftText: '🏃‍',
+                rightText: `${player.dexterity}%`,
+                tag: 'escape',
+            },
         ];
     }
 

@@ -118,14 +118,17 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
   }
 
   appendText(text: Text | string, ...types: Array<string>) {
+    let translated = false;
     if (typeof text !== 'string') {
+      translated = text.translated || false;
       types = text.types || types;
       text = text.text;
     }
-    const packs: Array<Text> = text.split('\n')
+    text = translated ? this.translate(text) : text;
+    const lines: Array<string> = text.split('\n')
       .map(s => s.trim())
-      .filter(s => !/^\s*$/.test(s))
-      .map(s => ({ text: s, types }));
+      .filter(s => !/^\s*$/.test(s));
+    const packs: Array<Text> = lines.map(s => ({ text: s, types }));
     this.textBuffer.push(...packs);
     this.flushLoop();
   }

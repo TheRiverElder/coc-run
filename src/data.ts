@@ -5,6 +5,8 @@ import { Game, GameData, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site
 import { testChance } from "./utils/game-utils";
 import { randInt } from "./utils/math";
 import SiteInvestigationEntity from "./buildin/entities/SiteInvestigationEntity";
+import EventTriggerEntity from "./buildin/entities/EventTriggerEntity";
+import TextDisplayEvent from "./buildin/events/TextDisplayEvent";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -85,6 +87,20 @@ const data = {
                         maxHealth: 10,
                         strength: 30,
                         dexterity: 40,
+                        loots: [new PortEntity({
+                            target: 'dark_river'
+                        })]
+                    }),
+                ],
+            }),
+            new Site({
+                id: 'dark_river',
+                name: '漆黑之河',
+                entities: [
+                    new EventTriggerEntity({
+                        event: new TextDisplayEvent({
+                            texts: [{ text: 'end_text' }]
+                        })
                     }),
                 ],
             }),
@@ -132,6 +148,21 @@ const data = {
         strength: '力量',
         dexterity: '敏捷',
         insight: '洞察',
+        end_text:  `
+            你发现了地下有一条暗黑的河流，甚至手电筒的关联都不能照亮它一毫
+            仿佛有一种声音在召唤你，让你向它靠近
+            正在思考眼前的一切时，你已经来到了暗河边
+            
+            你跳入了这条河流
+            没有一丝丝冰凉或溺水的痛苦，也没有任何其它感觉
+            你能感受到河水带着你飘向了无尽的黑暗深渊
+            可是你却丝毫不想反抗
+
+            不知道过了多久后，你醒了
+
+            在清晨的阳光中，病床上的你睁开双眼
+            询问护士的结果是，有人在海边发现了你，神志不清
+        `
     },
 };
 

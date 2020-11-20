@@ -1,4 +1,4 @@
-import { Dice, Game, Item, MeleeWeapon, Site } from "../../interfaces/interfaces";
+import { Dice, Game, Item, ItemEntity, MeleeWeapon, Site } from "../../interfaces/interfaces";
 import { num2strWithSign } from "../../utils/strings";
 import Entity, { EntityData } from "./Entity";
 
@@ -9,6 +9,7 @@ interface LivingEntityData extends EntityData {
     dexterity: number;
     baseDamage: Dice | number;
     baseWeaponName: string;
+    loots?: Array<Entity | Item>;
 }
 
 class LivingEntity extends Entity {
@@ -19,6 +20,7 @@ class LivingEntity extends Entity {
     dexterity: number;
     baseDamage: Dice | number;
     baseWeaponName: string;
+    loots: Array<Entity>;
 
     constructor(data: LivingEntityData) {
         super(data);
@@ -28,6 +30,7 @@ class LivingEntity extends Entity {
         this.dexterity = data.dexterity;
         this.baseDamage = data.baseDamage;
         this.baseWeaponName = data.baseWeaponName;
+        this.loots = data.loots?.map(e => e instanceof Item ? new ItemEntity({ item: e }) : e) || [];
     }
 
     mutateValue(key: string, delta: number, game: Game, reason?: string): void {
