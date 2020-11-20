@@ -45,6 +45,7 @@ html, body, #root, .App {
   font-size: 0.8em;
   flex: 0 0 0;
   border-bottom: .1em dashed black;
+  box-shadow: #dddddd 0 .2em .2em;
 }
 
 .state-bar .values {
@@ -93,6 +94,7 @@ html, body, #root, .App {
   flex-grow: 0;
   height: 30%;
   background-color: #282c34;
+  box-shadow: #dddddd 0 -0.2em .2em;
 }
 
 .text, .option {
@@ -122,9 +124,11 @@ html, body, #root, .App {
   border-radius: 1em;
   border-width: 0;
   width: 80%;
-  padding-top: 0.3em;
+  padding-top: 0.2em;
+  padding-bottom: 0.3em;
   background-color: white;
   transition: all 300ms;
+  position: relative
 }
 
 .option:hover {
@@ -132,6 +136,31 @@ html, body, #root, .App {
   background-color: #eeeeee;
   box-shadow: #000000 0 0.1em 0.1em;
   transition: all 300ms;
+}
+
+.option.skip-btn {
+  background-color: #282c34;
+  color: white;
+  border-color: white;
+  border-width: .1em;
+}
+
+.option > .option-side-text {
+  height: 100%;
+  font-size: 0.8em;
+  color: gray;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 0;
+}
+
+.option > .option-side-text.left {
+  left: .5em;
+}
+
+.option > .option-side-text.right {
+  right: .5em;
 }
 
 .text.self {

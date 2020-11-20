@@ -19,7 +19,7 @@ interface AppState extends GameState {
   showOptions: boolean;
 }
 
-const values = ['health', 'magic', 'money', 'insight', 'dexterity'];
+const values = ['magic', 'money', 'insight', 'strength', 'dexterity'];
 
 class App extends React.Component<{ data: GameData }, AppState> implements Game {
 
@@ -45,17 +45,19 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
 
   render() {
     const s = this.state;
+    const p = s.player;
     return (
       <div className="App">
         <header className="state-bar">
           <p>
             <span>第{Math.floor(s.time / 24) + 1}天{s.time % 24}点钟，</span>
-            <span>在{s.player.site.name}，</span>
-            <span>{s.player.holdingItem ? `手持${s.player.holdingItem.name}(${s.player.holdingItem.previewDamage(s.player, this)})` : '两手空空'}</span>
+            <span>在{p.site.name}，</span>
+            <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage(s.player, this)})` : '两手空空'}</span>
           </p>
           
           <p className="values">
-            {values.map(k => `${this.translate(k)}:${(s.player as any)[k]}`).map(s => (<span key={s} className="value">{s}</span>))}
+            <span className="value">{`${this.translate('health')}:${p.health}/${p.maxHealth}`}</span>
+            {values.map(k => `${this.translate(k)}:${(p as any)[k]}`).map(s => (<span key={s} className="value">{s}</span>))}
           </p>
         </header>
         
@@ -77,7 +79,7 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
                 onClick={this.handleClickOption.bind(this, o, i)}
               />
             )) 
-            : <button className="option"onClick={this.flushText.bind(this, true)}> -=跳过=- </button>
+            : <button className="option skip-btn"onClick={this.flushText.bind(this, true)}> -=快进=- </button>
             }
           </div>
         </div>

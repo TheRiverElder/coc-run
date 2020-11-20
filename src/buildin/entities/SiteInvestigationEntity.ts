@@ -26,6 +26,7 @@ class SiteInvestigationEntity extends Entity {
     getInteractions(game: Game): Array<Option> {
         return [{
             text: `调查${this.site.name}`,
+            leftText: '💡',
             rightText: `第${this.counter + 1}次`
         }];
     }

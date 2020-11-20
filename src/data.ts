@@ -47,7 +47,7 @@ const data = {
                     new ItemEntity({ item: new MeleeWeapon({
                         id: 'bone',
                         name: '猪骨',
-                        damage: 2,
+                        damage: 3,
                     }), autoEquip: true }),
                 ],
             }),

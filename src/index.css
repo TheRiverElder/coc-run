@@ -33,21 +33,3 @@ button {
 .item > * {
   margin: .5em;
 }
-
-.option {
-  position: relative;
-}
-
-.option-side-text {
-  position: absolute;
-  font-size: 0.8em;
-  color: grey;
-}
-
-.option-side-text.left {
-  left: 1em;
-}
-
-.option-side-text.right {
-  right: 1em;
-}

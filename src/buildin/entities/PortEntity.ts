@@ -5,23 +5,27 @@ import Site from "../Site";
 interface PortEntityData {
     site?: Site;
     target: string;
+    timeCost?: number;
 }
 
 class PortEntity extends Entity {
     target: string;
+    timeCost: number;
 
-    constructor({ target, site }: PortEntityData) {
+    constructor({ target, site, timeCost }: PortEntityData) {
         super({
             id: 'port', 
             name: target,
             site,
         });
         this.target = target;
+        this.timeCost = timeCost || 1;
     }
     
     getInteractions(game: Game) {
         return [{
             text: '去往' + (game.getMap().get(this.target)?.name || '#ERROR#'),
+            leftText: (game.getPlayer().prevSite?.id === this.target) ? '⬅' : '➡',
             tag: this.uid,
         }];
     }
@@ -31,6 +35,7 @@ class PortEntity extends Entity {
             const site = game.getMap().get(this.target);
             if (site) {
                 game.getPlayer().goToSite(site, game);
+                game.timePass(this.timeCost);
             }
         }
     }

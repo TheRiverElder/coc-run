@@ -1,4 +1,4 @@
-import { Game, Option } from "../../interfaces/interfaces";
+import { Game, Option, Site } from "../../interfaces/interfaces";
 import LivingEntity, { LivingEntityData } from "./LivingEntity";
 import Item from "../items/Item";
 import ItemEntity from "./ItemEntity";
@@ -11,6 +11,7 @@ interface PlayerEntityData extends LivingEntityData {
     insight: number;
     holdingItem: Item | null;
     inventory: Array<Item>;
+    prevSite?: Site;
 }
 
 class PlayerEntity extends LivingEntity {
@@ -19,6 +20,7 @@ class PlayerEntity extends LivingEntity {
     insight: number;
     holdingItem: Item | null;
     inventory: UniqueMap<Item> = new UniqueMap<Item>();
+    prevSite?: Site;
 
     constructor(data: PlayerEntityData) {
         super({...data, id: 'player'});
@@ -27,6 +29,7 @@ class PlayerEntity extends LivingEntity {
         this.insight = data.insight;
         this.holdingItem = data.holdingItem;
         data.inventory.forEach(e => this.inventory.add(e));
+        this.prevSite = data.prevSite;
     }
 
     mutateValue(key: string, delta: number, game: Game, reason?: string): void {
@@ -59,6 +62,11 @@ class PlayerEntity extends LivingEntity {
             case 'restore': this.inventory.add(prevItem); break;
             case 'delete': break;
         }
+    }
+
+    goToSite(newSite: Site, game: Game): void {
+        this.prevSite = this.site;
+        super.goToSite(newSite, game);
     }
 
     addItemToInventory(item: Item, game: Game): boolean {

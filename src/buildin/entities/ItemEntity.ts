@@ -25,6 +25,7 @@ class ItemEntity extends Entity {
     getInteractions() {
         return [{
             text: '捡起' + this.item.name,
+            leftText: '💎',
             tag: [],
         }];
     }
