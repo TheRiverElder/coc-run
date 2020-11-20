@@ -24,7 +24,7 @@ class Item implements Identical, Unique, Named {
         // empty
     }
 
-    previewDamage(entity: LivingEntity, game: Game): string {
+    previewDamage(game: Game, entity?: LivingEntity): string {
         return '';
     }
 }

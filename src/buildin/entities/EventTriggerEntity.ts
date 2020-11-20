@@ -1,4 +1,4 @@
-import { Game, GameEvent, Option, Site } from "../../interfaces/interfaces";
+import { Game, GameEvent, Option } from "../../interfaces/interfaces";
 import Entity from "./Entity";
 
 interface EventTriggerEntityData {

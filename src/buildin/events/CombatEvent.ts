@@ -23,7 +23,7 @@ class CombatEvent extends GameEvent {
 
     onRender(game: Game): Array<Option> {
         const player = game.getPlayer();
-        const previewDamage = player.getWeapon().previewDamage(this.enemy, game);
+        const previewDamage = player.getWeapon().previewDamage(game, this.enemy);
         return [
             { 
                 text: `攻击`,

@@ -24,7 +24,7 @@ class MeleeWeapon extends Item {
         entity.mutateValue('health', -dmg, game, `受到${this.name}攻击`);
     }
 
-    previewDamage(entity: LivingEntity, game: Game): string {
+    previewDamage(game: Game, entity: LivingEntity): string {
         if (typeof this.damage === 'number') {
             return String(this.damage);
         } else {

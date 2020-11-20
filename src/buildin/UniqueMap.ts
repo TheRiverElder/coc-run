@@ -37,6 +37,10 @@ class UniqueMap<T extends Unique> {
     values(): Array<T> {
         return Array.from(this.map.values());
     }
+    
+    get size(): number {
+        return this.map.size;
+    }
 }
 
 export default UniqueMap;

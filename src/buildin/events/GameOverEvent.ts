@@ -1,5 +1,4 @@
-import { Game, GameEvent, Item, Option } from "../../interfaces/interfaces";
-import { test } from "../../utils/math";
+import { Game, GameEvent } from "../../interfaces/interfaces";
 
 interface GameOverEventData {
     reason: string;

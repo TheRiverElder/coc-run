@@ -103,10 +103,11 @@ const data = {
                     new EventTriggerEntity({
                         option: { text: '跳入其中', leftText: '🏊‍' },
                         event: new SequenceEvent({
-                            events:[
+                            events: [
                                 new TextDisplayEvent({ texts: [{ text: 'end_text', translated: true }] }),
                                 new GameOverEvent({ reason: '完美通关' })
-                            ]
+                            ],
+                            joints: [{ text: '结束了' }]
                         })
                     }),
                 ],

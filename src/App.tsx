@@ -1,5 +1,6 @@
 import React, { MouseEventHandler, RefObject } from 'react';
 import './App.css';
+import InventoryEvent from './buildin/events/InventoryEvent';
 import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
 import { copy, findByPath } from './utils/objects';
 
@@ -52,7 +53,7 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
           <p>
             <span>第{Math.floor(s.time / 24) + 1}天{s.time % 24}点钟，</span>
             <span>在{p.site.name}，</span>
-            <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage(s.player, this)})` : '两手空空'}</span>
+            <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage(this)})` : '两手空空'}</span>
           </p>
           
           <p className="values">
@@ -184,7 +185,9 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
 
     if (option.tag === '__reset__') {
       this.reset();
-    } else if (s.events.length > 0) {
+    } else if (option.tag === '__inventory__') {
+      this.triggerEvent(new InventoryEvent());
+    }else if (s.events.length > 0) {
       const event = s.events[s.events.length - 1];
       event.onInput(option, this);
     } else if (option.entityUid) {
@@ -244,9 +247,17 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
   }
 
   showPortOptions() {
-    const site: Site = this.currentState.player.site;
+    const p = this.currentState.player;
+    const site: Site = p.site;
     const options = Array.from(site.entities.values(), e => e.getInteractions(this).map(o => Object.assign(o, { entityUid: e.uid }))).flat();
-    this.setOptions(options);
+    const itemCount = p.inventory.size + (p.holdingItem ? 1 : 0);
+    const inventoryOption: Option = {
+      text: '物品栏',
+      leftText: '💰',
+      rightText: `共${itemCount}个`,
+      tag: '__inventory__',
+    };
+    this.setOptions(itemCount ? [...options, inventoryOption] : options);
   }
 
   getPlayer() {

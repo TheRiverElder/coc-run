@@ -1,4 +1,4 @@
-import { Game, GameEvent, Option, Text } from "../../interfaces/interfaces";
+import { Game, GameEvent, Text } from "../../interfaces/interfaces";
 
 interface TextDisplayEventData {
     texts: Array<Text>;
