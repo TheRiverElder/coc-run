@@ -93,6 +93,7 @@ html, body, #root, .App {
   flex-shrink: 0;
   flex-grow: 0;
   height: 30%;
+  overflow: auto;
   background-color: #282c34;
   box-shadow: #dddddd 0 -0.2em .2em;
 }
@@ -120,6 +121,7 @@ html, body, #root, .App {
 }
 
 .option {
+  flex-shrink: 0;
   font-size: 1.2em;
   border-radius: 1em;
   border-width: 0;
