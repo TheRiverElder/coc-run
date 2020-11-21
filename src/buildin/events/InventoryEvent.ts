@@ -43,10 +43,16 @@ class InventoryEvent extends GameEvent {
 
     onInput(game: Game, option: Option) {
         if (typeof option.tag === 'number') {
+            const uid: number = option.tag;
             const p = game.getPlayer();
-            const item = p.inventory.get(option.tag);
-            if (item) {
-                p.holdItem(game, (item.uid === p.holdingItem?.uid) ? null : item);
+
+            if (uid === p.holdingItem?.uid) {
+                p.holdItem(game, null);
+            } else {
+                const item = p.inventory.get(option.tag);
+                if (item) {
+                    p.holdItem(game, item);
+                }
             }
         }
         game.endEvent(this);
