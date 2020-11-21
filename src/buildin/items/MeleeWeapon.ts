@@ -19,9 +19,9 @@ class MeleeWeapon extends Item {
         this.damage = data.damage;
     }
 
-    onAttack(entity: LivingEntity, game: Game) {
+    onAttack(game: Game, entity: LivingEntity) {
         const dmg = rollDice(this.damage);
-        entity.mutateValue('health', -dmg, game, `受到${this.name}攻击`);
+        entity.mutateValue(game, 'health', -dmg, `受到${this.name}攻击`);
     }
 
     previewDamage(game: Game, entity: LivingEntity): string {

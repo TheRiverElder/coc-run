@@ -1,10 +1,7 @@
 import MonsterEntity from "./buildin/entities/MonsterEntity";
-import eventPurse from "./buildin/events/purse";
-import eventRob from "./buildin/events/rob";
 import { Game, GameData, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "./interfaces/interfaces";
-import { testChance } from "./utils/game-utils";
 import { randInt } from "./utils/math";
-import SiteInvestigationEntity from "./buildin/entities/SiteInvestigationEntity";
+import InvestigationEntity from "./buildin/entities/InvestigationEntity";
 import EventTriggerEntity from "./buildin/entities/EventTriggerEntity";
 import TextDisplayEvent from "./buildin/events/TextDisplayEvent";
 import SequenceEvent from "./buildin/events/SequenceEvent";
@@ -30,16 +27,14 @@ const data = {
                 id: 'ng_bridge',
                 name: '鼐沟桥',
                 entities: [new PortEntity({ target: 'hs_village' })],
-                onEnter: testChance(0.2, () => eventPurse),
             }),
-                new Site({
+            new Site({
                 id: 'hs_village',
                 name: '灴山村',
                 entities: [
                     new PortEntity({ target: 'main_streat'  }),
                     new PortEntity({ target: 'ng_bridge' }),
                 ],
-                onEnter: testChance(0.5, () => eventRob),
             }),
             new Site({
                 id: 'main_streat',
@@ -60,7 +55,7 @@ const data = {
                 name: '王屠户家',
                 entities: [
                     new PortEntity({ target: 'main_streat' }),
-                    new SiteInvestigationEntity({
+                    new InvestigationEntity({
                         results: [new ItemEntity({item: new MeleeWeapon({
                             name: '杀猪刀',
                             damage: { faces: 3, times: 2, fix: -1 },

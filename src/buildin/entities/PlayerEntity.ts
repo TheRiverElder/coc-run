@@ -32,7 +32,7 @@ class PlayerEntity extends LivingEntity {
         this.prevSite = data.prevSite;
     }
 
-    mutateValue(key: string, delta: number, game: Game, reason?: string): void {
+    mutateValue(game: Game, key: string, delta: number, reason?: string): void {
         switch(key) {
             case 'health': this.health += delta; break;
             case 'magic': this.magic += delta; break;
@@ -47,7 +47,7 @@ class PlayerEntity extends LivingEntity {
         }
     }
 
-    holdItem(item: Item | null, game: Game, replaceOption: 'drop' | 'restore' | 'delete' = 'restore'): void {
+    holdItem(game: Game, item: Item | null, replaceOption: 'drop' | 'restore' | 'delete' = 'restore'): void {
         const prevItem = this.holdingItem;
         this.holdingItem = item;
         if (item) {
@@ -58,18 +58,18 @@ class PlayerEntity extends LivingEntity {
         }
         if (!prevItem) return;
         switch (replaceOption) {
-            case 'drop': this.site.addEntity(new ItemEntity({ item: prevItem }), game); break;
+            case 'drop': this.site.addEntity(game, new ItemEntity({ item: prevItem })); break;
             case 'restore': this.inventory.add(prevItem); break;
             case 'delete': break;
         }
     }
 
-    goToSite(newSite: Site, game: Game): void {
+    goToSite(game: Game, newSite: Site): void {
         this.prevSite = this.site;
-        super.goToSite(newSite, game);
+        super.goToSite(game, newSite);
     }
 
-    addItemToInventory(item: Item, game: Game): boolean {
+    addItemToInventory(game: Game, item: Item): boolean {
         if (this.inventory.add(item)) {
             game.appendText(`${this.name}获得了${item.name}`, 'mutate');
             return true;
@@ -77,7 +77,7 @@ class PlayerEntity extends LivingEntity {
         return false;
     }
 
-    removeItemFromInventory(item: Item | number, game: Game, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
+    removeItemFromInventory(game: Game, item: Item | number, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
         if (typeof item === 'number') {
             const i = this.inventory.get(item);
             if (!i) return false;
@@ -85,7 +85,7 @@ class PlayerEntity extends LivingEntity {
         }
         if (!this.inventory.remove(item)) return false;
         switch (replaceOption) {
-            case 'drop': this.site.addEntity(new ItemEntity({ item, site: this.site }), game); break;
+            case 'drop': this.site.addEntity(game, new ItemEntity({ item, site: this.site })); break;
             case 'delete': break;
         }
         game.appendText(`${this.name}失去了${item.name}`, 'mutate');

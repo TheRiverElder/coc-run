@@ -27,7 +27,7 @@ class GameEvent implements Identical, Unique {
         return [];
     }
 
-    onInput(option: Option, game: Game): void {
+    onInput(game: Game, option: Option): void {
         game.appendText(`来自事件[${this.id}]`);
     }
 }

@@ -40,7 +40,7 @@ class CombatEvent extends GameEvent {
         ];
     }
 
-    onInput(option: Option, game: Game) {
+    onInput(game: Game, option: Option) {
         let escaped: boolean = false;
         const p = game.getPlayer();
         const e = this.enemy;
@@ -49,11 +49,11 @@ class CombatEvent extends GameEvent {
                 game.appendText(this.enemy.name + '躲开了你的攻击');
                 if (test(this.enemy.dexterity)) {
                     game.appendText('并给了你一拳');
-                    e.getWeapon().onAttack(p, game);
+                    e.getWeapon().onAttack(game, p);
                 }
             } else {
                 const weapon = p.getWeapon();
-                weapon.onAttack(e, game);
+                weapon.onAttack(game, e);
             }
         } else if (option.tag === 'escape') {
             if(test(p.dexterity) || !test(e.dexterity)) {
@@ -64,7 +64,7 @@ class CombatEvent extends GameEvent {
                 game.appendText('你没有逃跑成功');
                 if (test(this.enemy.strength)) {
                     game.appendText('而且还被爪子抓伤');
-                    e.getWeapon().onAttack(p, game);
+                    e.getWeapon().onAttack(game, p);
                 }
             }
         }
@@ -82,7 +82,7 @@ class CombatEvent extends GameEvent {
                 game.appendText('你逃过了它的偷袭');
             } else {
                 game.appendText('你被爪子抓伤');
-                e.getWeapon().onAttack(p, game);
+                e.getWeapon().onAttack(game, p);
             }
         }
     }

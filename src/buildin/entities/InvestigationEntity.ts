@@ -2,18 +2,18 @@ import { Game, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 import Entity from "./Entity";
 
-interface SiteInvestigationEntityData {
+interface InvestigationEntityData {
     results: Array<Entity>;
     counter?: number;
     chances?: number;
 }
 
-class SiteInvestigationEntity extends Entity {
+class InvestigationEntity extends Entity {
     results: Array<Entity>;
     counter: number;
     chances: number;
 
-    constructor(data: SiteInvestigationEntityData) {
+    constructor(data: InvestigationEntityData) {
         super({
             id: 'site_investigation', 
             name: 'site_investigation',
@@ -31,16 +31,16 @@ class SiteInvestigationEntity extends Entity {
         }];
     }
 
-    onInteract(option: Option, game: Game): void {
+    onInteract(game: Game, option: Option): void {
         const site = this.site;
         this.counter++;
         if (this.counter >= this.chances) {
-            site.removeEntity(this, game);
+            site.removeEntity(game, this);
         }
         if (test(game.getPlayer().insight)) {
             game.appendText('你似乎察觉到了什么');
-            site.removeEntity(this, game);
-            site.addEntities(this.results, game, true);
+            site.removeEntity(game, this);
+            site.addEntities(game, this.results, true);
         } else {
             if (this.counter >= this.chances) {
                 game.appendText('好像没发现什么，放弃吧');
@@ -52,4 +52,4 @@ class SiteInvestigationEntity extends Entity {
     }
 }
 
-export default SiteInvestigationEntity;
+export default InvestigationEntity;

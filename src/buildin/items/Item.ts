@@ -20,7 +20,7 @@ class Item implements Identical, Unique, Named {
         this.name = data.name;
     }
 
-    onAttack(entity: LivingEntity, game: Game) {
+    onAttack(game: Game, entity: LivingEntity) {
         // empty
     }
 

@@ -10,7 +10,7 @@ class MonsterEntity extends LivingEntity {
         });
     }
 
-    onDetect(entity: Entity, site: Site, game: Game) {
+    onDetect(game: Game, entity: Entity, site: Site) {
         if (entity.id === 'player' || entity instanceof PlayerEntity) {
             game.triggerEvent(new CombatEvent({
                 id: 'combat',

@@ -30,13 +30,13 @@ class ItemEntity extends Entity {
         }];
     }
 
-    onInteract(option: Option, game: Game) {
+    onInteract(game: Game, option: Option) {
         if (this.autoEquip) {
-            game.getPlayer().holdItem(this.item, game);
+            game.getPlayer().holdItem(game, this.item);
         } else {
-            game.getPlayer().addItemToInventory(this.item, game);
+            game.getPlayer().addItemToInventory(game, this.item);
         }
-        this.site.removeEntity(this, game);
+        this.site.removeEntity(game, this);
         game.showPortOptions();
     }
 }

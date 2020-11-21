@@ -28,12 +28,12 @@ class InspireEvent extends GameEvent {
         return []
     }
 
-    onInput(opt: Option, game: Game) {
+    onInput(game: Game, opt: Option) {
         const p = game.getPlayer();
         if (opt.tag === 'investigate') {
             if (test(p.insight)) {
                 game.appendText('你发现了一个看起来有意思的东西');
-                p.holdItem(this.item, game);
+                p.holdItem(game, this.item);
             } else {
                 game.appendText('可惜啥都没发现');
             }

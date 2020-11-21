@@ -36,7 +36,7 @@ class SequenceEvent extends GameEvent {
         return [this.joints[this.pointer - 1]];
     }
 
-    onInput(option: Option, game: Game): void {
+    onInput(game: Game, option: Option): void {
         this.nextEvent(game);
     }
 }

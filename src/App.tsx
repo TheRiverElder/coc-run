@@ -153,7 +153,7 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
     this.resetting = true;
     this.currentState = this.props.data.initialize();
     const player = this.currentState.player;
-    player.site.addEntity(player, this);
+    player.site.addEntity(this, player);
     this.setState(this.currentState);
     this.refreshOptions();
     this.resetting = false;
@@ -187,13 +187,13 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
       this.reset();
     } else if (option.tag === '__inventory__') {
       this.triggerEvent(new InventoryEvent());
-    }else if (s.events.length > 0) {
+    } else if (s.events.length > 0) {
       const event = s.events[s.events.length - 1];
-      event.onInput(option, this);
+      event.onInput(this, option);
     } else if (option.entityUid) {
       const entity = s.player.site.entities.get(option.entityUid);
       if (entity) {
-        entity.onInteract(option, this)
+        entity.onInteract(this, option)
       }
     } else if (Array.isArray(option.tag)) {
       this.execCmd(option.tag);

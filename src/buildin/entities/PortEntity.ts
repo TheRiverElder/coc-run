@@ -30,11 +30,11 @@ class PortEntity extends Entity {
         }];
     }
 
-    onInteract(option: Option, game: Game) {
+    onInteract(game: Game, option: Option) {
         if (option.tag === this.uid) {
             const site = game.getMap().get(this.target);
             if (site) {
-                game.getPlayer().goToSite(site, game);
+                game.getPlayer().goToSite(game, site);
                 game.timePass(this.timeCost);
             }
         }

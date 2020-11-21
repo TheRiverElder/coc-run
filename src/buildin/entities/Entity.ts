@@ -23,16 +23,16 @@ class Entity implements Identical, Unique, Named {
         this.site = data.site || Site.FAKE_SITE;
     }
 
-    onDetect(entity: Entity, site: Site, game: Game) {
+    onDetect(game: Game, entity: Entity, site: Site) {
         // empty
     }
 
-    goToSite(newSite: Site, game: Game, silient: boolean = false): void {
-        this.site.removeEntity(this, game);
+    goToSite(game: Game, newSite: Site, silient: boolean = false): void {
+        this.site.removeEntity(game, this);
         if (silient) {
             newSite.entities.add(this);
         } else {
-            newSite.addEntity(this, game);
+            newSite.addEntity(game, this);
         }
         this.site = newSite;
     }
@@ -45,7 +45,7 @@ class Entity implements Identical, Unique, Named {
         return [];
     }
 
-    onInteract(option: Option, game: Game): void {
+    onInteract(game: Game, option: Option): void {
         // if (option.tag === this.uid) {
         //     game.appendText(this.name);
         // }

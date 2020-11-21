@@ -26,10 +26,10 @@ class EventTriggerEntity extends Entity {
         return [this.option];
     }
 
-    onInteract(option: Option, game: Game) {
+    onInteract(game: Game, option: Option) {
         game.triggerEvent(this.event);
         if (this.once) {
-            this.site.removeEntity(this, game);
+            this.site.removeEntity(game, this);
         }
     }
 }

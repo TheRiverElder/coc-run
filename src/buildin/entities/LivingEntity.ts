@@ -33,7 +33,7 @@ class LivingEntity extends Entity {
         this.loots = data.loots?.map(e => e instanceof Item ? new ItemEntity({ item: e }) : e) || [];
     }
 
-    mutateValue(key: string, delta: number, game: Game, reason?: string): void {
+    mutateValue(game: Game, key: string, delta: number, reason?: string): void {
         switch(key) {
             case 'health': this.health += delta; break;
             case 'strength': this.strength += delta; break;
@@ -42,14 +42,14 @@ class LivingEntity extends Entity {
         game.appendText(`${this.name} ${reason || ''} ${game.translate(key)} ${num2strWithSign(delta)}`);
         if (!this.isAlive()) {
             game.appendText(`${this.name}死亡`);
-            this.site.addEntities(this.loots, game);
-            this.site.removeEntity(this, game);
+            this.site.addEntities(game, this.loots);
+            this.site.removeEntity(game, this);
         }
     }
 
-    goToSite(newSite: Site, game: Game): void {
+    goToSite(game: Game, newSite: Site): void {
         game.appendText(`${this.name}来到了${newSite.name}`, 'mutate');
-        super.goToSite(newSite, game);
+        super.goToSite(game, newSite);
     }
 
     getWeapon(): Item {
