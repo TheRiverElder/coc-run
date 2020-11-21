@@ -20,9 +20,16 @@ interface AppState extends GameState {
   showOptions: boolean;
 }
 
+interface AppProps {
+  data: GameData;
+  debugMode?: boolean;
+}
+
 const values = ['magic', 'money', 'insight', 'strength', 'dexterity'];
 
-class App extends React.Component<{ data: GameData }, AppState> implements Game {
+class App extends React.Component<AppProps, AppState> implements Game {
+
+  public debugMode: boolean;
 
   private textListEl: RefObject<HTMLDivElement>;
   private resetting: boolean = false;
@@ -31,8 +38,9 @@ class App extends React.Component<{ data: GameData }, AppState> implements Game 
   private gameOverMessage: string = '';
   private currentState: GameState;
 
-  constructor(props: { data: GameData }) {
+  constructor(props: AppProps) {
     super(props);
+    this.debugMode = props.debugMode || false;
     this.textListEl = React.createRef<HTMLDivElement>();
 
     this.currentState = props.data.initialize();

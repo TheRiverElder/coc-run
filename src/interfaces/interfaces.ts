@@ -20,6 +20,8 @@ interface GameState {
 };
 
 interface Game {
+    debugMode: boolean;
+
     timePass(change: number, isInNextDay?: boolean): number;
 
     reset(): void;

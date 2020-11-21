@@ -10,7 +10,7 @@ polyfill();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App data={data}/>
+    <App data={data} debugMode={new URLSearchParams(window.location.search).get('debug-mode') === 'true'} />
   </React.StrictMode>,
   document.getElementById('root')
 );

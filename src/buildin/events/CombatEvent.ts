@@ -37,14 +37,22 @@ class CombatEvent extends GameEvent {
                 rightText: `${player.dexterity}%`,
                 tag: 'escape',
             },
-        ];
+        ].concat(game.debugMode ? [{
+            text: `一击必杀`,
+            leftText: '💻',
+            rightText: `调试模式`,
+            tag: 'one_punch',
+        }] : []);
     }
 
     onInput(game: Game, option: Option) {
         let escaped: boolean = false;
         const p = game.getPlayer();
         const e = this.enemy;
-        if (option.tag === 'attack') {
+
+        if (option.tag === 'one_punch') {
+            e.mutateValue(game, 'health', -e.health, '因为苟管理');
+        } else if (option.tag === 'attack') {
             if (test(this.enemy.dexterity)) {
                 game.appendText(this.enemy.name + '躲开了你的攻击');
                 if (test(this.enemy.dexterity)) {
