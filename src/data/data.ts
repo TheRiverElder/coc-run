@@ -1,11 +1,13 @@
-import MonsterEntity from "./buildin/entities/MonsterEntity";
-import { Game, GameData, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "./interfaces/interfaces";
-import { randInt } from "./utils/math";
-import InvestigationEntity from "./buildin/entities/InvestigationEntity";
-import EventTriggerEntity from "./buildin/entities/EventTriggerEntity";
-import TextDisplayEvent from "./buildin/events/TextDisplayEvent";
-import SequenceEvent from "./buildin/events/SequenceEvent";
-import GameOverEvent from "./buildin/events/GameOverEvent";
+import MonsterEntity from "../buildin/entities/MonsterEntity";
+import { Game, GameData, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "../interfaces/interfaces";
+import { randInt } from "../utils/math";
+import InvestigationEntity from "../buildin/entities/InvestigationEntity";
+import EventTriggerEntity from "../buildin/entities/EventTriggerEntity";
+import TextDisplayEvent from "../buildin/events/TextDisplayEvent";
+import SequenceEvent from "../buildin/events/SequenceEvent";
+import GameOverEvent from "../buildin/events/GameOverEvent";
+import translation from "./translation";
+import { findByPathStr } from "../utils/strings";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -99,7 +101,7 @@ const data = {
                         option: { text: '跳入其中', leftText: '🏊‍' },
                         event: new SequenceEvent({
                             events: [
-                                new TextDisplayEvent({ texts: [{ text: 'end_text', translated: true }] }),
+                                new TextDisplayEvent({ texts: [{ text: 'story.end', translated: true }] }),
                                 new GameOverEvent({ reason: '完美通关' })
                             ],
                             joints: [{ text: '结束了' }]
@@ -142,30 +144,7 @@ const data = {
         game.appendText("你是小江，少小离村去了城里，不常回来，最近家里说有事情找你，立刻回去，于是你收拾好了行装。");
     },
     translate(key: string) {
-        return (this.translation as any)[key] || key;
-    },
-    translation: {
-        money: '金钱',
-        health: '体力',
-        magic: '魔力',
-        strength: '力量',
-        dexterity: '敏捷',
-        insight: '洞察',
-        end_text:  `
-            你发现了地下有一条暗黑的河流，甚至手电筒的关联都不能照亮它一毫
-            仿佛有一种声音在召唤你，让你向它靠近
-            正在思考眼前的一切时，你已经来到了暗河边
-            
-            你跳入了这条河流
-            没有一丝丝冰凉或溺水的痛苦，也没有任何其它感觉
-            你能感受到河水带着你飘向了无尽的黑暗深渊
-            可是你却丝毫不想反抗
-
-            不知道过了多久后，你醒了
-
-            在清晨的阳光中，病床上的你睁开双眼
-            询问护士的结果是，有人在海边发现了你，神志不清
-        `
+        return findByPathStr(translation, key, key.indexOf('.') >= 0 ? '' : 'text') || key;
     },
 };
 

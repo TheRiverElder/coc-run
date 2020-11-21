@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import data from './data';
+import data from './data/data';
 import polyfill from './utils/polyfill'
 
 polyfill();
