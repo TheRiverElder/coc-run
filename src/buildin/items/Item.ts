@@ -21,11 +21,11 @@ class Item implements Identical, Unique, Named {
     }
 
     onAttack(game: Game, entity: LivingEntity): Damage {
-        return { value: 0, type: 'fist' };
+        return { value: 0, type: 'melee' };
     }
 
     previewDamage(game: Game, entity?: LivingEntity): string {
-        return '';
+        return '0';
     }
 }
 

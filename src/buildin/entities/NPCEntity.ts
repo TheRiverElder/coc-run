@@ -26,7 +26,7 @@ class NPCEntity extends LivingEntity {
     }
 
     onDetect(game: Game, entity: Entity, site: Site) {
-        if (entity.id === 'player') {
+        if (entity.id === 'player' && !this.takled) {
             this.talk(game);
         }
     }

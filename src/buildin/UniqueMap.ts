@@ -41,6 +41,23 @@ class UniqueMap<T extends Unique> {
     get size(): number {
         return this.map.size;
     }
+
+    clear(): void {
+        this.map.clear();
+    }
+
+    forEach(fn: (elem: T) => void): void {
+        return this.map.forEach(fn);
+    }
+
+    find(fn: (elem: T) => boolean): T | undefined {
+        for (const elem of Array.from(this.map.values())) {
+            if (fn(elem)) {
+                return elem;
+            }
+        }
+        return undefined;
+    }
 }
 
 export default UniqueMap;

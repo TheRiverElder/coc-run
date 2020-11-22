@@ -69,6 +69,17 @@ class PlayerEntity extends LivingEntity {
         super.goToSite(game, newSite);
     }
 
+    goBack(game: Game): boolean {
+        if (this.prevSite) {
+            const currentSite = this.site;
+            super.goToSite(game, this.prevSite);
+            this.prevSite = currentSite;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     addItemToInventory(game: Game, item: Item): boolean {
         if (this.inventory.add(item)) {
             game.appendText(`${this.name}获得了${item.name}`, 'mutate');

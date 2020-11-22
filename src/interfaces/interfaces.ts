@@ -39,6 +39,10 @@ interface Game {
     getMap(): Map<string, Site>;
 
     translate(key: string): string;
+
+    getEntity(uid: number): Entity | undefined;
+    recordAddEntity(entity: Entity): void;
+    recordRemoveEntity(entity: Entity): void;
 }
 
 interface GameData {

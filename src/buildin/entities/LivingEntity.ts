@@ -44,7 +44,7 @@ class LivingEntity extends Entity {
             case 'dexterity': this.dexterity += delta; break;
         }
         game.appendText(`${this.name} ${reason || ''} ${game.translate(key)} ${num2strWithSign(delta)}`);
-        if (!this.isAlive()) {
+        if (this.health <= 0) {
             game.appendText(`${this.name}死亡`);
             this.site.addEntities(game, this.loots);
             this.site.removeEntity(game, this);

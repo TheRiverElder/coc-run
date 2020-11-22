@@ -1,7 +1,7 @@
 import React, { MouseEventHandler, RefObject } from 'react';
 import './App.css';
 import InventoryEvent from './buildin/events/InventoryEvent';
-import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
+import { Game, GameState, Option, Text, GameEvent, GameData, Site, UniqueMap, Entity } from './interfaces/interfaces';
 import { copy, findByPath } from './utils/objects';
 
 function OptionBtn(props: { option: Option, className: string, onClick: MouseEventHandler }) {
@@ -37,6 +37,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   private pid: NodeJS.Timeout | null = null;
   private gameOverMessage: string = '';
   private currentState: GameState;
+  private entityMap: UniqueMap<Entity> = new UniqueMap<Entity>();
 
   constructor(props: AppProps) {
     super(props);
@@ -49,7 +50,6 @@ class App extends React.Component<AppProps, AppState> implements Game {
       showOptions: true, 
       showInventory: false,
     });
-    this.props.data.start(this);
   }
 
   render() {
@@ -162,12 +162,25 @@ class App extends React.Component<AppProps, AppState> implements Game {
     this.currentState = this.props.data.initialize();
     const player = this.currentState.player;
     player.site.addEntity(this, player);
-    this.setState(this.currentState);
+    this.entityMap.clear();
+    this.currentState.map.forEach(s => s.entities.forEach(this.recordAddEntity.bind(this)))
     this.refreshOptions();
     this.resetting = false;
     this.appendText('开始游戏', 'system');
     this.props.data.start(this);
     this.applyChange();
+  }
+
+  getEntity(uid: number): Entity | undefined {
+    return this.entityMap.get(uid);
+  }
+
+  recordAddEntity(entity: Entity): void {
+    this.entityMap.add(entity);
+  }
+  
+  recordRemoveEntity(entity: Entity): void {
+    this.entityMap.remove(entity);
   }
   
   takeScreenshot() {

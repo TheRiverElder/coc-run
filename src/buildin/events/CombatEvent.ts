@@ -83,7 +83,7 @@ class CombatEvent extends GameEvent {
         if (escaped) {
             game.appendText(`你成功逃离了${this.enemy.name}的追杀`);
 			if (p.prevSite) {
-				p.goToSite(game, p.prevSite);
+				p.goBack(game);
 			}
         } else {
             game.appendText(`${this.enemy.name}依然存活(${this.enemy.health}/${this.enemy.maxHealth})`);

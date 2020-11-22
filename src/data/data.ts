@@ -22,17 +22,19 @@ const data = {
                 name: '巴士车站',
                 entities: [
                     new PortEntity({ target: 'ng_bridge' }),
+                    new EventTriggerEntity({
+                        option: { text: '还是回城里吧', leftText: '🏙' },
+                        event: new GameOverEvent({ reason: '因为你是头号玩家' }),
+                        once: true,
+                    }),
                 ],
-                onEnter: (game: Game) => game.setOptions([
-                    { text: '到村子里去', tag: ['player', 'goToSite', ['hs_village']] },
-                    { text: '回城里', tag: ['gameOver', ['小江坐上了离开的巴士。']] },
-                ]),
             }),
             new Site({
                 id: 'ng_bridge',
                 name: '鼐沟桥',
                 entities: [
                     new PortEntity({ target: 'hs_village' }),
+                    new PortEntity({ target: 'bus_stop' }),
                     new NPCEntity({
                         name: '不修边幅的老者',
                         health: 7,
@@ -161,7 +163,7 @@ const data = {
         };
     },
     start: (game: Game) => {
-        game.appendText("你是小江，少小离村去了城里，不常回来，最近家里说有事情找你，立刻回去，于是你收拾好了行装。");
+        game.appendText({ text: 'story.start', translated: true });
     },
     translate(key: string): string {
         const result = findByPathStr(translation, key, key.indexOf('.') >= 0 ? '' : 'text') || key;
