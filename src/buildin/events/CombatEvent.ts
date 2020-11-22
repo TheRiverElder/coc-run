@@ -5,10 +5,12 @@ interface CombatEventData {
     enemy: LivingEntity;
     priority?: number;
     uid?: number;
+    playerFirst?: boolean;
 }
 
 class CombatEvent extends GameEvent {
     enemy: LivingEntity;
+    playerFirst: boolean;
 
     constructor(data: CombatEventData) {
         super({
@@ -17,16 +19,16 @@ class CombatEvent extends GameEvent {
             priority: 10,
         });
         this.enemy = data.enemy;
+        this.playerFirst = data.playerFirst || false;
     }
 
     onStart(game: Game) {
         const e = this.enemy;
         game.appendText(`在你面前的是一个如暗夜般漆黑的怪物——${e.name}(${e.health}/${e.maxHealth})`);
         
-
-        if (e.health <= 0) {
-            game.appendText('你打败了' + this.enemy.name);
-            game.endEvent(this);
+        if (this.playerFirst) {
+            game.getPlayer().attack(game, e);
+            this.checkCombatEnd(game);
         }
     }
 
@@ -76,10 +78,9 @@ class CombatEvent extends GameEvent {
             }
         }
 
-        if (e.health <= 0) {
-            game.appendText('你打败了' + this.enemy.name);
-            game.endEvent(this);
-        } else if (escaped) {
+        if (this.checkCombatEnd(game)) return;
+
+        if (escaped) {
             game.appendText(`你成功逃离了${this.enemy.name}的追杀`);
 			if (p.prevSite) {
 				p.goToSite(game, p.prevSite);
@@ -88,6 +89,15 @@ class CombatEvent extends GameEvent {
             game.appendText(`${this.enemy.name}依然存活(${this.enemy.health}/${this.enemy.maxHealth})`);
             e.attack(game, p);
         }
+    }
+
+    checkCombatEnd(game: Game): boolean {
+        if (this.enemy.health <= 0) {
+            game.appendText('你打败了' + this.enemy.name);
+            game.endEvent(this);
+            return true;
+        }
+        return false;
     }
 }
 

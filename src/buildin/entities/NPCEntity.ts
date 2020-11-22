@@ -50,7 +50,7 @@ class NPCEntity extends LivingEntity {
         if (option.tag === 'talk') {
             this.talk(game);
         } else if (option.tag === 'attack') {
-            game.triggerEvent(new CombatEvent({ enemy: this }));
+            game.triggerEvent(new CombatEvent({ enemy: this, playerFirst: true }));
         }
     }
 
