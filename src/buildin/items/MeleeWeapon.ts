@@ -1,5 +1,5 @@
 import { Game } from "../../interfaces/interfaces";
-import { Dice } from "../../interfaces/types";
+import { Damage, Dice } from "../../interfaces/types";
 import { rollDice } from "../../utils/math";
 import LivingEntity from "../entities/LivingEntity";
 import Item, { ItemData } from "./Item";
@@ -19,9 +19,11 @@ class MeleeWeapon extends Item {
         this.damage = data.damage;
     }
 
-    onAttack(game: Game, entity: LivingEntity) {
-        const dmg = rollDice(this.damage);
-        entity.mutateValue(game, 'health', -dmg, `受到${this.name}攻击`);
+    onAttack(game: Game, entity: LivingEntity): Damage {
+        return {
+            value: rollDice(this.damage),
+            type: 'melee',
+        };
     }
 
     previewDamage(game: Game, entity: LivingEntity): string {

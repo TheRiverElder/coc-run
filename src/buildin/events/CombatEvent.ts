@@ -39,7 +39,7 @@ class CombatEvent extends GameEvent {
             },
         ].concat(game.debugMode ? [{
             text: `一击必杀`,
-            leftText: '💻',
+            leftText: '💀',
             rightText: `调试模式`,
             tag: 'one_punch',
         }] : []);
@@ -53,45 +53,31 @@ class CombatEvent extends GameEvent {
         if (option.tag === 'one_punch') {
             e.mutateValue(game, 'health', -e.health, '因为苟管理');
         } else if (option.tag === 'attack') {
-            if (test(this.enemy.dexterity)) {
-                game.appendText(this.enemy.name + '躲开了你的攻击');
-                if (test(this.enemy.dexterity)) {
-                    game.appendText('并给了你一拳');
-                    e.getWeapon().onAttack(game, p);
-                }
-            } else {
-                const weapon = p.getWeapon();
-                weapon.onAttack(game, e);
-            }
+            p.attack(game, e);
         } else if (option.tag === 'escape') {
             if(test(p.dexterity) || !test(e.dexterity)) {
                 escaped = true;
-                game.appendText('你逃了出去');
                 game.endEvent(this);
             } else {
                 game.appendText('你没有逃跑成功');
                 if (test(this.enemy.strength)) {
                     game.appendText('而且还被爪子抓伤');
-                    e.getWeapon().onAttack(game, p);
+                    p.onReceiveDamage(game, e.getWeapon().onAttack(game, p), e, true);
                 }
             }
         }
 
-        if (this.enemy.health <= 0) {
+        if (e.health <= 0) {
             game.appendText('你打败了' + this.enemy.name);
             game.endEvent(this);
-            // game.triggerEvent('end');
         } else if (escaped) {
             game.appendText(`你成功逃离了${this.enemy.name}的追杀`);
+			if (p.prevSite) {
+				p.goToSite(game, p.prevSite);
+			}
         } else {
             game.appendText(`${this.enemy.name}依然存活(${this.enemy.health}/${this.enemy.maxHealth})`);
-            game.appendText(`到了${this.enemy.name}的回合`);
-            if (test(game.getPlayer().dexterity)) {
-                game.appendText('你逃过了它的偷袭');
-            } else {
-                game.appendText('你被爪子抓伤');
-                e.getWeapon().onAttack(game, p);
-            }
+            e.attack(game, p);
         }
     }
 }

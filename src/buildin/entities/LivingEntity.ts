@@ -1,10 +1,12 @@
-import { Dice, Game, Item, ItemEntity, MeleeWeapon, Site } from "../../interfaces/interfaces";
+import { Damage, Dice, Game, Item, ItemEntity, MeleeWeapon, Site } from "../../interfaces/interfaces";
+import { test } from "../../utils/math";
 import { num2strWithSign } from "../../utils/strings";
 import Entity, { EntityData } from "./Entity";
 
 interface LivingEntityData extends EntityData {
     health: number;
     maxHealth: number;
+    shield?: number;
     strength: number;
     dexterity: number;
     baseDamage: Dice | number;
@@ -16,6 +18,7 @@ class LivingEntity extends Entity {
     
     health: number;
     maxHealth: number;
+    shield: number;
     strength: number;
     dexterity: number;
     baseDamage: Dice | number;
@@ -26,6 +29,7 @@ class LivingEntity extends Entity {
         super(data);
         this.health = data.health;
         this.maxHealth = data.maxHealth;
+        this.shield = data.shield || 0;
         this.strength = data.strength;
         this.dexterity = data.dexterity;
         this.baseDamage = data.baseDamage;
@@ -44,6 +48,41 @@ class LivingEntity extends Entity {
             game.appendText(`${this.name}死亡`);
             this.site.addEntities(game, this.loots);
             this.site.removeEntity(game, this);
+        }
+    }
+
+    attack(game: Game, target: LivingEntity, isFightBack: boolean = false): Damage {
+        const weapon = this.getWeapon();
+        const damage: Damage = weapon.onAttack(game, target);
+        this.onAttack(game, damage, target);
+        if (damage.value) {
+            target.onReceiveDamage(game, damage, this, isFightBack);
+        }
+        return damage;
+    }
+
+    onAttack(game: Game, damage: Damage, target: LivingEntity): void {
+        // empty
+    }
+
+    onReceiveDamage(game: Game, damage: Damage, source: LivingEntity, isFightBack: boolean = false) {
+        if (!isFightBack) {
+            if (test(this.dexterity)) {
+                const s = `${this.name}躲过了${source.name}的进攻`;
+                if (test(this.dexterity)) {
+                    game.appendText(s + `，并返回打一把`);
+                    this.attack(game, source, true);
+                } else {
+                    game.appendText(s);
+                }
+                return;
+            }
+        }
+        damage.value = Math.max(0, damage.value - this.shield);
+        if (damage.value) {
+            this.mutateValue(game, 'health', -damage.value, `受到${source.name}攻击`);
+        } else {
+            game.appendText(`${this.name}的护甲防住了${source.name}的攻势`);
         }
     }
 

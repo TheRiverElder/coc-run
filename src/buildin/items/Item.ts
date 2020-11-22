@@ -1,5 +1,5 @@
 import { Game } from "../../interfaces/interfaces";
-import { Identical, Named, Unique } from "../../interfaces/types";
+import { Damage, Identical, Named, Unique } from "../../interfaces/types";
 import { genUid } from "../../utils/math";
 import LivingEntity from "../entities/LivingEntity";
 
@@ -20,8 +20,8 @@ class Item implements Identical, Unique, Named {
         this.name = data.name;
     }
 
-    onAttack(game: Game, entity: LivingEntity) {
-        // empty
+    onAttack(game: Game, entity: LivingEntity): Damage {
+        return { value: 0, type: 'fist' };
     }
 
     previewDamage(game: Game, entity?: LivingEntity): string {
