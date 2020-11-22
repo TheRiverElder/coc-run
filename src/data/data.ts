@@ -164,6 +164,7 @@ const data = {
     },
     start: (game: Game) => {
         game.appendText({ text: 'story.start', translated: true });
+        game.getPlayer().goToSite(game, game.getMap().get('bus_stop') as Site);
     },
     translate(key: string): string {
         const result = findByPathStr(translation, key, key.indexOf('.') >= 0 ? '' : 'text') || key;

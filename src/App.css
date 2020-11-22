@@ -45,7 +45,8 @@ html, body, #root, .App {
   font-size: 0.8em;
   flex: 0 0 0;
   border-bottom: .1em dashed black;
-  box-shadow: #dddddd 0 .2em .2em;
+  box-shadow: #0000002f 0 .2em .2em;
+  z-index: 1;
 }
 
 .state-bar .values {
@@ -95,7 +96,8 @@ html, body, #root, .App {
   height: 30%;
   overflow: auto;
   background-color: #282c34;
-  box-shadow: #dddddd 0 -0.2em .2em;
+  box-shadow: #0000002f 0 -0.2em .2em;
+  z-index: 1;
 }
 
 .text, .option {

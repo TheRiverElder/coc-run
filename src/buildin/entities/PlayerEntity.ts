@@ -70,7 +70,7 @@ class PlayerEntity extends LivingEntity {
     }
 
     goBack(game: Game): boolean {
-        if (this.prevSite) {
+        if (this.prevSite && this.prevSite !== Site.FAKE_SITE) {
             const currentSite = this.site;
             super.goToSite(game, this.prevSite);
             this.prevSite = currentSite;
