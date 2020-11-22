@@ -1,5 +1,5 @@
 import MonsterEntity from "../buildin/entities/MonsterEntity";
-import { Game, GameData, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "../interfaces/interfaces";
+import { Game, GameData, Item, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "../interfaces/interfaces";
 import { randInt } from "../utils/math";
 import InvestigationEntity from "../buildin/entities/InvestigationEntity";
 import EventTriggerEntity from "../buildin/entities/EventTriggerEntity";
@@ -8,6 +8,7 @@ import SequenceEvent from "../buildin/events/SequenceEvent";
 import GameOverEvent from "../buildin/events/GameOverEvent";
 import translation from "./translation";
 import { findByPathStr } from "../utils/strings";
+import NPCEntity from "../buildin/entities/NPCEntity";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -19,7 +20,9 @@ const data = {
             new Site({
                 id: 'bus_stop',
                 name: '巴士车站',
-                entities: [new PortEntity({ target: 'ng_bridge' })],
+                entities: [
+                    new PortEntity({ target: 'ng_bridge' }),
+                ],
                 onEnter: (game: Game) => game.setOptions([
                     { text: '到村子里去', tag: ['player', 'goToSite', ['hs_village']] },
                     { text: '回城里', tag: ['gameOver', ['小江坐上了离开的巴士。']] },
@@ -28,7 +31,21 @@ const data = {
             new Site({
                 id: 'ng_bridge',
                 name: '鼐沟桥',
-                entities: [new PortEntity({ target: 'hs_village' })],
+                entities: [
+                    new PortEntity({ target: 'hs_village' }),
+                    new NPCEntity({
+                        name: '不修边幅的老者',
+                        health: 7,
+                        maxHealth: 7,
+                        strength: 30,
+                        dexterity: 30,
+                        baseDamage: 1,
+                        baseWeaponName: '拳头',
+                        loots: [new Item({ name: '拐弯的木拐杖' })],
+                        text: { text: 'old_mans_talk', translated: true },
+                        idleText: { text: '有什么事吗？' },
+                    }),
+                ],
             }),
             new Site({
                 id: 'hs_village',

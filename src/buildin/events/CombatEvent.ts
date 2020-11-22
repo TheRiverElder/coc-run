@@ -1,9 +1,10 @@
 import { Game, GameEvent, LivingEntity, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
-import { EventData } from "../GameEvent";
 
-interface CombatEventData extends EventData {
+interface CombatEventData {
     enemy: LivingEntity;
+    priority?: number;
+    uid?: number;
 }
 
 class CombatEvent extends GameEvent {
@@ -12,13 +13,21 @@ class CombatEvent extends GameEvent {
     constructor(data: CombatEventData) {
         super({
             ...data,
+            id: 'combat',
             priority: 10,
         });
         this.enemy = data.enemy;
     }
 
     onStart(game: Game) {
-        game.appendText(`在你面前的是一个如暗夜般漆黑的怪物——${this.enemy.name}(${this.enemy.health}/${this.enemy.maxHealth})`);
+        const e = this.enemy;
+        game.appendText(`在你面前的是一个如暗夜般漆黑的怪物——${e.name}(${e.health}/${e.maxHealth})`);
+        
+
+        if (e.health <= 0) {
+            game.appendText('你打败了' + this.enemy.name);
+            game.endEvent(this);
+        }
     }
 
     onRender(game: Game): Array<Option> {
