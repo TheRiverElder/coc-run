@@ -15,9 +15,8 @@ function copy<T>(ori: T, shallow: boolean = false): T {
 
 function findByPath(o: any, path: Array<string>) {
     let w = o, p = null;
-    for (let i = 0; i < path.length; i++) {
+    for (let i = 0; i < path.length && w; i++) {
         const key = path[i];
-        if (!w[key]) break;
         p = w;
         w = w[key];
     }

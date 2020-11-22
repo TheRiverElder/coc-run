@@ -12,10 +12,7 @@ class MonsterEntity extends LivingEntity {
 
     onDetect(game: Game, entity: Entity, site: Site) {
         if (entity.id === 'player' || entity instanceof PlayerEntity) {
-            game.triggerEvent(new CombatEvent({
-                id: 'combat',
-                enemy: this,
-            }));
+            game.triggerEvent(new CombatEvent({ enemy: this }));
         }
     }
 }

@@ -41,8 +41,11 @@ const data = {
                         dexterity: 30,
                         baseDamage: 1,
                         baseWeaponName: '拳头',
-                        loots: [new Item({ name: '拐弯的木拐杖' })],
-                        text: { text: 'old_mans_talk', translated: true },
+                        loots: [
+                            new Item({ name: '扭曲的木拐杖' }),
+                            new Item({ name: '磨损的铜钱' }),
+                        ],
+                        text: { text: 'story.old_mans_talk', translated: true },
                         idleText: { text: '有什么事吗？' },
                     }),
                 ],
@@ -160,8 +163,9 @@ const data = {
     start: (game: Game) => {
         game.appendText("你是小江，少小离村去了城里，不常回来，最近家里说有事情找你，立刻回去，于是你收拾好了行装。");
     },
-    translate(key: string) {
-        return findByPathStr(translation, key, key.indexOf('.') >= 0 ? '' : 'text') || key;
+    translate(key: string): string {
+        const result = findByPathStr(translation, key, key.indexOf('.') >= 0 ? '' : 'text') || key;
+        return typeof result === 'string' ? result : String(result);
     },
 };
 
