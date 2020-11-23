@@ -34,6 +34,8 @@ interface Game {
 
     triggerEvent(event: GameEvent): void;
     endEvent(event: GameEvent): void;
+    refreshEvents(): void;
+    findEvent(v: number | string): GameEvent | undefined;
 
     getPlayer(): PlayerEntity;
     getMap(): Map<string, Site>;

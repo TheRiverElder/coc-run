@@ -262,6 +262,15 @@ class App extends React.Component<AppProps, AppState> implements Game {
     this.refreshOptions();
   }
 
+  refreshEvents(): void {
+    this.currentState.events.sort((a, b) => a.priority - b.priority);
+  }
+
+  findEvent(v: number | string): GameEvent | undefined {
+    const fn = typeof v === 'number' ? ((e: GameEvent) => e.uid === v) : ((e: GameEvent) => e.id === v);
+    return this.currentState.events.find(fn);
+  }
+
   refreshOptions() {
     const s = this.currentState;
     if (s.events.length > 0) {
@@ -273,9 +282,11 @@ class App extends React.Component<AppProps, AppState> implements Game {
   }
 
   openInventory() {
-    this.triggerEvent(new InventoryEvent());
-    this.refreshOptions();
-    this.applyChange();
+    if (!this.findEvent('inventory')) {
+      this.triggerEvent(new InventoryEvent());
+      this.refreshOptions();
+      this.applyChange();
+    }
   }
 
   showPortOptions() {
