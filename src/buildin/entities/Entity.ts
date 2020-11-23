@@ -1,5 +1,5 @@
 import { Game, Option } from "../../interfaces/interfaces";
-import { Identical, Named, Unique } from "../../interfaces/types";
+import { Identical, Named, Subopt, Unique } from "../../interfaces/types";
 import { genUid } from "../../utils/math";
 import Site from "../Site";
 
@@ -45,7 +45,7 @@ class Entity implements Identical, Unique, Named {
         return [];
     }
 
-    onInteract(game: Game, option: Option): void {
+    onInteract(game: Game, option: Option, subopt: Subopt | null): void {
         // if (option.tag === this.uid) {
         //     game.appendText(this.name);
         // }

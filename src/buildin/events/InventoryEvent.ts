@@ -1,4 +1,5 @@
 import { Game, GameEvent, Option } from "../../interfaces/interfaces";
+import { Subopt } from "../../interfaces/types";
 
 class InventoryEvent extends GameEvent {
 
@@ -19,14 +20,18 @@ class InventoryEvent extends GameEvent {
         );
     }
 
-    onRender(game: Game) {
+    onRender(game: Game): Array<Option> {
         const p = game.getPlayer();
-        const options = [
+        const options: Array<Option> = [
             { text: '返回' },
             ...p.inventory.values().map(i => ({ 
-                text: '拿上' + i.name,
+                text: i.name,
                 leftText: '🤜',
                 rightText: i.previewDamage(game),
+                subopts: [
+                    { text: '装备', tag: 'hold' },
+                    { text: '丢弃', tag: 'drop' },
+                ],
                 tag: i.uid,
             })),
         ];
@@ -41,7 +46,7 @@ class InventoryEvent extends GameEvent {
         return options;
     }
 
-    onInput(game: Game, option: Option) {
+    onInput(game: Game, option: Option, subopt: Subopt) {
         if (typeof option.tag === 'number') {
             const uid: number = option.tag;
             const p = game.getPlayer();
@@ -51,11 +56,16 @@ class InventoryEvent extends GameEvent {
             } else {
                 const item = p.inventory.get(option.tag);
                 if (item) {
-                    p.holdItem(game, item);
+                    if (subopt.tag === 'hold') {
+                        p.holdItem(game, item);
+                    } else if (subopt.tag === 'drop') {
+                        p.removeItemFromInventory(game, item, 'drop');
+                    }
                 }
             }
+        } else {
+            game.endEvent(this);
         }
-        game.endEvent(this);
     }
 }
 

@@ -1,16 +1,19 @@
-import React, { MouseEventHandler, RefObject } from 'react';
+import React, { RefObject } from 'react';
 import './App.css';
 import InventoryEvent from './buildin/events/InventoryEvent';
 import { Game, GameState, Option, Text, GameEvent, GameData, Site, UniqueMap, Entity } from './interfaces/interfaces';
+import { Subopt } from './interfaces/types';
 import { copy, findByPath } from './utils/objects';
 
-function OptionBtn(props: { option: Option, className: string, onClick: MouseEventHandler }) {
+function OptionBtn(props: { option: Option, className: string, onClick: (option: Option, subopt: Subopt | null) => void }) {
   const { className, option, onClick } = props;
   return (
-    <button className={className} onClick={onClick}>
+    <button className={className} onClick={option.subopts ? undefined : () => onClick(option, null)}>
       {option.leftText ? <span className="option-side-text left">{option.leftText}</span> : null}
-      {option.text}
       {option.rightText ? <span className="option-side-text right">{option.rightText}</span> : null}
+
+      {option.text}
+      {option.subopts ? option.subopts.map((s, i) => (<span key={i} className="subopt" onClick={() => onClick(option, s)}>{s.text}</span>)) : null}
     </button>
   );
 }
@@ -85,7 +88,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
                 key={i} 
                 className="option"
                 option={o}
-                onClick={this.handleClickOption.bind(this, o, i)}
+                onClick={this.handleClickOption.bind(this)}
               />
             )) 
             : <button className="option skip-btn"onClick={this.flushText.bind(this, true)}> -=快进=- </button>
@@ -198,7 +201,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   }
 
   // 相当于游戏的主循环
-  handleClickOption(option: Option, index: number) {
+  handleClickOption(option: Option, subopt: Subopt | null) {
     this.appendText(option.text, 'self');
     // this.takeScreenshot();
     this.showPortOptions();
@@ -210,11 +213,11 @@ class App extends React.Component<AppProps, AppState> implements Game {
       this.triggerEvent(new InventoryEvent());
     } else if (s.events.length > 0) {
       const event = s.events[s.events.length - 1];
-      event.onInput(this, option);
+      event.onInput(this, option, subopt);
     } else if (option.entityUid) {
       const entity = s.player.site.entities.get(option.entityUid);
       if (entity) {
-        entity.onInteract(this, option)
+        entity.onInteract(this, option, subopt);
       }
     } else if (Array.isArray(option.tag)) {
       this.execCmd(option.tag);

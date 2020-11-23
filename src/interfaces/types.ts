@@ -20,8 +20,14 @@ interface Option {
     text: string;
     leftText?: string;
     rightText?: string;
+    subopts?: Array<Subopt>;
     tag?: any;
     entityUid?: number;
+}
+
+interface Subopt {
+    text: string;
+    tag?: any;
 }
 
 interface Dice {
@@ -43,6 +49,7 @@ export type {
     
     Text,
     Option,
+    Subopt,
 
     Dice,
     Damage,

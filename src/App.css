@@ -149,6 +149,13 @@ html, body, #root, .App {
   border-width: .1em;
 }
 
+.option > .subopt {
+  color: #282c34;
+  font-size: 0.8em;
+  padding: 0 0.5em;
+  border-left: #282c34 solid 1px;
+}
+
 .option > .option-side-text {
   height: 100%;
   font-size: 0.8em;

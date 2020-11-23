@@ -1,5 +1,5 @@
 import { Game, Option } from "../interfaces/interfaces";
-import { Identical, Unique } from "../interfaces/types";
+import { Identical, Subopt, Unique } from "../interfaces/types";
 import { genUid } from "../utils/math";
 
 interface EventData {
@@ -27,7 +27,7 @@ class GameEvent implements Identical, Unique {
         return [];
     }
 
-    onInput(game: Game, option: Option): void {
+    onInput(game: Game, option: Option, subopt: Subopt | null): void {
         game.appendText(`来自事件[${this.id}]`);
     }
 }
