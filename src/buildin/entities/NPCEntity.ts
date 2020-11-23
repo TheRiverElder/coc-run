@@ -56,6 +56,7 @@ class NPCEntity extends LivingEntity {
 
     talk(game: Game) {
         if (!this.takled) {
+            game.appendText(`${this.name}说:`);
             game.appendText(this.text, 'talk');
             this.takled = true;
         } else {

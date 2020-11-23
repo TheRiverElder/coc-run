@@ -6,7 +6,7 @@ class InventoryEvent extends GameEvent {
     constructor() {
         super({
             id: 'inventory',
-            priority: 10
+            priority: 99
         });
     }
 

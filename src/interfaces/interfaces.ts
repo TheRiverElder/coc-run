@@ -42,9 +42,9 @@ interface Game {
 
     translate(key: string): string;
 
-    getEntity(uid: number): Entity | undefined;
-    recordAddEntity(entity: Entity): void;
-    recordRemoveEntity(entity: Entity): void;
+    // getEntity(uid: number): Entity | undefined;
+    // recordAddEntity(entity: Entity): void;
+    // recordRemoveEntity(entity: Entity): void;
 }
 
 interface GameData {

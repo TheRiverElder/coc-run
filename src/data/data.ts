@@ -132,8 +132,8 @@ const data = {
                 ],
             }),
             new Site({
-                id: 'hospital',
-                name: '医院',
+                id: 'old_house',
+                name: 'laofangzi',
             }),
         ];
         const map = new Map<string, Site>();
