@@ -40,6 +40,15 @@ html, body, #root, .App {
   }
 }
 
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .state-bar {
   padding: .5em 1em;
   font-size: 0.8em;
@@ -97,7 +106,23 @@ html, body, #root, .App {
   overflow: auto;
   background-color: #282c34;
   box-shadow: #0000002f 0 -0.2em .2em;
+  position: relative;
   z-index: 1;
+}
+
+.fab {
+  position: absolute;
+  bottom: 1em;
+  right: .5em;
+  background-color: white;
+  height: 2em;
+  width: 2em;
+  padding: 0;
+  margin: 0;
+  border-radius: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .text, .option {
@@ -118,8 +143,8 @@ html, body, #root, .App {
   font-family: 'Times New Roman', Times, serif;
   padding: .2em .5em;
   border-radius: .2em;
-  background-color: white;
-  animation: .618s glitter;
+  /* background-color: white; */
+  animation: .618s slideUp;
 }
 
 .option {
@@ -152,8 +177,13 @@ html, body, #root, .App {
 .option > .subopt {
   color: #282c34;
   font-size: 0.8em;
+  margin: 0 0 0 0.5em;
   padding: 0 0.5em;
   border-left: #282c34 solid 1px;
+}
+
+.option > .subopt + .subopt {
+  margin-left: 0;
 }
 
 .option > .option-side-text {
@@ -191,12 +221,28 @@ html, body, #root, .App {
   text-align: center;
   font-size: .8em;
   opacity: 0.5;
+  margin-top: -0.5em;
+  padding-top: 0;
+}
+
+.text.self + .text.mutate {
+  margin-top: -0.8em;
+  padding-right: 2em;
+  text-align: right;
 }
 
 .text.system {
   text-align: center;
   border-top: rgb(204, 204, 204) solid 1px;
   border-bottom: rgb(204, 204, 204) solid 1px;
+}
+
+.text.talk {
+  border-left: rgb(100, 97, 112) solid 0.1em;
+  font-style: italic;
+  color: #555c69;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .no-break {

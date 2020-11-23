@@ -83,6 +83,8 @@ class App extends React.Component<AppProps, AppState> implements Game {
           </div>
 
           <div className="option-panel">
+            <div className="fab" onClick={this.openInventory.bind(this)}>💰</div>
+            
             {this.state.showOptions ? this.state.options.map((o, i) => (
               <OptionBtn
                 key={i} 
@@ -270,18 +272,17 @@ class App extends React.Component<AppProps, AppState> implements Game {
     }
   }
 
+  openInventory() {
+    this.triggerEvent(new InventoryEvent());
+    this.refreshOptions();
+    this.applyChange();
+  }
+
   showPortOptions() {
     const p = this.currentState.player;
     const site: Site = p.site;
     const options = Array.from(site.entities.values(), e => e.getInteractions(this).map(o => Object.assign(o, { entityUid: e.uid }))).flat();
-    const itemCount = p.inventory.size + (p.holdingItem ? 1 : 0);
-    const inventoryOption: Option = {
-      text: '物品栏',
-      leftText: '💰',
-      rightText: `共${itemCount}个`,
-      tag: '__inventory__',
-    };
-    this.setOptions(itemCount ? [...options, inventoryOption] : options);
+    this.setOptions(options);
   }
 
   getPlayer() {
