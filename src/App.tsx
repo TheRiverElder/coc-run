@@ -1,9 +1,9 @@
 import React, { RefObject } from 'react';
 import './App.css';
 import InventoryEvent from './buildin/events/InventoryEvent';
-import { Game, GameState, Option, Text, GameEvent, GameData, Site, UniqueMap, Entity } from './interfaces/interfaces';
+import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
 import { Subopt } from './interfaces/types';
-import { copy, findByPath } from './utils/objects';
+import { findByPath } from './utils/objects';
 
 function OptionBtn(props: { option: Option, className: string, onClick: (option: Option, subopt: Subopt | null) => void }) {
   const { className, option, onClick } = props;
@@ -188,10 +188,10 @@ class App extends React.Component<AppProps, AppState> implements Game {
   //   this.entityMap.remove(entity);
   // }
   
-  takeScreenshot() {
-    const { textList, showOptions, ...ss } = this.state;
-    this.currentState = copy(ss, true);
-  }
+  // takeScreenshot() {
+  //   const { textList, showOptions, ...ss } = this.state;
+  //   this.currentState = copy(ss, true);
+  // }
 
   applyChange() {
     this.setState(this.currentState);
@@ -244,6 +244,8 @@ class App extends React.Component<AppProps, AppState> implements Game {
       (result as Function).apply(thisArg, params);
     }
   }
+  
+  //#region events
 
   triggerEvent(event: GameEvent) {
     this.currentState.events.push(event);
@@ -267,6 +269,10 @@ class App extends React.Component<AppProps, AppState> implements Game {
     const fn = typeof v === 'number' ? ((e: GameEvent) => e.uid === v) : ((e: GameEvent) => e.id === v);
     return this.currentState.events.find(fn);
   }
+
+  //#endregion
+
+  //#region options
 
   refreshOptions() {
     const s = this.currentState;
@@ -292,6 +298,8 @@ class App extends React.Component<AppProps, AppState> implements Game {
     const options = Array.from(site.entities.values(), e => e.getInteractions(this).map(o => Object.assign(o, { entityUid: e.uid }))).flat();
     this.setOptions(options);
   }
+
+  //#endregion
 
   getPlayer() {
     return this.currentState.player;

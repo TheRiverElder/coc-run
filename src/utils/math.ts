@@ -13,6 +13,10 @@ function test(possibility: number): boolean {
     return (Math.random() < (possibility > 1 ? possibility / 100 : possibility));
 }
 
+function chooseOne<T>(choices: Array<T>): T {
+    return choices[randInt(choices.length)];
+}
+
 let uidc = Date.now();
 function genUid(): number {
     return uidc++;
@@ -22,5 +26,6 @@ export {
     randInt,
     test,
     rollDice,
+    chooseOne,
     genUid,
 }

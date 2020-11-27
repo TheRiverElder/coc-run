@@ -1,6 +1,6 @@
 import MonsterEntity from "../buildin/entities/MonsterEntity";
 import { Game, GameData, Item, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "../interfaces/interfaces";
-import { randInt } from "../utils/math";
+import { chooseOne, randInt } from "../utils/math";
 import InvestigationEntity from "../buildin/entities/InvestigationEntity";
 import EventTriggerEntity from "../buildin/entities/EventTriggerEntity";
 import TextDisplayEvent from "../buildin/events/TextDisplayEvent";
@@ -168,6 +168,9 @@ const data = {
     },
     translate(key: string): string {
         const result = findByPathStr(translation, key, key.indexOf('.') >= 0 ? '' : 'text') || key;
+        if (Array.isArray(result)) {
+            return chooseOne(result);
+        }
         return typeof result === 'string' ? result : String(result);
     },
 };

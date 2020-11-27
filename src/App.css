@@ -206,15 +206,15 @@ html, body, #root, .App {
 
 .text.self {
   text-align: end;
-  opacity: 0.5;
+  color: #282c34;
 }
 
 .text.good {
-  color: green;
+  color: rgb(64, 148, 64);
 }
 
 .text.bad {
-  color: red;
+  color: rgb(255, 82, 82);
 }
 
 .text.mutate {
@@ -226,7 +226,7 @@ html, body, #root, .App {
 }
 
 .text.self + .text.mutate {
-  margin-top: -0.8em;
+  margin-top: -0.5em;
   padding-right: 2em;
   text-align: right;
 }
