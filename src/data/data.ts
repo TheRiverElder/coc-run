@@ -8,7 +8,7 @@ import SequenceEvent from "../buildin/events/SequenceEvent";
 import GameOverEvent from "../buildin/events/GameOverEvent";
 import translation from "./translation";
 import { findByPathStr } from "../utils/strings";
-import NPCEntity from "../buildin/entities/NPCEntity";
+import StrangeOldMan from "../buildin/entities/StrangeOldMan";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -35,7 +35,7 @@ const data = {
                 entities: [
                     new PortEntity({ target: 'hs_village' }),
                     new PortEntity({ target: 'bus_stop' }),
-                    new NPCEntity({
+                    new StrangeOldMan({
                         name: '不修边幅的老者',
                         health: 7,
                         maxHealth: 7,
@@ -47,7 +47,7 @@ const data = {
                             new Item({ name: '扭曲的木拐杖' }),
                             new Item({ name: '磨损的铜钱' }),
                         ],
-                        text: { text: 'story.old_mans_talk', translated: true },
+                        talkText: { text: 'story.old_mans_talk', translated: true },
                         idleText: { text: '有什么事吗？' },
                     }),
                 ],

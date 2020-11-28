@@ -1,6 +1,7 @@
-import { Damage, Dice, Game, Item, ItemEntity, MeleeWeapon, Site } from "../../interfaces/interfaces";
+import { CombatEvent, Damage, Dice, Game, Item, ItemEntity, MeleeWeapon, Site } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 import { num2strWithSign } from "../../utils/strings";
+import { CombatEntity } from "../events/CombatEvent";
 import Entity, { EntityData } from "./Entity";
 
 interface LivingEntityData extends EntityData {
@@ -49,6 +50,10 @@ class LivingEntity extends Entity {
             this.site.addEntities(game, this.loots);
             this.site.removeEntity(game, this);
         }
+    }
+
+    onCombatTurn(game: Game, combat: CombatEvent, self: CombatEntity) {
+        // empty
     }
 
     attack(game: Game, target: LivingEntity, isFightBack: boolean = false): Damage {

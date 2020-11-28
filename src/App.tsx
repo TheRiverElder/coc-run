@@ -93,7 +93,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
                 onClick={this.handleClickOption.bind(this)}
               />
             )) 
-            : <button className="option skip-btn"onClick={this.flushText.bind(this, true)}> -=快进=- </button>
+            : <button className="option skip-btn"onClick={this.flushText.bind(this, true)}> ⏩ </button>
             }
           </div>
         </div>

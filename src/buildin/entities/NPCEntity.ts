@@ -1,15 +1,17 @@
 import { Entity, Game, LivingEntity, Site, Text, Option, CombatEvent } from "../../interfaces/interfaces";
+import { chooseOne } from "../../utils/math";
+import { CombatEntity } from "../events/CombatEvent";
 import { LivingEntityData } from "./LivingEntity";
 
 interface NPCEntityData extends LivingEntityData {
-    text: Text;
+    talkText: Text;
     idleText?: Text;
     autoChat?: boolean;
     allowAttack?: boolean;
 }
 
 class NPCEntity extends LivingEntity {
-    text: Text;
+    talkText: Text;
     idleText: Text;
     autoChat: boolean;
     takled: boolean;
@@ -19,7 +21,7 @@ class NPCEntity extends LivingEntity {
             ...data,
             id: 'npc',
         });
-        this.text = data.text;
+        this.talkText = data.talkText;
         this.idleText = data.idleText || { text: '...' };
         this.autoChat = data.autoChat || false;
         this.takled = false;
@@ -50,17 +52,32 @@ class NPCEntity extends LivingEntity {
         if (option.tag === 'talk') {
             this.talk(game);
         } else if (option.tag === 'attack') {
-            game.triggerEvent(new CombatEvent({ enemy: this, playerFirst: true }));
+            this.onBeAttack(game);
         }
+    }
+
+    onBeAttack(game: Game): void {
+        game.triggerEvent(new CombatEvent({ rivals: [
+            { entity: game.getPlayer(), tag: 'civilian'},
+            { entity: this, tag: 'angry_civilian' },
+        ]}));
     }
 
     talk(game: Game) {
         if (!this.takled) {
             game.appendText(`${this.name}说:`);
-            game.appendText(this.text, 'talk');
+            game.appendText(this.talkText, 'talk');
             this.takled = true;
         } else {
             game.appendText(this.idleText);
+        }
+    }
+
+    onCombatTurn(game: Game, combat: CombatEvent, self: CombatEntity) {
+        if (this.health >= this.maxHealth * 0.75) {
+            combat.attack(game, this, chooseOne(combat.rivals.filter(e => e.tag !== self.tag)).entity);
+        } else {
+            combat.escape(game, this);
         }
     }
 }

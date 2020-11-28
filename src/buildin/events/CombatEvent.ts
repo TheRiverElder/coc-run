@@ -1,16 +1,28 @@
 import { Game, GameEvent, LivingEntity, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 
+interface CombatEntity {
+    entity: LivingEntity;
+    tag: any;
+    dexFix: number;
+}
+
+interface CombatEntityData {
+    entity: LivingEntity;
+    tag: any;
+    dexFix?: number;
+}
+
 interface CombatEventData {
-    enemy: LivingEntity;
-    priority?: number;
     uid?: number;
-    playerFirst?: boolean;
+    priority?: number;
+    rivals: Array<CombatEntityData>;
+    next?: number;
 }
 
 class CombatEvent extends GameEvent {
-    enemy: LivingEntity;
-    playerFirst: boolean;
+    rivals: Array<CombatEntity>;
+    next: CombatEntity;
 
     constructor(data: CombatEventData) {
         super({
@@ -18,88 +30,146 @@ class CombatEvent extends GameEvent {
             id: 'combat',
             priority: 10,
         });
-        this.enemy = data.enemy;
-        this.playerFirst = data.playerFirst || false;
-    }
-
-    onStart(game: Game) {
-        const e = this.enemy;
-        game.appendText(`在你面前的是一个如暗夜般漆黑的怪物——${e.name}(${e.health}/${e.maxHealth})`);
-        
-        if (this.playerFirst) {
-            game.getPlayer().attack(game, e);
-            this.checkCombatEnd(game);
+        this.rivals = data.rivals.map(e => ({
+            entity: e.entity,
+            tag: e.tag,
+            dexFix: e.dexFix || 0,
+        }));
+        if (!this.rivals.length) {
+            throw new Error("Combat with no rivals is not allowed!");
+        }
+        if ('next' in data) {
+            this.next = this.rivals.find(e => e.entity.uid === data.next) || this.rivals[0];
+        } else {
+            this.next = this.rivals[0];
         }
     }
 
+    onStart(game: Game) {
+        game.appendText('战斗开始！');
+        this.displayRivals(game);
+        
+        this.runForPlayer(game);
+    }
+
     onRender(game: Game): Array<Option> {
-        const player = game.getPlayer();
-        const previewDamage = player.getWeapon().previewDamage(game, this.enemy);
-        return [
-            { 
-                text: `攻击`,
-                leftText: '🗡',
-                rightText: `${previewDamage}♥`,
-                tag: 'attack',
-            },
-            { 
-                text: `逃跑`,
-                leftText: '🏃‍',
-                rightText: `${player.dexterity}%`,
-                tag: 'escape',
-            },
-        ].concat(game.debugMode ? [{
-            text: `一击必杀`,
-            leftText: '💀',
-            rightText: `调试模式`,
-            tag: 'one_punch',
-        }] : []);
+        const p = game.getPlayer();
+        const cp = this.rivals.find(e => e.entity.uid === p.uid);
+        const escape = { 
+            text: `逃跑`,
+            leftText: '🏃‍',
+            rightText: `${p.dexterity}%`,
+            tag: 'escape',
+        };
+        if (!cp) {
+            return [escape];
+        }
+        const weapon = p.getWeapon();
+        const options: Array<Option> = this.rivals.filter(e => e.tag !== cp.tag).map(e => ({
+            text: `攻击${e.entity.name}`,
+            leftText: '🗡',
+            rightText: `${weapon.previewDamage(game, e.entity)}♥`,
+            tag: e.entity.uid,
+        }));
+        options.push(escape);
+        if (game.debugMode) {
+            options.push({
+                text: `一击必杀`,
+                leftText: '💀',
+                rightText: `调试模式`,
+                tag: 'one_punch',
+            });
+        }
+        return options;
+    }
+
+    displayRivals(game: Game) {
+        game.appendText('场上剩余：' + this.rivals.filter(e => e.entity.id !== 'player').map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
     }
 
     onInput(game: Game, option: Option) {
-        let escaped: boolean = false;
         const p = game.getPlayer();
-        const e = this.enemy;
+        const cp = this.rivals.find(e => e.entity.uid === p.uid);
+        if (!cp) {
+            game.endEvent(this);
+            return;
+        }
 
         if (option.tag === 'one_punch') {
-            e.mutateValue(game, 'health', -e.health, '因为苟管理');
-        } else if (option.tag === 'attack') {
-            p.attack(game, e);
+            this.rivals.filter(e => e.tag === cp.tag).forEach(e => e.entity.mutateValue(game, 'health', -e.entity.health, '因为苟管理'));
         } else if (option.tag === 'escape') {
-            if(test(p.dexterity) || !test(e.dexterity)) {
-                escaped = true;
-                game.endEvent(this);
-            } else {
-                game.appendText('你没有逃跑成功');
-                if (test(this.enemy.strength)) {
-                    game.appendText('而且还被爪子抓伤');
-                    p.onReceiveDamage(game, e.getWeapon().onAttack(game, p), e, true);
-                }
+            this.escape(game, p);
+        } else if (typeof option.tag === 'number') {
+            const enemy = this.rivals.find(e => e.entity.uid === option.tag);
+            if (enemy) {
+                p.attack(game, enemy.entity);
             }
         }
 
         if (this.checkCombatEnd(game)) return;
-
-        if (escaped) {
-            game.appendText(`你成功逃离了${this.enemy.name}的追杀`);
-			if (p.prevSite) {
-				p.goBack(game);
-			}
-        } else {
-            game.appendText(`${this.enemy.name}依然存活(${this.enemy.health}/${this.enemy.maxHealth})`);
-            e.attack(game, p);
-        }
+        this.turnNext();
+        this.runForPlayer(game);
+        this.displayRivals(game);
     }
 
     checkCombatEnd(game: Game): boolean {
-        if (this.enemy.health <= 0) {
-            game.appendText('你打败了' + this.enemy.name);
+        this.remanageRivals();
+        const tag = this.rivals?.[0].tag;
+        if (this.rivals.length <= 1 || this.rivals.every(e => e.tag === tag)) {
+            game.appendText('战斗结束');
             game.endEvent(this);
             return true;
         }
         return false;
     }
+
+    remanageRivals(): void {
+        this.rivals = this.rivals.filter(e => e.entity.isAlive());
+        this.rivals.sort((a, b) => a.entity.dexterity - b.entity.dexterity);
+    }
+
+    // let next one act
+    nextAct(game: Game): void {
+        this.next.entity.onCombatTurn(game, this, this.next);
+        this.turnNext();
+    }
+
+    turnNext(): void {
+        const uid = this.next.entity.uid;
+        this.next = this.rivals[(this.rivals.findIndex(e => e.entity.uid === uid) + 1) % this.rivals.length];
+    }
+
+    runForPlayer(game: Game): void {
+        while (!this.checkCombatEnd(game) && this.next.entity.id !== 'player') {
+            this.nextAct(game);
+        }
+    }
+
+    public escape(game: Game, rival: LivingEntity): void {
+        if(test(rival.dexterity)) {
+            game.appendText(`${rival.name}逃跑成功`);
+            game.endEvent(this);
+            const index = this.rivals.findIndex(e => e.entity.uid === rival.uid);
+            if (index >= 0) {
+                this.rivals.splice(index, 1);
+                if (rival.uid === this.next.entity.uid) {
+                    this.next = this.rivals[index % this.rivals.length];
+                }
+            }
+        } else {
+            game.appendText(`${rival.name}逃跑失败`);
+        }
+    }
+
+    public attack(game: Game, source: LivingEntity, target: LivingEntity): void {
+        game.appendText(`${source.name}使用${source.getWeapon().name}攻击${target.name}`);
+        source.attack(game, target);
+    }
 }
 
 export default CombatEvent;
-export type { CombatEventData };
+export type {
+    CombatEventData,
+    CombatEntity,
+    CombatEntityData,
+};
