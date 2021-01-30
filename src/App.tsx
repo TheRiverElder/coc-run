@@ -2,7 +2,7 @@ import React, { RefObject } from 'react';
 import './App.css';
 import InventoryEvent from './buildin/events/InventoryEvent';
 import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
-import { Subopt } from './interfaces/types';
+import { DisplayText, Subopt } from './interfaces/types';
 import { findByPath } from './utils/objects';
 
 function OptionBtn(props: { option: Option, className: string, onClick: (option: Option, subopt: Subopt | null) => void }) {
@@ -131,18 +131,29 @@ class App extends React.Component<AppProps, AppState> implements Game {
     }
   }
 
-  appendText(text: Text | string, ...types: Array<string>) {
+  appendText(text: DisplayText, ...types: Array<string>) {
     let translated = false;
+    if (typeof text === 'string' && text.startsWith('#')) {
+      text = { text: text.slice(1), translated: true };
+    }
     if (typeof text !== 'string') {
       translated = text.translated || false;
       types = text.types || types;
       text = text.text;
     }
     text = translated ? this.translate(text) : text;
-    const lines: Array<string> = text.split('\n')
+    const packs: Array<Text> = text.split('\n')
       .map(s => s.trim())
-      .filter(s => !/^\s*$/.test(s));
-    const packs: Array<Text> = lines.map(s => ({ text: s, types }));
+      .filter(s => !/^\s*$/.test(s))
+      .map(s => {
+        const r = /@\s*([^@]+)\s*@$/.exec(s);
+        let t = types;
+        if (r) {
+          s = s.slice(0, r.index).trim();
+          t = r[1].trim().split(/\s+/);
+        }
+        return { text: s, types: t };
+      });
     this.textBuffer.push(...packs);
     this.flushLoop();
   }

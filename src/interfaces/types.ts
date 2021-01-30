@@ -1,22 +1,24 @@
-interface Identical {
+export interface Identical {
     id: string;
 }
 
-interface Unique {
+export interface Unique {
     uid: number;
 }
 
-interface Named {
+export interface Named {
     name: string;
 }
 
-interface Text {
+export interface Text {
     text: string;
     translated?: boolean;
     types?: Array<string>;
 }
 
-interface Option {
+export type DisplayText = Text | string;
+
+export interface Option {
     text: string;
     leftText?: string;
     rightText?: string;
@@ -25,32 +27,19 @@ interface Option {
     entityUid?: number;
 }
 
-interface Subopt {
+export interface Subopt {
     text: string;
     tag?: any;
 }
 
-interface Dice {
+export interface Dice {
     faces: number; // 骰子面数
     times?: number; // 投掷次数
     factor?: number; // 投掷后总和乘上一个倍数
     fix?: number; // 然后加上一个修正值
 }
 
-interface Damage {
+export interface Damage {
     value: number;
     type: string;
-}
-
-export type {
-    Identical,
-    Unique,
-    Named,
-    
-    Text,
-    Option,
-    Subopt,
-
-    Dice,
-    Damage,
 }

@@ -5,6 +5,7 @@ interface CombatEntity {
     entity: LivingEntity;
     tag: any;
     dexFix: number;
+    order: number;
 }
 
 interface CombatEntityData {
@@ -30,10 +31,11 @@ class CombatEvent extends GameEvent {
             id: 'combat',
             priority: 10,
         });
-        this.rivals = data.rivals.map(e => ({
+        this.rivals = data.rivals.map((e, i) => ({
             entity: e.entity,
             tag: e.tag,
             dexFix: e.dexFix || 0,
+            order: i,
         }));
         if (!this.rivals.length) {
             throw new Error("Combat with no rivals is not allowed!");
@@ -47,8 +49,8 @@ class CombatEvent extends GameEvent {
 
     onStart(game: Game) {
         game.appendText('战斗开始！');
+        this.rivals.forEach(e => e.entity.onCombatStart(game, this, e));
         this.displayRivals(game);
-        
         this.runForPlayer(game);
     }
 
@@ -118,6 +120,7 @@ class CombatEvent extends GameEvent {
         if (this.rivals.length <= 1 || this.rivals.every(e => e.tag === tag)) {
             game.appendText('战斗结束');
             game.endEvent(this);
+            this.rivals.forEach(e => e.entity.onCombatStart(game, this, e));
             return true;
         }
         return false;
@@ -126,6 +129,7 @@ class CombatEvent extends GameEvent {
     remanageRivals(): void {
         this.rivals = this.rivals.filter(e => e.entity.isAlive());
         this.rivals.sort((a, b) => a.entity.dexterity - b.entity.dexterity);
+        this.rivals.forEach((e, i) => e.order = i);
     }
 
     // let next one act
@@ -135,8 +139,7 @@ class CombatEvent extends GameEvent {
     }
 
     turnNext(): void {
-        const uid = this.next.entity.uid;
-        this.next = this.rivals[(this.rivals.findIndex(e => e.entity.uid === uid) + 1) % this.rivals.length];
+        this.next = this.rivals[(this.next.order + 1) % this.rivals.length];
     }
 
     runForPlayer(game: Game): void {
@@ -147,7 +150,7 @@ class CombatEvent extends GameEvent {
 
     public escape(game: Game, rival: LivingEntity): void {
         if(test(rival.dexterity)) {
-            game.appendText(`${rival.name}逃跑成功`);
+            game.appendText(`${rival.name}逃跑成功`, 'good');
             game.endEvent(this);
             const index = this.rivals.findIndex(e => e.entity.uid === rival.uid);
             if (index >= 0) {
@@ -156,13 +159,14 @@ class CombatEvent extends GameEvent {
                     this.next = this.rivals[index % this.rivals.length];
                 }
             }
+            this.remanageRivals();
         } else {
-            game.appendText(`${rival.name}逃跑失败`);
+            game.appendText(`${rival.name}逃跑失败`, 'bad');
         }
     }
 
     public attack(game: Game, source: LivingEntity, target: LivingEntity): void {
-        game.appendText(`${source.name}使用${source.getWeapon().name}攻击${target.name}`);
+        game.appendText(`${source.name}使用${source.getWeapon().name}攻击${target.name}`, 'bad');
         source.attack(game, target);
     }
 }

@@ -11,7 +11,7 @@ import { Damage, Dice, Option, Text } from "./types";
 import CombatEvent from "../buildin/events/CombatEvent";
 import UniqueMap from "../buildin/UniqueMap";
 
-interface GameState {
+export interface GameState {
     events: Array<GameEvent>;
     options: Array<Option>;
     player: PlayerEntity;
@@ -19,7 +19,7 @@ interface GameState {
     time: number;
 };
 
-interface Game {
+export interface Game {
     debugMode: boolean;
 
     timePass(change: number, isInNextDay?: boolean): number;
@@ -47,7 +47,7 @@ interface Game {
     // recordRemoveEntity(entity: Entity): void;
 }
 
-interface GameData {
+export interface GameData {
     initialize(): GameState;
     start(game: Game): void;
     translate(key: string): string;
@@ -72,10 +72,6 @@ export {
 }
 
 export type {
-    GameState,
-    Game,
-    GameData,
-
     Text,
     Option,
 

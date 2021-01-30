@@ -1,4 +1,3 @@
-import MonsterEntity from "../buildin/entities/MonsterEntity";
 import { Game, GameData, Item, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "../interfaces/interfaces";
 import { chooseOne, randInt } from "../utils/math";
 import InvestigationEntity from "../buildin/entities/InvestigationEntity";
@@ -8,7 +7,10 @@ import SequenceEvent from "../buildin/events/SequenceEvent";
 import GameOverEvent from "../buildin/events/GameOverEvent";
 import translation from "./translation";
 import { findByPathStr } from "../utils/strings";
-import StrangeOldMan from "../buildin/entities/StrangeOldMan";
+import StrangeOldMan from "./entity/StrangeOldMan";
+import MonsterEntity from "./entity/MonsterEntity";
+import ChatEvent from "./event/ChatEvent";
+import NPCEntity from "./entity/NPCEntity";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -16,7 +18,55 @@ function randValue(): number {
 
 const data = {
     initialize() {
+        const villageWang = new NPCEntity({
+            name: '王屠夫',
+            health: 7,
+            maxHealth: 7,
+            strength: 30,
+            dexterity: 30,
+            baseDamage: 1,
+            baseWeaponName: '拳头',
+            talkText: { text: 'story.wang', translated: true },
+        });
+        const villageLiheng = new StrangeOldMan({
+            name: '老者',
+            health: 7,
+            maxHealth: 7,
+            strength: 30,
+            dexterity: 30,
+            baseDamage: 1,
+            baseWeaponName: '拳头',
+            loots: [
+                new ItemEntity({ item: new Item({ name: '扭曲的木拐杖' }) }),
+                new ItemEntity({ item: new Item({ name: '磨损的铜钱' }) }),
+            ],
+            talkText: { text: 'story.old_mans_talk', translated: true },
+            idleText: { text: 'idle.old_man', translated: true },
+        });
+        const elder = new NPCEntity({
+            name: '廖族长',
+            health: 7,
+            maxHealth: 7,
+            strength: 30,
+            dexterity: 30,
+            baseDamage: 1,
+            baseWeaponName: '拳头',
+            talkText: '#story.elder.welcome',
+        })
+
+
         const sites = [
+            new Site({
+                id: 'apartment',
+                name: '公寓',
+                entities: [new EventTriggerEntity({
+                    event: new ChatEvent({
+                        blocks: [
+                            { id: 'start', text: ['#story.start'] },
+                        ],
+                    })
+                })],
+            }),
             new Site({
                 id: 'bus_stop',
                 name: '巴士车站',
@@ -35,21 +85,7 @@ const data = {
                 entities: [
                     new PortEntity({ target: 'hs_village' }),
                     new PortEntity({ target: 'bus_stop' }),
-                    new StrangeOldMan({
-                        name: '不修边幅的老者',
-                        health: 7,
-                        maxHealth: 7,
-                        strength: 30,
-                        dexterity: 30,
-                        baseDamage: 1,
-                        baseWeaponName: '拳头',
-                        loots: [
-                            new Item({ name: '扭曲的木拐杖' }),
-                            new Item({ name: '磨损的铜钱' }),
-                        ],
-                        talkText: { text: 'story.old_mans_talk', translated: true },
-                        idleText: { text: '有什么事吗？' },
-                    }),
+                    villageLiheng,
                 ],
             }),
             new Site({
@@ -79,6 +115,7 @@ const data = {
                 name: '王屠户家',
                 entities: [
                     new PortEntity({ target: 'main_streat' }),
+                    villageWang,
                     new InvestigationEntity({
                         results: [new ItemEntity({item: new MeleeWeapon({
                             name: '杀猪刀',
@@ -93,6 +130,7 @@ const data = {
                 entities: [
                     new PortEntity({ target: 'temple_basement' }),
                     new PortEntity({ target: 'main_streat' }),
+                    elder,
                 ],
             }),
             new Site({
@@ -156,7 +194,9 @@ const data = {
                 dexterity: randValue(),
                 insight: randValue(),
                 holdingItem: null,
-                inventory: [],
+                inventory: [
+                    new Item({ name: '奇怪的簪子' }),
+                ],
                 baseDamage: 1,
                 baseWeaponName: '拳头',
             }),

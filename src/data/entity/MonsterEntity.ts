@@ -1,7 +1,7 @@
+import { LivingEntityData } from "../../buildin/entities/LivingEntity";
+import { CombatEntity } from "../../buildin/events/CombatEvent";
 import { CombatEvent, Entity, Game, LivingEntity, PlayerEntity, Site } from "../../interfaces/interfaces";
 import { chooseOne } from "../../utils/math";
-import { CombatEntity } from "../events/CombatEvent";
-import { LivingEntityData } from "./LivingEntity";
 
 class MonsterEntity extends LivingEntity {
 

@@ -1,18 +1,22 @@
-import { Entity, Game, LivingEntity, Site, Text, Option, CombatEvent } from "../../interfaces/interfaces";
+import { Entity, Game, LivingEntity, Site, Option, CombatEvent } from "../../interfaces/interfaces";
 import { chooseOne } from "../../utils/math";
-import { CombatEntity } from "../events/CombatEvent";
-import { LivingEntityData } from "./LivingEntity";
+import { CombatEntity } from "../../buildin/events/CombatEvent";
+import { LivingEntityData } from "../../buildin/entities/LivingEntity";
+import { DisplayText, Subopt } from "../../interfaces/types";
+import ChatEvent from "../event/ChatEvent";
 
 interface NPCEntityData extends LivingEntityData {
-    talkText: Text;
-    idleText?: Text;
+    talkText: DisplayText;
+    chat?: ChatEvent;
+    idleText?: DisplayText;
     autoChat?: boolean;
     allowAttack?: boolean;
 }
 
 class NPCEntity extends LivingEntity {
-    talkText: Text;
-    idleText: Text;
+    talkText: DisplayText;
+    idleText: DisplayText;
+    chat?: ChatEvent;
     autoChat: boolean;
     takled: boolean;
 
@@ -22,6 +26,7 @@ class NPCEntity extends LivingEntity {
             id: 'npc',
         });
         this.talkText = data.talkText;
+        this.chat = data.chat;
         this.idleText = data.idleText || { text: '...' };
         this.autoChat = data.autoChat || false;
         this.takled = false;
@@ -36,22 +41,24 @@ class NPCEntity extends LivingEntity {
     getInteractions(game: Game): Array<Option> {
         return [
             {
-                text: `对话${this.name}`,
-                leftText: '💬',
-                tag: 'talk',
-            },
-            {
-                text: `攻击${this.name}`,
-                leftText: '🗡',
-                tag: 'attack',
+                text: this.name,
+                leftText: '👨‍🦲',
+                subopts: [
+                    { text: '对话', tag: 'talk' },
+                    { text: '攻击', tag: 'attack' },
+                ]
             },
         ];
     }
 
-    onInteract(game: Game, option: Option) {
-        if (option.tag === 'talk') {
-            this.talk(game);
-        } else if (option.tag === 'attack') {
+    onInteract(game: Game, option: Option, subopt: Subopt) {
+        if (subopt.tag === 'talk') {
+            if (this.chat) {
+                game.triggerEvent(this.chat);
+            } else {
+                this.talk(game);
+            }
+        } else if (subopt.tag === 'attack') {
             this.onBeAttack(game);
         }
     }

@@ -52,7 +52,15 @@ class LivingEntity extends Entity {
         }
     }
 
+    onCombatStart(game: Game, combat: CombatEvent, self: CombatEntity) {
+        // empty
+    }
+
     onCombatTurn(game: Game, combat: CombatEvent, self: CombatEntity) {
+        // empty
+    }
+
+    onCombatEnd(game: Game, combat: CombatEvent, self: CombatEntity) {
         // empty
     }
 
@@ -75,10 +83,10 @@ class LivingEntity extends Entity {
             if (test(this.dexterity)) {
                 const s = `${this.name}躲过了${source.name}的进攻`;
                 if (test(this.dexterity)) {
-                    game.appendText(s + `，并返回打一把`);
+                    game.appendText(s + `，并返回打一把`, 'good');
                     this.attack(game, source, true);
                 } else {
-                    game.appendText(s);
+                    game.appendText(s, 'good');
                 }
                 return;
             }
@@ -87,7 +95,7 @@ class LivingEntity extends Entity {
         if (damage.value) {
             this.mutateValue(game, 'health', -damage.value, `受到${source.name}攻击`);
         } else {
-            game.appendText(`${this.name}的护甲防住了${source.name}的攻势`);
+            game.appendText(`${this.name}的护甲防住了${source.name}的攻势`, 'good');
         }
     }
 
@@ -106,6 +114,14 @@ class LivingEntity extends Entity {
 
     isAlive(): boolean {
         return this.health > 0;
+    }
+
+    removeSelf(game: Game): boolean {
+        if (this.site !== Site.FAKE_SITE) {
+            this.site.removeEntity(game, this);
+            return true;
+        }
+        return false;
     }
 }
 

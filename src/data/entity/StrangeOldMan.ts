@@ -1,21 +1,22 @@
 import { CombatEvent, Game, LivingEntity } from "../../interfaces/interfaces";
-import NPCEntity from "./NPCEntity";
+import NPCEntity, { NPCEntityData } from "./NPCEntity";
+import Shadow from "./Shadow";
+
+interface StrangeOldManData extends NPCEntityData {
+    shadow?: LivingEntity;
+}
 
 class StrangeOldMan extends NPCEntity {
     shadow?: LivingEntity;
 
+    constructor(data: StrangeOldManData) {
+        super(data);
+        this.shadow = data.shadow;
+    }
+
     onBeAttack(game: Game) {
         if (!this.shadow || !this.shadow.isAlive()) {
-            this.shadow = new NPCEntity({
-                name: `${this.name}的影子`,
-                health: this.health,
-                maxHealth: this.maxHealth,
-                dexterity: this.dexterity,
-                strength: this.strength,
-                baseDamage: this.baseDamage,
-                baseWeaponName: this.baseWeaponName,
-                talkText: this.talkText,
-            });
+            this.shadow = new Shadow({ owner: this });
             this.site.addEntity(game, this.shadow);
         }
         game.triggerEvent(new CombatEvent({ rivals: [
@@ -27,3 +28,6 @@ class StrangeOldMan extends NPCEntity {
 }
 
 export default StrangeOldMan;
+export type {
+    StrangeOldManData,
+}
