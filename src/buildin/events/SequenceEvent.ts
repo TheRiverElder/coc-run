@@ -1,6 +1,7 @@
 import { Game, GameEvent, Option } from "../../interfaces/interfaces";
+import { GameEventData } from "../GameEvent";
 
-interface SequenceEventData {
+interface SequenceEventData extends GameEventData {
     events: Array<GameEvent>;
     joints?: Array<Option>;
 }
@@ -12,32 +13,32 @@ class SequenceEvent extends GameEvent {
 
     constructor(data: SequenceEventData) {
         super({
-            id: 'sequence',
+            ...data,
             priority: 0,
         });
         this.events = data.events;
         this.joints = Array(this.events.length - 1).fill(0).map((_, i) => data.joints?.[i] || { text: '...' });
     }
 
-    nextEvent(game: Game) {
+    nextEvent() {
         if (this.pointer >= this.events.length) {
-            game.endEvent(this);
+            this.game.endEvent(this);
             return;
         }
         const ce = this.events[this.pointer++];
-        game.triggerEvent(ce);
+        this.game.triggerEvent(ce);
     }
 
-    onStart(game: Game) {
-        this.nextEvent(game);
+    override onStart() {
+        this.nextEvent();
     }
 
-    onRender(game: Game): Array<Option> {
+    override onRender(): Array<Option> {
         return [this.joints[this.pointer - 1]];
     }
 
-    onInput(game: Game, option: Option): void {
-        this.nextEvent(game);
+    override onInput(option: Option): void {
+        this.nextEvent();
     }
 }
 

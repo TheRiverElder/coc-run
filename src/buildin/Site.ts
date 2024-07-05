@@ -4,6 +4,7 @@ import Entity from "./entities/Entity";
 import UniqueMap from "./UniqueMap";
 
 interface SiteData extends Identical, Named {
+    game: Game;
     entities?: Array<Entity>;
     onEnter?: ((game: Game) => void) | GameEvent;
 }
@@ -11,18 +12,21 @@ interface SiteData extends Identical, Named {
 class Site implements Identical, Named {
 
     static FAKE_SITE = new Site({
+        game: null as unknown as Game,
         id: '__fake_site__',
         name: 'Fake Site',
         entities: [],
     });
     
-    id: string;
+    readonly game: Game;
+    readonly id: string;
     name: string;
-    entities: UniqueMap<Entity> = new UniqueMap<Entity>();
+    readonly entities: UniqueMap<Entity> = new UniqueMap<Entity>();
 
     private onEnterFn: ((game: Game) => void) | GameEvent | null;
     
     constructor(data: SiteData) {
+        this.game = data.game;
         this.id = data.id;
         this.name = data.name;
         this.onEnterFn = data.onEnter || null;
@@ -32,40 +36,40 @@ class Site implements Identical, Named {
         });
     }
 
-    onEnter(game: Game): void {
+    onEnter(): void {
         if (this.onEnterFn) {
             if (typeof this.onEnterFn === 'function') {
-                this.onEnterFn(game);
+                this.onEnterFn(this.game);
             } else {
-                game.triggerEvent(this.onEnterFn);
+                this.game.triggerEvent(this.onEnterFn);
             }
         }
     }
 
-    addEntity(game: Game, entity: Entity, silent: boolean = false): Site {
+    addEntity(entity: Entity, silent: boolean = false): Site {
         this.entities.add(entity);
         if (entity.site !== this) {
             entity.site = this;
             if (!silent) {
-                this.entities.values().forEach(e => e.onDetect(game, entity, this));
+                this.entities.values().forEach(e => e.onDetect(entity, this));
             }
         }
         return this;
     }
 
-    addEntities(game: Game, entities: Array<Entity>, silent: boolean = false): Site {
-        entities.forEach(e => this.addEntity(game, e, silent));
+    addEntities(entities: Array<Entity>, silent: boolean = false): Site {
+        entities.forEach(e => this.addEntity(e, silent));
         return this;
     }
 
-    removeEntity(game: Game, entity: Entity): Site {
+    removeEntity(entity: Entity): Site {
         this.entities.remove(entity.uid);
         entity.site = Site.FAKE_SITE;
         return this;
     }
 
-    removeEntities(game: Game, entities: Array<Entity>): Site {
-        entities.forEach(e => this.removeEntity(game, e));
+    removeEntities(entities: Array<Entity>): Site {
+        entities.forEach(e => this.removeEntity(e));
         return this;
     }
 

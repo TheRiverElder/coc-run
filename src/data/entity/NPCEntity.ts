@@ -14,6 +14,7 @@ interface NPCEntityData extends LivingEntityData {
 }
 
 class NPCEntity extends LivingEntity {
+
     talkText: DisplayText;
     idleText: DisplayText;
     chat?: ChatEvent;
@@ -32,13 +33,13 @@ class NPCEntity extends LivingEntity {
         this.takled = false;
     }
 
-    onDetect(game: Game, entity: Entity, site: Site) {
+    onDetect(entity: Entity, site: Site) {
         if (entity.id === 'player' && !this.takled) {
-            this.talk(game);
+            this.talk();
         }
     }
 
-    getInteractions(game: Game): Array<Option> {
+    getInteractions(): Array<Option> {
         return [
             {
                 text: this.name,
@@ -51,40 +52,43 @@ class NPCEntity extends LivingEntity {
         ];
     }
 
-    onInteract(game: Game, option: Option, subopt: Subopt) {
+    onInteract(option: Option, subopt: Subopt) {
         if (subopt.tag === 'talk') {
             if (this.chat) {
-                game.triggerEvent(this.chat);
+                this.game.triggerEvent(this.chat);
             } else {
-                this.talk(game);
+                this.talk();
             }
         } else if (subopt.tag === 'attack') {
-            this.onBeAttack(game);
+            this.onBeAttack();
         }
     }
 
-    onBeAttack(game: Game): void {
-        game.triggerEvent(new CombatEvent({ rivals: [
-            { entity: game.getPlayer(), tag: 'civilian'},
-            { entity: this, tag: 'angry_civilian' },
-        ]}));
+    onBeAttack(): void {
+        this.game.triggerEvent(new CombatEvent({
+            game: this.game,
+            rivals: [
+                { entity: this.game.getPlayer(), tag: 'civilian' },
+                { entity: this, tag: 'angry_civilian' },
+            ]
+        }));
     }
 
-    talk(game: Game) {
+    talk() {
         if (!this.takled) {
-            game.appendText(`${this.name}说:`);
-            game.appendText(this.talkText, 'talk');
+            this.game.appendText(`${this.name}说:`);
+            this.game.appendText(this.talkText, 'talk');
             this.takled = true;
         } else {
-            game.appendText(this.idleText);
+            this.game.appendText(this.idleText);
         }
     }
 
-    onCombatTurn(game: Game, combat: CombatEvent, self: CombatEntity) {
+    onCombatTurn(combat: CombatEvent, self: CombatEntity) {
         if (this.health >= this.maxHealth * 0.75) {
-            combat.attack(game, this, chooseOne(combat.rivals.filter(e => e.tag !== self.tag)).entity);
+            combat.attack(this, chooseOne(combat.rivals.filter(e => e.tag !== self.tag)).entity);
         } else {
-            combat.escape(game, this);
+            combat.escape(this);
         }
     }
 }

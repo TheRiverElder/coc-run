@@ -1,12 +1,12 @@
-import { CombatEvent, Game, LivingEntity } from "../../interfaces/interfaces";
+import { CombatEvent, LivingEntity } from "../../interfaces/interfaces";
 import NPCEntity, { NPCEntityData } from "./NPCEntity";
 import Shadow from "./Shadow";
 
-interface StrangeOldManData extends NPCEntityData {
+export interface StrangeOldManData extends NPCEntityData {
     shadow?: LivingEntity;
 }
 
-class StrangeOldMan extends NPCEntity {
+export default class StrangeOldMan extends NPCEntity {
     shadow?: LivingEntity;
 
     constructor(data: StrangeOldManData) {
@@ -14,20 +14,20 @@ class StrangeOldMan extends NPCEntity {
         this.shadow = data.shadow;
     }
 
-    onBeAttack(game: Game) {
+    onBeAttack() {
         if (!this.shadow || !this.shadow.isAlive()) {
-            this.shadow = new Shadow({ owner: this });
-            this.site.addEntity(game, this.shadow);
+            this.shadow = new Shadow({ game: this.game, owner: this });
+            this.site.addEntity(this.shadow);
         }
-        game.triggerEvent(new CombatEvent({ rivals: [
-            { entity: game.getPlayer(), tag: 'civilian'},
-            { entity: this, tag: 'angry_civilian' },
-            { entity: this.shadow, tag: 'angry_civilian' },
-        ]}));
+        if (this.shadow) {
+            this.game.triggerEvent(new CombatEvent({
+                game: this.game, 
+                rivals: [
+                    { entity: this.game.getPlayer(), tag: 'civilian' },
+                    { entity: this, tag: 'angry_civilian' },
+                    { entity: this.shadow, tag: 'angry_civilian' },
+                ],
+            }));
+        }
     }
-}
-
-export default StrangeOldMan;
-export type {
-    StrangeOldManData,
 }

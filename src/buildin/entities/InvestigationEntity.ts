@@ -1,29 +1,31 @@
 import { Game, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
-import Entity from "./Entity";
+import Entity, { EntityData } from "./Entity";
 
-interface InvestigationEntityData {
+interface InvestigationEntityData extends EntityData {
     results: Array<Entity>;
     counter?: number;
     chances?: number;
 }
 
 class InvestigationEntity extends Entity {
+
+    get name(): string {
+        throw new Error("Method not implemented.");
+    }
+
     results: Array<Entity>;
     counter: number;
     chances: number;
 
     constructor(data: InvestigationEntityData) {
-        super({
-            id: 'site_investigation', 
-            name: 'site_investigation',
-        });
+        super(data);
         this.results = data.results;
         this.counter = data.counter || 0;
         this.chances = data.chances || 2;
     }
     
-    getInteractions(game: Game): Array<Option> {
+    override getInteractions(): Array<Option> {
         return [{
             text: `调查${this.site.name}`,
             leftText: '💡',
@@ -31,22 +33,22 @@ class InvestigationEntity extends Entity {
         }];
     }
 
-    onInteract(game: Game, option: Option): void {
+    override onInteract(option: Option): void {
         const site = this.site;
         this.counter++;
         if (this.counter >= this.chances) {
-            site.removeEntity(game, this);
+            site.removeEntity(this);
         }
-        if (test(game.getPlayer().insight)) {
-            game.appendText('你似乎察觉到了什么');
-            site.removeEntity(game, this);
-            site.addEntities(game, this.results, true);
+        if (test(this.game.getPlayer().insight)) {
+            this.game.appendText('你似乎察觉到了什么');
+            site.removeEntity(this);
+            site.addEntities(this.results, true);
         } else {
             if (this.counter >= this.chances) {
-                game.appendText('好像没发现什么，放弃吧');
-                game.appendText(`你失去了对${site.name}的兴趣`, 'mutate');
+                this.game.appendText('好像没发现什么，放弃吧');
+                this.game.appendText(`你失去了对${site.name}的兴趣`, 'mutate');
             } else {
-                game.appendText('没什么特别的');
+                this.game.appendText('没什么特别的');
             }
         }
     }

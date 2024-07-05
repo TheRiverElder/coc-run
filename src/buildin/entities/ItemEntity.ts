@@ -1,43 +1,44 @@
 import { Game, Item, Option } from "../../interfaces/interfaces";
-import Entity from "./Entity";
+import Entity, { EntityData } from "./Entity";
 import Site from "../Site";
 
-interface ItemEntityData {
+interface ItemEntityData extends Omit<EntityData, "game"> {
     site?: Site;
     item: Item;
     autoEquip?: boolean;
 }
 
 class ItemEntity extends Entity {
+
+    get name(): string {
+        return `[物品]${this.item.name}`;
+    }
+
     item: Item;
     autoEquip: boolean;
 
-    constructor({ item, site, autoEquip }: ItemEntityData) {
-        super({
-            id: 'item', 
-            name: item.name,
-            site,
-        });
-        this.item = item;
-        this.autoEquip = autoEquip || false;
+    constructor(data: ItemEntityData) {
+        super({ ...data, game: data.item.game });
+        this.item = data.item;
+        this.autoEquip = data.autoEquip ?? false;
     }
-    
+
     getInteractions() {
         return [{
-            text: '捡起' + this.item.name,
+            text: '捡起' + this.name,
             leftText: '💎',
             tag: [],
         }];
     }
 
-    onInteract(game: Game, option: Option) {
+    onInteract(option: Option) {
         if (this.autoEquip) {
-            game.getPlayer().holdItem(game, this.item);
+            this.game.getPlayer().holdItem(this.item);
         } else {
-            game.getPlayer().addItemToInventory(game, this.item);
+            this.game.getPlayer().addItemToInventory(this.item);
         }
-        this.site.removeEntity(game, this);
-        game.showPortOptions();
+        this.site.removeEntity(this);
+        this.game.showPortOptions();
     }
 }
 

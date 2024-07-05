@@ -3,16 +3,17 @@ import { Subopt } from "../../interfaces/types";
 
 class InventoryEvent extends GameEvent {
 
-    constructor() {
+    constructor(game: Game) {
         super({
+            game,
             id: 'inventory',
             priority: 99
         });
     }
 
-    onStart(game: Game) {
-        const p = game.getPlayer();
-        game.setOptions([{ text: '返回', tag: [] }]
+    override onStart() {
+        const p = this.game.getPlayer();
+        this.game.setOptions([{ text: '返回', tag: [] }]
             .concat(Array.from(p.inventory.values(), i => ({
                 text: (p.holdingItem?.uid === i.uid ? '卸下' : '装备') + i.name,
                 tag: ['currentState', 'player', 'holdItem',  [p.holdingItem?.uid === i.uid ? i : null]] as any,
@@ -20,14 +21,14 @@ class InventoryEvent extends GameEvent {
         );
     }
 
-    onRender(game: Game): Array<Option> {
-        const p = game.getPlayer();
+    override onRender(): Array<Option> {
+        const p = this.game.getPlayer();
         const options: Array<Option> = [
             { text: '返回' },
             ...p.inventory.values().map(i => ({ 
                 text: i.name,
                 leftText: '🤜',
-                rightText: i.previewDamage(game),
+                rightText: i.previewDamage(),
                 subopts: [
                     { text: '装备', tag: 'hold' },
                     { text: '丢弃', tag: 'drop' },
@@ -39,32 +40,32 @@ class InventoryEvent extends GameEvent {
             options.splice(1, 0, { 
                 text: '收起'+ p.holdingItem.name,
                 leftText: '🤚',
-                rightText: p.holdingItem.previewDamage(game),
+                rightText: p.holdingItem.previewDamage(),
                 tag: p.holdingItem.uid,
             });
         }
         return options;
     }
 
-    onInput(game: Game, option: Option, subopt: Subopt) {
+    override onInput(option: Option, subopt: Subopt) {
         if (typeof option.tag === 'number') {
             const uid: number = option.tag;
-            const p = game.getPlayer();
+            const p = this.game.getPlayer();
 
             if (uid === p.holdingItem?.uid) {
-                p.holdItem(game, null);
+                p.unholdItem();
             } else {
                 const item = p.inventory.get(option.tag);
                 if (item) {
                     if (subopt.tag === 'hold') {
-                        p.holdItem(game, item);
+                        p.holdItem(item);
                     } else if (subopt.tag === 'drop') {
-                        p.removeItemFromInventory(game, item, 'drop');
+                        p.removeItemFromInventory(item, 'drop');
                     }
                 }
             }
         } else {
-            game.endEvent(this);
+            this.game.endEvent(this);
         }
     }
 }

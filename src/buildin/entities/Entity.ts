@@ -1,43 +1,45 @@
 import { Game, Option } from "../../interfaces/interfaces";
-import { Identical, Named, Subopt, Unique } from "../../interfaces/types";
-import { genUid } from "../../utils/math";
+import { Identical, Subopt, Unique } from "../../interfaces/types";
 import Site from "../Site";
 
 interface EntityData {
+    game: Game;
     id?: string;
     uid?: number;
-    name: string;
     site?: Site;
 }
 
-class Entity implements Identical, Unique, Named {
-    id: string;
-    uid: number;
-    name: string;
+abstract class Entity implements Identical, Unique {
+
+    readonly game: Game;
+    readonly id: string; // 指定了一种类型，之后会用Type系统代替
+    readonly uid: number;
+
     site: Site;
 
     constructor(data: EntityData) {
+        this.game = data.game;
         this.id = data.id || 'entity';
-        this.uid = data.uid || genUid();
-        this.name = data.name;
+        this.uid = data.uid || this.game.generateUid();
         this.site = data.site || Site.FAKE_SITE;
     }
 
-    onDetect(game: Game, entity: Entity, site: Site) {
-        // empty
-    }
-
-    goToSite(game: Game, newSite: Site, silient: boolean = false): void {
-        this.site.removeEntity(game, this);
+    /**
+     * 走到新的地点
+     * @param newSite 要去的新的地点
+     * @param silient 如果为true，则不会地点改变的提示文字
+     */
+    goToSite(newSite: Site, silient: boolean = false): void {
+        this.site.removeEntity(this);
         if (silient) {
             newSite.entities.add(this);
         } else {
-            newSite.addEntity(game, this);
+            newSite.addEntity(this);
         }
         this.site = newSite;
     }
 
-    getInteractions(game: Game): Array<Option> {
+    getInteractions(): Array<Option> {
         // return [{
         //     text: this.name,
         //     tag: this.uid,
@@ -45,10 +47,14 @@ class Entity implements Identical, Unique, Named {
         return [];
     }
 
-    onInteract(game: Game, option: Option, subopt: Subopt | null): void {
+    onInteract(option: Option, subopt: Subopt | null): void {
         // if (option.tag === this.uid) {
         //     game.appendText(this.name);
         // }
+    }
+
+    onDetect(entity: Entity, site: Site) {
+        // empty
     }
 }
 

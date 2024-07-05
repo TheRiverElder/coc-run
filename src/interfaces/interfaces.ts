@@ -22,6 +22,8 @@ export interface GameState {
 export interface Game {
     debugMode: boolean;
 
+    generateUid(): number;
+
     timePass(change: number, isInNextDay?: boolean): number;
 
     reset(): void;
@@ -48,7 +50,7 @@ export interface Game {
 }
 
 export interface GameData {
-    initialize(): GameState;
+    initialize(game: Game): GameState;
     start(game: Game): void;
     translate(key: string): string;
 }

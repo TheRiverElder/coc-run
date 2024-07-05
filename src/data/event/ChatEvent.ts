@@ -1,4 +1,4 @@
-import GameEvent from "../../buildin/GameEvent";
+import GameEvent, { GameEventData } from "../../buildin/GameEvent";
 import IdMap from "../../buildin/IdMap";
 import { Game } from "../../interfaces/interfaces";
 import { Identical, Option, Subopt, Text } from "../../interfaces/types";
@@ -13,7 +13,7 @@ interface ChatBlock extends Identical {
     options?: Array<ChatOption>;
 }
 
-interface ChatEventData {
+interface ChatEventData extends GameEventData {
     blocks: Array<ChatBlock>;
     entry?: string;
 }
@@ -24,6 +24,7 @@ class ChatEvent extends GameEvent {
 
     constructor(data: ChatEventData) {
         super({
+            ...data,
             id: 'chat',
             priority: 10,
         });
@@ -31,30 +32,30 @@ class ChatEvent extends GameEvent {
         this.currentBlockId = data.entry || data.blocks[0].id;
     }
 
-    onStart(game: Game): void {
-        this.displayTextAndCheckEnd(game);
+    onStart(): void {
+        this.displayTextAndCheckEnd();
     }
 
-    onRender(game: Game): Array<Option> {
+    onRender(): Array<Option> {
         const block = this.blocks.get(this.currentBlockId);
         return block?.options?.map(e => ({ text: e.text, tag: e.target })) || [];
     }
 
-    onInput(game: Game, option: Option, subopt: Subopt | null): void {
+    onInput(option: Option, subopt: Subopt | null): void {
         if (typeof option.tag === 'string') {
             this.currentBlockId = option.tag;
-            this.displayTextAndCheckEnd(game);
+            this.displayTextAndCheckEnd();
         } else {
-            game.endEvent(this);
+            this.game.endEvent(this);
         }
     }
 
-    displayTextAndCheckEnd(game: Game) {
+    displayTextAndCheckEnd() {
         const block = this.blocks.get(this.currentBlockId);
         if (block) {
-            block.text.forEach(line => game.appendText(line));
+            block.text.forEach(line => this.game.appendText(line));
             if (!block.options || !block.options.length) {
-                game.endEvent(this);
+                this.game.endEvent(this);
             }
         }
     }

@@ -1,6 +1,7 @@
 import { Game, GameEvent } from "../../interfaces/interfaces";
+import { GameEventData } from "../GameEvent";
 
-interface GameOverEventData {
+interface GameOverEventData extends GameEventData {
     reason: string;
 }
 
@@ -9,14 +10,15 @@ class GameOverEvent extends GameEvent {
 
     constructor(data: GameOverEventData) {
         super({
+            ...data,
             id: 'game_over',
             priority: 10,
         });
         this.reason = data.reason;
     }
 
-    onStart(game: Game) {
-        game.gameOver(this.reason);
+    onStart() {
+        this.game.gameOver(this.reason);
     }
 }
 

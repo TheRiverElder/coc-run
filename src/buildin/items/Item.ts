@@ -4,27 +4,30 @@ import { genUid } from "../../utils/math";
 import LivingEntity from "../entities/LivingEntity";
 
 interface ItemData {
+    game: Game;
     id?: string;
     uid?: number;
     name: string;
 }
 
 class Item implements Identical, Unique, Named {
-    id: string;
-    uid: number;
+    readonly game: Game;
+    readonly id: string;
+    readonly uid: number;
     name: string;
 
     constructor(data: ItemData) {
+        this.game = data.game;
         this.id = data.id || 'item';
-        this.uid = data.uid || genUid();
+        this.uid = data.uid || this.game.generateUid();
         this.name = data.name;
     }
 
-    onAttack(game: Game, entity: LivingEntity): Damage {
+    onAttack(entity: LivingEntity): Damage {
         return { value: 0, type: 'melee' };
     }
 
-    previewDamage(game: Game, entity?: LivingEntity): string {
+    previewDamage(entity?: LivingEntity): string {
         return '0';
     }
 }

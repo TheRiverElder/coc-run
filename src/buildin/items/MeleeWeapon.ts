@@ -19,14 +19,14 @@ class MeleeWeapon extends Item {
         this.damage = data.damage;
     }
 
-    onAttack(game: Game, entity: LivingEntity): Damage {
+    onAttack(entity: LivingEntity): Damage {
         return {
             value: rollDice(this.damage),
             type: 'melee',
         };
     }
 
-    previewDamage(game: Game, entity: LivingEntity): string {
+    previewDamage(entity: LivingEntity): string {
         if (typeof this.damage === 'number') {
             return String(this.damage);
         } else {

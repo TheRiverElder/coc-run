@@ -1,5 +1,6 @@
 import { Game, GameEvent, LivingEntity, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
+import { GameEventData } from "../GameEvent";
 
 interface CombatEntity {
     entity: LivingEntity;
@@ -14,7 +15,7 @@ interface CombatEntityData {
     dexFix?: number;
 }
 
-interface CombatEventData {
+interface CombatEventData extends GameEventData {
     uid?: number;
     priority?: number;
     rivals: Array<CombatEntityData>;
@@ -47,15 +48,15 @@ class CombatEvent extends GameEvent {
         }
     }
 
-    onStart(game: Game) {
-        game.appendText('战斗开始！');
-        this.rivals.forEach(e => e.entity.onCombatStart(game, this, e));
-        this.displayRivals(game);
-        this.runForPlayer(game);
+    onStart() {
+        this.game.appendText('战斗开始！');
+        this.rivals.forEach(e => e.entity.onCombatStart(this, e));
+        this.displayRivals();
+        this.runForPlayer();
     }
 
-    onRender(game: Game): Array<Option> {
-        const p = game.getPlayer();
+    onRender(): Array<Option> {
+        const p = this.game.getPlayer();
         const cp = this.rivals.find(e => e.entity.uid === p.uid);
         const escape = { 
             text: `逃跑`,
@@ -70,11 +71,11 @@ class CombatEvent extends GameEvent {
         const options: Array<Option> = this.rivals.filter(e => e.tag !== cp.tag).map(e => ({
             text: `攻击${e.entity.name}`,
             leftText: '🗡',
-            rightText: `${weapon.previewDamage(game, e.entity)}♥`,
+            rightText: `${weapon.previewDamage(e.entity)}♥`,
             tag: e.entity.uid,
         }));
         options.push(escape);
-        if (game.debugMode) {
+        if (this.game.debugMode) {
             options.push({
                 text: `一击必杀`,
                 leftText: '💀',
@@ -85,42 +86,42 @@ class CombatEvent extends GameEvent {
         return options;
     }
 
-    displayRivals(game: Game) {
-        game.appendText('场上剩余：' + this.rivals.filter(e => e.entity.id !== 'player').map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
+    displayRivals() {
+        this.game.appendText('场上剩余：' + this.rivals.filter(e => e.entity.id !== 'player').map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
     }
 
-    onInput(game: Game, option: Option) {
-        const p = game.getPlayer();
+    onInput(option: Option) {
+        const p = this.game.getPlayer();
         const cp = this.rivals.find(e => e.entity.uid === p.uid);
         if (!cp) {
-            game.endEvent(this);
+            this.game.endEvent(this);
             return;
         }
 
         if (option.tag === 'one_punch') {
-            this.rivals.filter(e => e.tag === cp.tag).forEach(e => e.entity.mutateValue(game, 'health', -e.entity.health, '因为苟管理'));
+            this.rivals.filter(e => e.tag === cp.tag).forEach(e => e.entity.mutateValue('health', -e.entity.health, '因为苟管理'));
         } else if (option.tag === 'escape') {
-            this.escape(game, p);
+            this.escape(p);
         } else if (typeof option.tag === 'number') {
             const enemy = this.rivals.find(e => e.entity.uid === option.tag);
             if (enemy) {
-                p.attack(game, enemy.entity);
+                p.attack(enemy.entity);
             }
         }
 
-        if (this.checkCombatEnd(game)) return;
+        if (this.checkCombatEnd()) return;
         this.turnNext();
-        this.runForPlayer(game);
-        this.displayRivals(game);
+        this.runForPlayer();
+        this.displayRivals();
     }
 
-    checkCombatEnd(game: Game): boolean {
+    checkCombatEnd(): boolean {
         this.remanageRivals();
         const tag = this.rivals?.[0].tag;
         if (this.rivals.length <= 1 || this.rivals.every(e => e.tag === tag)) {
-            game.appendText('战斗结束');
-            game.endEvent(this);
-            this.rivals.forEach(e => e.entity.onCombatStart(game, this, e));
+            this.game.appendText('战斗结束');
+            this.game.endEvent(this);
+            this.rivals.forEach(e => e.entity.onCombatStart(this, e));
             return true;
         }
         return false;
@@ -133,8 +134,8 @@ class CombatEvent extends GameEvent {
     }
 
     // let next one act
-    nextAct(game: Game): void {
-        this.next.entity.onCombatTurn(game, this, this.next);
+    nextAct(): void {
+        this.next.entity.onCombatTurn(this, this.next);
         this.turnNext();
     }
 
@@ -142,16 +143,16 @@ class CombatEvent extends GameEvent {
         this.next = this.rivals[(this.next.order + 1) % this.rivals.length];
     }
 
-    runForPlayer(game: Game): void {
-        while (!this.checkCombatEnd(game) && this.next.entity.id !== 'player') {
-            this.nextAct(game);
+    runForPlayer(): void {
+        while (!this.checkCombatEnd() && this.next.entity.id !== 'player') {
+            this.nextAct();
         }
     }
 
-    public escape(game: Game, rival: LivingEntity): void {
+    public escape(rival: LivingEntity): void {
         if(test(rival.dexterity)) {
-            game.appendText(`${rival.name}逃跑成功`, 'good');
-            game.endEvent(this);
+            this.game.appendText(`${rival.name}逃跑成功`, 'good');
+            this.game.endEvent(this);
             const index = this.rivals.findIndex(e => e.entity.uid === rival.uid);
             if (index >= 0) {
                 this.rivals.splice(index, 1);
@@ -161,13 +162,13 @@ class CombatEvent extends GameEvent {
             }
             this.remanageRivals();
         } else {
-            game.appendText(`${rival.name}逃跑失败`, 'bad');
+            this.game.appendText(`${rival.name}逃跑失败`, 'bad');
         }
     }
 
-    public attack(game: Game, source: LivingEntity, target: LivingEntity): void {
-        game.appendText(`${source.name}使用${source.getWeapon().name}攻击${target.name}`, 'bad');
-        source.attack(game, target);
+    public attack(source: LivingEntity, target: LivingEntity): void {
+        this.game.appendText(`${source.name}使用${source.getWeapon().name}攻击${target.name}`, 'bad');
+        source.attack(target);
     }
 }
 

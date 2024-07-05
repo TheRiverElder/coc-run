@@ -5,6 +5,7 @@ import { CombatEntity } from "../events/CombatEvent";
 import Entity, { EntityData } from "./Entity";
 
 interface LivingEntityData extends EntityData {
+    name?: string;
     health: number;
     maxHealth: number;
     shield?: number;
@@ -15,97 +16,102 @@ interface LivingEntityData extends EntityData {
     loots?: Array<Entity | Item>;
 }
 
-class LivingEntity extends Entity {
-    
+abstract class LivingEntity extends Entity {
+
+    name: string;
+
     health: number;
     maxHealth: number;
     shield: number;
     strength: number;
     dexterity: number;
     baseDamage: Dice | number;
-    baseWeaponName: string;
+    baseWeaponName: string; // 基础武器的名字，不同实体的武器是不一样的
     loots: Array<Entity>;
 
     constructor(data: LivingEntityData) {
         super(data);
+
+        this.name = data.name ?? "???";
         this.health = data.health;
         this.maxHealth = data.maxHealth;
-        this.shield = data.shield || 0;
+        this.shield = data.shield ?? 0;LivingEntity
         this.strength = data.strength;
         this.dexterity = data.dexterity;
         this.baseDamage = data.baseDamage;
         this.baseWeaponName = data.baseWeaponName;
-        this.loots = data.loots?.map(e => e instanceof Item ? new ItemEntity({ item: e }) : e) || [];
+        this.loots = data.loots?.map(e => e instanceof Item ? new ItemEntity({ item: e }) : e) ?? [];
     }
 
-    mutateValue(game: Game, key: string, delta: number, reason?: string): void {
-        switch(key) {
+    mutateValue(key: string, delta: number, reason?: string): void {
+        switch (key) {
             case 'health': this.health += delta; break;
             case 'strength': this.strength += delta; break;
             case 'dexterity': this.dexterity += delta; break;
         }
-        game.appendText(`${this.name} ${reason || ''} ${game.translate(key)} ${num2strWithSign(delta)}`);
+        this.game.appendText(`${this.name} ${reason || ''} ${this.game.translate(key)} ${num2strWithSign(delta)}`);
         if (this.health <= 0) {
-            game.appendText(`${this.name}死亡`);
-            this.site.addEntities(game, this.loots);
-            this.site.removeEntity(game, this);
+            this.game.appendText(`${this.name}死亡`);
+            this.site.addEntities(this.loots);
+            this.site.removeEntity(this);
         }
     }
 
-    onCombatStart(game: Game, combat: CombatEvent, self: CombatEntity) {
+    onCombatStart(combat: CombatEvent, self: CombatEntity) {
         // empty
     }
 
-    onCombatTurn(game: Game, combat: CombatEvent, self: CombatEntity) {
+    onCombatTurn(combat: CombatEvent, self: CombatEntity) {
         // empty
     }
 
-    onCombatEnd(game: Game, combat: CombatEvent, self: CombatEntity) {
+    onCombatEnd(combat: CombatEvent, self: CombatEntity) {
         // empty
     }
 
-    attack(game: Game, target: LivingEntity, isFightBack: boolean = false): Damage {
+    attack(target: LivingEntity, isFightBack: boolean = false): Damage {
         const weapon = this.getWeapon();
-        const damage: Damage = weapon.onAttack(game, target);
-        this.onAttack(game, damage, target);
+        const damage: Damage = weapon.onAttack(target);
+        this.onAttack(damage, target);
         if (damage.value) {
-            target.onReceiveDamage(game, damage, this, isFightBack);
+            target.onReceiveDamage(damage, this, isFightBack);
         }
         return damage;
     }
 
-    onAttack(game: Game, damage: Damage, target: LivingEntity): void {
+    onAttack(damage: Damage, target: LivingEntity): void {
         // empty
     }
 
-    onReceiveDamage(game: Game, damage: Damage, source: LivingEntity, isFightBack: boolean = false) {
+    onReceiveDamage(damage: Damage, source: LivingEntity, isFightBack: boolean = false) {
         if (!isFightBack) {
             if (test(this.dexterity)) {
                 const s = `${this.name}躲过了${source.name}的进攻`;
                 if (test(this.dexterity)) {
-                    game.appendText(s + `，并返回打一把`, 'good');
-                    this.attack(game, source, true);
+                    this.game.appendText(s + `，并返回打一把`, 'good');
+                    this.attack(source, true);
                 } else {
-                    game.appendText(s, 'good');
+                    this.game.appendText(s, 'good');
                 }
                 return;
             }
         }
         damage.value = Math.max(0, damage.value - this.shield);
         if (damage.value) {
-            this.mutateValue(game, 'health', -damage.value, `受到${source.name}攻击`);
+            this.mutateValue('health', -damage.value, `受到${source.name}攻击`);
         } else {
-            game.appendText(`${this.name}的护甲防住了${source.name}的攻势`, 'good');
+            this.game.appendText(`${this.name}的护甲防住了${source.name}的攻势`, 'good');
         }
     }
 
-    goToSite(game: Game, newSite: Site): void {
-        game.appendText(`${this.name}来到了${newSite.name}`, 'mutate');
-        super.goToSite(game, newSite);
+    goToSite(newSite: Site, silent: boolean = false): void {
+        this.game.appendText(`${this.name}来到了${newSite.name}`, 'mutate');
+        super.goToSite(newSite, silent);
     }
 
     getWeapon(): Item {
         return new MeleeWeapon({
+            game: this.game,
             id: 'melee',
             name: this.baseWeaponName,
             damage: this.baseDamage,
@@ -116,9 +122,9 @@ class LivingEntity extends Entity {
         return this.health > 0;
     }
 
-    removeSelf(game: Game): boolean {
+    removeSelf(): boolean {
         if (this.site !== Site.FAKE_SITE) {
-            this.site.removeEntity(game, this);
+            this.site.removeEntity(this);
             return true;
         }
         return false;

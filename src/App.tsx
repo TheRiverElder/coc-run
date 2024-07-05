@@ -47,12 +47,17 @@ class App extends React.Component<AppProps, AppState> implements Game {
     this.debugMode = props.debugMode || false;
     this.textListEl = React.createRef<HTMLDivElement>();
 
-    this.currentState = props.data.initialize();
+    this.currentState = props.data.initialize(this);
     this.state = Object.assign({}, this.currentState, { 
       textList: [], 
       showOptions: true, 
       showInventory: false,
     });
+  }
+
+  private uidCounter = 1;
+  generateUid(): number {
+    return this.uidCounter++;
   }
 
   render() {
@@ -64,7 +69,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
           <p>
             <span>第{Math.floor(s.time / 24) + 1}天{s.time % 24}点钟，</span>
             <span>在{p.site.name}，</span>
-            <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage(this)})` : '两手空空'}</span>
+            <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage()})` : '两手空空'}</span>
           </p>
           
           <p className="values">
@@ -175,9 +180,9 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
   reset() {
     this.resetting = true;
-    this.currentState = this.props.data.initialize();
+    this.currentState = this.props.data.initialize(this);
     const player = this.currentState.player;
-    player.site.addEntity(this, player);
+    player.site.addEntity(player);
     // this.entityMap.clear();
     // this.currentState.map.forEach(s => s.entities.forEach(this.recordAddEntity.bind(this)))
     this.refreshOptions();
@@ -224,11 +229,11 @@ class App extends React.Component<AppProps, AppState> implements Game {
       this.reset();
     } else if (s.events.length > 0) {
       const event = s.events[0];
-      event.onInput(this, option, subopt);
+      event.onInput(option, subopt);
     } else if (option.entityUid) {
       const entity = s.player.site.entities.get(option.entityUid);
       if (entity) {
-        entity.onInteract(this, option, subopt);
+        entity.onInteract(option, subopt);
       }
     } else if (Array.isArray(option.tag)) {
       this.execCmd(option.tag);
@@ -261,7 +266,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   triggerEvent(event: GameEvent) {
     this.currentState.events.push(event);
     this.refreshEvents();
-    event.onStart(this);
+    event.onStart();
   }
 
   endEvent(event: GameEvent) {
@@ -289,7 +294,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
     const s = this.currentState;
     if (s.events.length > 0) {
       const event = s.events[s.events.length - 1];
-      this.setOptions(event.onRender(this));
+      this.setOptions(event.onRender());
     } else {
       this.showPortOptions();
     }
@@ -297,7 +302,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
   openInventory() {
     if (!this.findEvent('inventory')) {
-      this.triggerEvent(new InventoryEvent());
+      this.triggerEvent(new InventoryEvent(this));
       this.refreshOptions();
       this.applyChange();
     }
@@ -306,7 +311,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   showPortOptions() {
     const p = this.currentState.player;
     const site: Site = p.site;
-    const options = Array.from(site.entities.values(), e => e.getInteractions(this).map(o => Object.assign(o, { entityUid: e.uid }))).flat();
+    const options = Array.from(site.entities.values(), e => e.getInteractions().map(o => Object.assign(o, { entityUid: e.uid }))).flat();
     this.setOptions(options);
   }
 

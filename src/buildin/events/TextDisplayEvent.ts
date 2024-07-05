@@ -1,6 +1,7 @@
 import { Game, GameEvent, Text } from "../../interfaces/interfaces";
+import { GameEventData } from "../GameEvent";
 
-interface TextDisplayEventData {
+interface TextDisplayEventData extends GameEventData {
     texts: Array<Text>;
 }
 
@@ -9,15 +10,15 @@ class TextDisplayEvent extends GameEvent {
 
     constructor(data: TextDisplayEventData) {
         super({
-            id: 'text',
+            ...data,
             priority: 10,
         });
         this.texts = data.texts;
     }
 
-    onStart(game: Game) {
-        this.texts.forEach(t => game.appendText(t));
-        game.endEvent(this);
+    override onStart() {
+        this.texts.forEach(t => this.game.appendText(t));
+        this.game.endEvent(this);
     }
 }
 

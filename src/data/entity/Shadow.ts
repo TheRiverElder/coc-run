@@ -1,9 +1,11 @@
+import { LivingEntityData } from "../../buildin/entities/LivingEntity";
 import { CombatEntity } from "../../buildin/events/CombatEvent";
 import { CombatEvent, Game, LivingEntity, Site } from "../../interfaces/interfaces";
 import { chooseOne } from "../../utils/math";
 import MonsterEntity from "./MonsterEntity";
 
 interface ShadowData {
+    game: Game;
     id?: string;
     uid?: number;
     name?: string;
@@ -16,7 +18,7 @@ class Shadow extends MonsterEntity {
 
     constructor(data: ShadowData) {
         const owner = data.owner;
-        const d = {
+        const d: LivingEntityData = {
             ...data,
             id: 'shadow',
             name: `${owner.name}的影子`,
@@ -31,16 +33,16 @@ class Shadow extends MonsterEntity {
         this.owner = owner;
     }
 
-    onCombatStart(game: Game, combat: CombatEvent, self: CombatEntity) {
-        
+    onCombatStart(combat: CombatEvent, self: CombatEntity) {
+
     }
 
-    onCombatTurn(game: Game, combat: CombatEvent, self: CombatEntity) {
-        combat.attack(game, this, chooseOne(combat.rivals.filter(e => e.tag !== self.tag)).entity);
+    onCombatTurn(combat: CombatEvent, self: CombatEntity) {
+        combat.attack(this, chooseOne(combat.rivals.filter(e => e.tag !== self.tag)).entity);
     }
 
-    onCombatEnd(game: Game, combat: CombatEvent, self: CombatEntity) {
-        this.removeSelf(game);
+    onCombatEnd(combat: CombatEvent, self: CombatEntity) {
+        this.removeSelf();
     }
 }
 

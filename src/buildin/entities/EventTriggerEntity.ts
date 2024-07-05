@@ -1,40 +1,40 @@
 import { Game, GameEvent, Option } from "../../interfaces/interfaces";
 import Entity from "./Entity";
 
-interface EventTriggerEntityData {
+export interface EventTriggerEntityData {
     event: GameEvent;
     option?: Option;
     once?: boolean; 
 }
 
-class EventTriggerEntity extends Entity {
+export default class EventTriggerEntity extends Entity {
+
+    get name(): string {
+        return this.event.id;
+    }
+
     event: GameEvent;
     option: Option;
     once: boolean; 
 
-    constructor({ event, once, option }: EventTriggerEntityData) {
+    constructor(data: EventTriggerEntityData) {
         super({
+            game: data.event.game,
             id: 'event_trigger', 
-            name: event.id,
         });
-        this.event = event;
-        this.option = option || { text: '...' };
-        this.once = once || true;
+        this.event = data.event;
+        this.option = data.option || { text: '...' };
+        this.once = data.once || true;
     }
     
-    getInteractions(game: Game) {
+    override getInteractions() {
         return [this.option];
     }
 
-    onInteract(game: Game, option: Option) {
-        game.triggerEvent(this.event);
+    override onInteract(option: Option) {
+        this.game.triggerEvent(this.event);
         if (this.once) {
-            this.site.removeEntity(game, this);
+            this.site.removeEntity(this);
         }
     }
-}
-
-export default EventTriggerEntity;
-export type {
-    EventTriggerEntityData,
 }

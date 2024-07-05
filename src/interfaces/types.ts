@@ -25,11 +25,13 @@ export interface Option {
     subopts?: Array<Subopt>;
     tag?: any;
     entityUid?: number;
+    onInteract?: () => void;
 }
 
 export interface Subopt {
     text: string;
     tag?: any;
+    onInteract?: () => void;
 }
 
 export interface Dice {
