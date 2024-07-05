@@ -82,7 +82,7 @@ export default class PlayerEntity extends LivingEntity {
     private previousSite?: Site;
 
     get prevSite(): Site | null {
-        return this.prevSite ?? null;
+        return this.previousSite ?? null;
     }
 
     /**
