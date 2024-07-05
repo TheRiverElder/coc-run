@@ -4,7 +4,7 @@ import { num2strWithSign } from "../../utils/strings";
 import { CombatEntity } from "../events/CombatEvent";
 import Entity, { EntityData } from "./Entity";
 
-interface LivingEntityData extends EntityData {
+export interface LivingEntityData extends EntityData {
     name?: string;
     health: number;
     maxHealth: number;
@@ -16,7 +16,7 @@ interface LivingEntityData extends EntityData {
     loots?: Array<Entity | Item>;
 }
 
-abstract class LivingEntity extends Entity {
+export default abstract class LivingEntity extends Entity {
 
     name: string;
 
@@ -129,9 +129,4 @@ abstract class LivingEntity extends Entity {
         }
         return false;
     }
-}
-
-export default LivingEntity;
-export type {
-    LivingEntityData,
 }

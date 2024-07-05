@@ -1,11 +1,11 @@
-import { Game, Option } from "../../interfaces/interfaces";
+import { Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 import Entity, { EntityData } from "./Entity";
 
 interface InvestigationEntityData extends EntityData {
-    results: Array<Entity>;
-    counter?: number;
-    chances?: number;
+    results: Array<Entity>; // 调查结果
+    counter?: number; // 已经调查过的次数
+    chances?: number; // 总共能调查几次
 }
 
 class InvestigationEntity extends Entity {
@@ -21,8 +21,8 @@ class InvestigationEntity extends Entity {
     constructor(data: InvestigationEntityData) {
         super(data);
         this.results = data.results;
-        this.counter = data.counter || 0;
-        this.chances = data.chances || 2;
+        this.counter = data.counter ?? 0;
+        this.chances = data.chances ?? 2;
     }
     
     override getInteractions(): Array<Option> {

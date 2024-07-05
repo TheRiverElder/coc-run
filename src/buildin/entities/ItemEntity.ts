@@ -1,4 +1,4 @@
-import { Game, Item, Option } from "../../interfaces/interfaces";
+import { Item, Option } from "../../interfaces/interfaces";
 import Entity, { EntityData } from "./Entity";
 import Site from "../Site";
 
@@ -9,10 +9,6 @@ interface ItemEntityData extends Omit<EntityData, "game"> {
 }
 
 class ItemEntity extends Entity {
-
-    get name(): string {
-        return `[物品]${this.item.name}`;
-    }
 
     item: Item;
     autoEquip: boolean;
@@ -25,7 +21,7 @@ class ItemEntity extends Entity {
 
     getInteractions() {
         return [{
-            text: '捡起' + this.name,
+            text: '捡起' + this.item.name,
             leftText: '💎',
             tag: [],
         }];
