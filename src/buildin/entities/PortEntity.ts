@@ -23,11 +23,18 @@ class PortEntity extends Entity {
         this.timeCost = data.timeCost || 1;
     }
     
-    override getInteractions() {
+    override getInteractions(): Array<Option> {
         return [{
             text: this.name,
             leftText: (this.game.getPlayer().prevSite?.id === this.target) ? '⬅' : '➡',
             tag: this.uid,
+            action: () => {
+                const site = this.game.getMap().get(this.target);
+                if (site) {
+                    this.game.getPlayer().goToSite(site);
+                    this.game.timePass(this.timeCost);
+                }
+            }
         }];
     }
 

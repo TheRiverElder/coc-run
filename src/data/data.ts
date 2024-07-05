@@ -109,8 +109,9 @@ const data = {
                 id: 'main_streat',
                 name: '大路',
                 entities: [
-                    new PortEntity({ game, target: 'temple' }),
+                    new PortEntity({ game, target: 'clan_hall' }),
                     new PortEntity({ game, target: 'wang_house' }),
+                    new PortEntity({ game, target: 'home_house' }),
                     new PortEntity({ game, target: 'ng_bridge' }),
                     new ItemEntity({
                         item: new MeleeWeapon({
@@ -143,20 +144,70 @@ const data = {
             }),
             new Site({
                 game,
-                id: 'temple',
+                id: 'home_house',
+                name: '自己的老房子',
+                entities: [
+                    new PortEntity({ game, target: 'main_streat' }),
+                    new PortEntity({ game, target: 'mom_room' }),
+                    new PortEntity({ game, target: 'nanny_room' }),
+                ],
+            }),
+            new Site({
+                game,
+                id: 'mom_room',
+                name: '妈妈的房间',
+                entities: [
+                    new PortEntity({ game, target: 'home_house' }),
+                ],
+            }),
+            new Site({
+                game,
+                id: 'nanny_room',
+                name: '奶奶的房间',
+                entities: [
+                    new PortEntity({ game, target: 'home_house' }),
+                    new InvestigationEntity({
+                        game,
+                        results: [new PortEntity({
+                            game,
+                            target: 'nanny_secret_room',
+                        })]
+                    }),
+                ],
+            }),
+            new Site({
+                game,
+                id: 'nanny_secret_room',
+                name: '奶奶的密室',
+                entities: [
+                    new PortEntity({ game, target: 'nanny_room' }),
+                    new InvestigationEntity({
+                        game,
+                        results: [new ItemEntity({
+                            item: new Item({
+                                game,
+                                name: '黑木盒',
+                            }), autoEquip: false
+                        })]
+                    }),
+                ],
+            }),
+            new Site({
+                game,
+                id: 'clan_hall',
                 name: '祠堂',
                 entities: [
-                    new PortEntity({ game, target: 'temple_basement' }),
+                    new PortEntity({ game, target: 'clan_hall_basement' }),
                     new PortEntity({ game, target: 'main_streat' }),
                     elder,
                 ],
             }),
             new Site({
                 game,
-                id: 'temple_basement',
+                id: 'clan_hall_basement',
                 name: '祠堂地下室',
                 entities: [
-                    new PortEntity({ game, target: 'temple' }),
+                    new PortEntity({ game, target: 'clan_hall' }),
                     new MonsterEntity({
                         game,
                         name: '触手怪',
@@ -178,7 +229,7 @@ const data = {
                 id: 'dark_river',
                 name: '漆黑之河',
                 entities: [
-                    new PortEntity({ game, target: 'temple_basement' }),
+                    new PortEntity({ game, target: 'clan_hall_basement' }),
                     new EventTriggerEntity({
                         option: { text: '跳入其中', leftText: '🏊‍' },
                         event: new SequenceEvent({

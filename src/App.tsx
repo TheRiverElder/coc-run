@@ -48,9 +48,9 @@ class App extends React.Component<AppProps, AppState> implements Game {
     this.textListEl = React.createRef<HTMLDivElement>();
 
     this.currentState = props.data.initialize(this);
-    this.state = Object.assign({}, this.currentState, { 
-      textList: [], 
-      showOptions: true, 
+    this.state = Object.assign({}, this.currentState, {
+      textList: [],
+      showOptions: true,
       showInventory: false,
     });
   }
@@ -71,13 +71,13 @@ class App extends React.Component<AppProps, AppState> implements Game {
             <span>在{p.site.name}，</span>
             <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage()})` : '两手空空'}</span>
           </p>
-          
+
           <p className="values">
             <span className="value">{`${this.translate('health')}:${p.health}/${p.maxHealth}`}</span>
             {values.map(k => `${this.translate(k)}:${(p as any)[k]}`).map(s => (<span key={s} className="value">{s}</span>))}
           </p>
         </header>
-        
+
         <div className="panel">
           <div className="text-panel" ref={this.textListEl}>
             {this.state.textList.map((t, i) => (
@@ -89,17 +89,17 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
           <div className="option-panel">
             <div className="fab" onClick={this.openInventory.bind(this)}>💰</div>
-            
+
             {this.state.showOptions ? this.state.options.map((o, i) => (
               <OptionBtn
-                key={i} 
+                key={i}
                 className="option"
                 option={o}
                 onClick={this.handleClickOption.bind(this)}
               />
-            )) 
-            : <button className="option skip-btn"onClick={this.flushText.bind(this, true)}> ⏩ </button>
-            }
+            )) : (
+              <button className="option skip-btn" onClick={this.flushText.bind(this, true)}> ⏩ </button>
+            )}
           </div>
         </div>
       </div>
@@ -115,7 +115,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
       () => this.textListEl.current?.scrollTo({
         top: this.textListEl.current.scrollHeight,
         behavior: 'smooth',
-      })
+      }),
     );
   }
 
@@ -124,7 +124,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
       this.setState(() => ({ showOptions: false }));
       this.flushText();
       this.pid = setInterval(this.flushLoop.bind(this, true), 350);
-    } else if (isInInterval){
+    } else if (isInInterval) {
       if (this.textBuffer.length) {
         this.setState(() => ({ showOptions: false }));
         this.flushText();
@@ -199,11 +199,11 @@ class App extends React.Component<AppProps, AppState> implements Game {
   // recordAddEntity(entity: Entity): void {
   //   this.entityMap.add(entity);
   // }
-  
+
   // recordRemoveEntity(entity: Entity): void {
   //   this.entityMap.remove(entity);
   // }
-  
+
   // takeScreenshot() {
   //   const { textList, showOptions, ...ss } = this.state;
   //   this.currentState = copy(ss, true);
@@ -260,7 +260,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
       (result as Function).apply(thisArg, params);
     }
   }
-  
+
   //#region events
 
   triggerEvent(event: GameEvent) {
