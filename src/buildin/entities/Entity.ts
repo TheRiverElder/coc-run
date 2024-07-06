@@ -1,27 +1,23 @@
-import { Game, Option } from "../../interfaces/interfaces";
-import { Identical, Subopt, Unique } from "../../interfaces/types";
+import { Option } from "../../interfaces/interfaces";
+import { Subopt } from "../../interfaces/types";
+import ObjectBase, { ObjectBaseData } from "../objects/ObjectBase";
 import Site from "../Site";
 
-interface EntityData {
-    game: Game;
-    id?: string;
-    uid?: number;
+interface EntityData extends ObjectBaseData {
     site?: Site;
 }
 
-abstract class Entity implements Identical, Unique {
+abstract class Entity extends ObjectBase {
 
-    readonly game: Game;
-    readonly id: string; // 指定了一种类型，之后会用Type系统代替
-    readonly uid: number;
-
-    site: Site;
+    private _site: Site | null;
+    public get site(): Site {
+        if (!this._site) throw new Error("Site not set!");
+        return this._site;
+    }
 
     constructor(data: EntityData) {
-        this.game = data.game;
-        this.id = data.id || 'entity';
-        this.uid = data.uid || this.game.generateUid();
-        this.site = data.site || Site.FAKE_SITE;
+        super(data);
+        this._site = data.site ?? null;
     }
 
     /**
@@ -36,25 +32,29 @@ abstract class Entity implements Identical, Unique {
         } else {
             newSite.addEntity(this);
         }
-        this.site = newSite;
+        this._site = newSite;
     }
 
-    getInteractions(): Array<Option> {
-        // return [{
-        //     text: this.name,
-        //     tag: this.uid,
-        // }];
-        return [];
-    }
-
+    /**
+     * @depratured
+     */
     onInteract(option: Option, subopt: Subopt | null): void {
         // if (option.tag === this.uid) {
         //     game.appendText(this.name);
         // }
     }
 
+    /**
+     * @depratured
+     */
     onDetect(entity: Entity, site: Site) {
         // empty
+    }
+
+    // 把自己从场景中移除，此行为不会解除entity对site的引用
+    removeSelf() {
+        this.site.removeEntity(this);
+        this._site = null;
     }
 }
 

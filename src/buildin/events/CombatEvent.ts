@@ -1,13 +1,7 @@
-import { Game, GameEvent, LivingEntity, Option } from "../../interfaces/interfaces";
+import { GameEvent, LivingEntity, Option, PlayerEntity } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
+import CombatableComponent from "../components/CombatableComponent";
 import { GameEventData } from "../GameEvent";
-
-interface CombatEntity {
-    entity: LivingEntity;
-    tag: any;
-    dexFix: number;
-    order: number;
-}
 
 interface CombatEntityData {
     entity: LivingEntity;
@@ -22,9 +16,9 @@ interface CombatEventData extends GameEventData {
     next?: number;
 }
 
-class CombatEvent extends GameEvent {
+export default class CombatEvent extends GameEvent {
     rivals: Array<CombatEntity>;
-    next: CombatEntity;
+    actingRival: CombatEntity;
 
     constructor(data: CombatEventData) {
         super({
@@ -32,43 +26,38 @@ class CombatEvent extends GameEvent {
             id: 'combat',
             priority: 10,
         });
-        this.rivals = data.rivals.map((e, i) => ({
-            entity: e.entity,
-            tag: e.tag,
-            dexFix: e.dexFix || 0,
-            order: i,
-        }));
-        if (!this.rivals.length) {
+        this.rivals = data.rivals.map((e, i) => new CombatEntity(this, e.entity, e.tag, e.dexFix || 0, i));
+        if (this.rivals.length < 2) {
             throw new Error("Combat with no rivals is not allowed!");
         }
         if ('next' in data) {
-            this.next = this.rivals.find(e => e.entity.uid === data.next) || this.rivals[0];
+            this.actingRival = this.rivals.find(e => e.entity.uid === data.next) || this.rivals[0];
         } else {
-            this.next = this.rivals[0];
+            this.actingRival = this.rivals[0];
         }
     }
 
-    onStart() {
+    override onStart() {
         this.game.appendText('战斗开始！');
-        this.rivals.forEach(e => e.entity.onCombatStart(this, e));
-        this.displayRivals();
+        this.rivals.forEach(e => e.combatable.onCombatStart(e));
+        this.displayRivalsInformation();
         this.runForPlayer();
     }
 
-    onRender(): Array<Option> {
-        const p = this.game.getPlayer();
-        const cp = this.rivals.find(e => e.entity.uid === p.uid);
-        const escape = { 
+    override onRender(): Array<Option> {
+        const player = this.game.getPlayer();
+        const combatPlayer = this.rivals.find(e => e.entity.uid === player.uid);
+        const escape: Option = {
             text: `逃跑`,
             leftText: '🏃‍',
-            rightText: `${p.dexterity}%`,
+            rightText: `${player.dexterity}%`,
             tag: 'escape',
         };
-        if (!cp) {
+        if (!combatPlayer) {
             return [escape];
         }
-        const weapon = p.getWeapon();
-        const options: Array<Option> = this.rivals.filter(e => e.tag !== cp.tag).map(e => ({
+        const weapon = player.getWeapon();
+        const options: Array<Option> = this.rivals.filter(e => e.tag !== combatPlayer.tag).map(e => ({
             text: `攻击${e.entity.name}`,
             leftText: '🗡',
             rightText: `${weapon.previewDamage(e.entity)}♥`,
@@ -86,11 +75,11 @@ class CombatEvent extends GameEvent {
         return options;
     }
 
-    displayRivals() {
-        this.game.appendText('场上剩余：' + this.rivals.filter(e => e.entity.id !== 'player').map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
+    displayRivalsInformation() {
+        this.game.appendText(`场上剩余（${this.rivals.length}）：` + this.rivals.map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
     }
 
-    onInput(option: Option) {
+    override onInput(option: Option) {
         const p = this.game.getPlayer();
         const cp = this.rivals.find(e => e.entity.uid === p.uid);
         if (!cp) {
@@ -112,7 +101,7 @@ class CombatEvent extends GameEvent {
         if (this.checkCombatEnd()) return;
         this.turnNext();
         this.runForPlayer();
-        this.displayRivals();
+        this.displayRivalsInformation();
     }
 
     checkCombatEnd(): boolean {
@@ -130,34 +119,34 @@ class CombatEvent extends GameEvent {
     remanageRivals(): void {
         this.rivals = this.rivals.filter(e => e.entity.isAlive());
         this.rivals.sort((a, b) => a.entity.dexterity - b.entity.dexterity);
-        this.rivals.forEach((e, i) => e.order = i);
+        this.rivals.forEach((e, i) => e.ordinal = i);
     }
 
     // let next one act
     nextAct(): void {
-        this.next.entity.onCombatTurn(this, this.next);
+        this.actingRival.entity.onCombatTurn(this, this.actingRival);
         this.turnNext();
     }
 
     turnNext(): void {
-        this.next = this.rivals[(this.next.order + 1) % this.rivals.length];
+        this.actingRival = this.rivals[(this.actingRival.ordinal + 1) % this.rivals.length];
     }
 
     runForPlayer(): void {
-        while (!this.checkCombatEnd() && this.next.entity.id !== 'player') {
+        while (!this.checkCombatEnd() && !(this.actingRival.entity instanceof PlayerEntity)) {
             this.nextAct();
         }
     }
 
     public escape(rival: LivingEntity): void {
-        if(test(rival.dexterity)) {
+        if (test(rival.dexterity)) {
             this.game.appendText(`${rival.name}逃跑成功`, 'good');
             this.game.endEvent(this);
             const index = this.rivals.findIndex(e => e.entity.uid === rival.uid);
             if (index >= 0) {
                 this.rivals.splice(index, 1);
-                if (rival.uid === this.next.entity.uid) {
-                    this.next = this.rivals[index % this.rivals.length];
+                if (rival.uid === this.actingRival.entity.uid) {
+                    this.actingRival = this.rivals[index % this.rivals.length];
                 }
             }
             this.remanageRivals();
@@ -172,9 +161,70 @@ class CombatEvent extends GameEvent {
     }
 }
 
-export default CombatEvent;
+class CombatEntity {
+    constructor(
+        public readonly combat: CombatEvent,
+        public readonly entity: LivingEntity,
+        public tag: any,
+        public dexFix: number,
+        public ordinal: number,
+    ) {
+
+    }
+
+    get combatable(): CombatableComponent {
+        return this.entity.getComponent(CombatableComponent.ID) as CombatableComponent;
+    }
+
+    onCombatStart() {
+        this.combatable.onCombatStart(this);
+    }
+
+    onCombatTurn() {
+        this.combatable.onCombatTurn(this);
+    }
+
+    onCombatEnd() {
+        this.combatable.onCombatEnd(this);
+    }
+
+    attack(target: CombatEntity) {
+        const combatable = this.combatable;
+        const game = combatable.game;
+
+        // TODO
+        // game.appendText(`${this.name}使用${source.getWeapon().name}攻击${target.name}`, 'bad');
+        // source.attack(target);
+    }
+
+    escape() {
+        const combat = this.combat;
+        const combatable = this.combatable;
+        const game = combatable.game;
+
+        if (test(combatable.dexterity)) {
+            game.appendText(`【${this.name}】逃跑成功`, 'good');
+            game.endEvent(combat);
+            if (this.ordinal >= 0) {
+                combat.rivals.splice(this.ordinal, 1);
+                if (this.entity.uid === combat.actingRival.entity.uid) {
+                    combat.actingRival = combat.rivals[this.ordinal % combat.rivals.length];
+                }
+            }
+            combat.remanageRivals();
+        } else {
+            game.appendText(`【${this.name}】逃跑失败`, 'bad');
+        }
+    }
+
+    get name(): string {
+        return this.combatable.living.hostName;
+    }
+}
+
+export type { CombatEntity };
+
 export type {
     CombatEventData,
-    CombatEntity,
     CombatEntityData,
 };

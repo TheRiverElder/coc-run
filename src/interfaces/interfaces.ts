@@ -55,6 +55,45 @@ export interface GameData {
     translate(key: string): string;
 }
 
+export interface GameObject {
+
+    readonly game: Game;
+    readonly uid: number;
+    
+    // new (game: Game, uid?: number): GameComponent;
+
+    getInteractions(): Array<Option>;
+
+    addComponent(component: GameComponent): boolean;
+    removeComponent(component: GameComponent): boolean;
+    getComponent(id: string): GameComponent;
+    tryGetComponent(id: string): GameComponent | null;
+}
+
+export interface GameComponent {
+    
+    get id(): string;
+
+    get host(): GameObject;
+
+    // this.host.game;
+    get game(): Game;
+
+
+    // 由系统调用
+    mount(host: GameObject): void;
+    unmount(): void;
+
+    // 由开发者覆写
+    onMount(): void;
+    onUnount(): void;
+
+    // this.host.removeComponent(this);
+    removeSelf(): void;
+
+    getInteractions(): Array<Option>;
+}
+
 export {
     UniqueMap,
 
