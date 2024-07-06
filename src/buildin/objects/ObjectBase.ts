@@ -24,7 +24,9 @@ export default class ObjectBase implements GameObject {
     }
 
     getComponentInteractions(): Option[] {
-        return Array.from(this.components.values()).flatMap(component => component.getInteractions());
+        return Array.from(this.components.values())
+            .filter(it => !it.hidden)
+            .flatMap(component => component.getInteractions());
     }
 
     private components = new Map<string, GameComponent>();
@@ -42,7 +44,7 @@ export default class ObjectBase implements GameObject {
     }
 
     getComponent(id: string): GameComponent {
-        const component =  this.components.get(id);
+        const component = this.components.get(id);
         if (!component) throw new Error(`Component not found: ${id}`);
         return component;
     }
