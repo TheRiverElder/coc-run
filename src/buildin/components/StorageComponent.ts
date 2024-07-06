@@ -1,4 +1,4 @@
-import { difference, pullAll, slice, union } from "lodash";
+import { difference, intersection, pullAll, slice } from "lodash";
 import Item from "../items/Item";
 import ComponentBase from "./CompoenentBase";
 
@@ -42,7 +42,7 @@ export default class StorageComponent extends ComponentBase {
     }
 
     remove(...oldItems: Array<Item>) {
-        const actualItems = union(oldItems, this._items);
+        const actualItems = intersection(oldItems, this._items);
         pullAll(this._items, oldItems);
 
         if (this.doDisplayMessage) {
