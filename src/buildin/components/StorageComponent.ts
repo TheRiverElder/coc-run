@@ -1,8 +1,8 @@
 import { difference, intersection, pullAll, slice } from "lodash";
 import Item from "../items/Item";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 
-export interface StorageComponentData {
+export interface StorageComponentData extends ComponentBaseData {
     items?: Array<Item>;
     doDisplayMessage?: boolean;
 }
@@ -18,7 +18,7 @@ export default class StorageComponent extends ComponentBase {
     doDisplayMessage: boolean;
 
     constructor(data: StorageComponentData) {
-        super();
+        super(data);
         this._items = data.items ?? [];
         this.doDisplayMessage = data.doDisplayMessage ?? false;
     }

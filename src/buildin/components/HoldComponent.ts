@@ -1,9 +1,9 @@
 import { slice } from "lodash";
 import Item from "../items/Item";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 
 
-export interface HoldComponentData {
+export interface HoldComponentData extends ComponentBaseData {
     holderSize: number;
     heldItems?: Array<Item | null>; // 手持的物品，如果超过holderAmount的数量，则会忽略
 }
@@ -25,7 +25,7 @@ export default class HoldComponent extends ComponentBase {
     }
 
     constructor(data: HoldComponentData) {
-        super();
+        super(data);
 
         this._holders = Array(data.holderSize);
         for (let index = 0; index < this._holders.length; index++) {

@@ -79,6 +79,7 @@ export interface GameComponent {
     // this.host.game;
     get game(): Game;
 
+    hidden: boolean;
 
     // 由系统调用
     mount(host: GameObject): void;

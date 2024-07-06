@@ -1,8 +1,8 @@
 import { Option } from "../../interfaces/types";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 import MoveComponent from "./MoveComponent";
 
-export interface PortComponentData {
+export interface PortComponentData extends ComponentBaseData {
     target: string;
 }
 
@@ -17,7 +17,7 @@ export default class PortComponent extends ComponentBase {
     target: string;
 
     constructor(data: PortComponentData) {
-        super();
+        super(data);
 
         this.target = data.target;
     }

@@ -1,10 +1,10 @@
 import { Dice } from "../../interfaces/types";
 import CombatAI from "../CombatAI/CombatAI";
 import { CombatEntity } from "../events/CombatEvent";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 import HealthComponent from "./HealthComponent";
 
-export interface CombatableComponentData {
+export interface CombatableComponentData extends ComponentBaseData {
     dexterity: number;
     baseDamage: Dice | number;
     combatAI: CombatAI;
@@ -23,7 +23,7 @@ export default class CombatableComponent extends ComponentBase {
     }
 
     constructor(data: CombatableComponentData) {
-        super();
+        super(data);
         this.dexterity = data.dexterity;
         this.baseDamage = data.baseDamage;
         this.combatAI = data.combatAI;

@@ -1,9 +1,9 @@
 import { Option } from "../../interfaces/types";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 
 export type LockCore = string | number;
 
-export interface LockCompoenentData {
+export interface LockCompoenentData extends ComponentBaseData {
     core?: LockCore;
     locked?: boolean;
 }
@@ -17,7 +17,7 @@ export default class LockCompoenent extends ComponentBase {
     }
 
     constructor(data: LockCompoenentData) {
-        super();
+        super(data);
         this.core = data.core ?? null;
         this._locked = data.locked ?? false;
     }

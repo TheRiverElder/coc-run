@@ -1,8 +1,8 @@
 import { clamp, toString } from "lodash";
 import { Entity, GameObject } from "../../interfaces/interfaces";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 
-export interface HealthComponentData {
+export interface HealthComponentData extends ComponentBaseData {
     health?: number;
     maxHealth: number;
     onDie?: (host: GameObject) => void;
@@ -33,7 +33,7 @@ export default class HealthComponent extends ComponentBase {
     }
 
     constructor(data: HealthComponentData) {
-        super();
+        super(data);
 
         this.health = data.health ?? data.maxHealth;
         this.maxHealth = data.maxHealth;

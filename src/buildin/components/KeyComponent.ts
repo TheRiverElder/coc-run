@@ -1,7 +1,7 @@
-import ComponentBase from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 import { LockCore } from "./LockCompoenent";
 
-export interface KeyComponentData {
+export interface KeyComponentData extends ComponentBaseData {
     core: LockCore;
 }
 
@@ -16,7 +16,7 @@ export default class KeyComponent extends ComponentBase {
     core: LockCore | null;
 
     constructor(data: KeyComponentData) {
-        super();
+        super(data);
         this.core = data.core;
     }
 
