@@ -1,5 +1,6 @@
+import { GameObject } from "../../interfaces/interfaces";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
-import { LockCore } from "./LockCompoenent";
+import LockCompoenent, { LockCore } from "./LockCompoenent";
 
 export interface KeyComponentData extends ComponentBaseData {
     core: LockCore;
@@ -18,6 +19,14 @@ export default class KeyComponent extends ComponentBase {
     constructor(data: KeyComponentData) {
         super(data);
         this.core = data.core;
+    }
+
+    use(target?: GameObject): void {
+        if (!target) return;
+        const lock = target.tryGetComponent<LockCompoenent>(LockCompoenent.ID);
+        if (!lock) return;
+
+        lock.unlock(this);
     }
 
 }

@@ -62,6 +62,7 @@ export interface GameObject {
     // new (game: Game, uid?: number): GameComponent;
 
     getInteractions(): Array<Option>;
+    use(target?: GameObject): void;
 
     addComponent(component: GameComponent): boolean;
     removeComponent(component: GameComponent): boolean;
@@ -92,6 +93,7 @@ export interface GameComponent {
     removeSelf(): void;
 
     getInteractions(): Array<Option>;
+    use(target?: GameObject): void; // 作为物品时候调用
 }
 
 export {

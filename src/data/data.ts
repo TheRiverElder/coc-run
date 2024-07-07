@@ -1,6 +1,5 @@
 import { Entity, Game, GameData, Item, ItemEntity, PlayerEntity, Site } from "../interfaces/interfaces";
 import { chooseOne, randInt } from "../utils/math";
-import InvestigationEntity from "../buildin/entities/InvestigationEntity";
 import EventTriggerEntity from "../buildin/entities/EventTriggerEntity";
 import TextDisplayEvent from "../buildin/events/TextDisplayEvent";
 import SequenceEvent from "../buildin/events/SequenceEvent";
@@ -217,15 +216,12 @@ const data = {
                 name: '奶奶的密室',
                 entities: [
                     ...createPorts('nanny_room'),
-                    new InvestigationEntity({
-                        game,
-                        results: [new ItemEntity({
-                            item: new Item({
-                                game,
-                                name: '黑木盒',
-                            }), autoEquip: false
-                        })]
-                    }),
+                    createEntityWithComponents(game, new ClueComponent({
+                        discoverer: createItemClue(new Item({
+                            game,
+                            name: '黑木盒',
+                        })),
+                    })),
                 ],
             }),
             new Site({
@@ -265,9 +261,9 @@ const data = {
                                 game,
                                 events: [
                                     new TextDisplayEvent({ game, texts: [{ text: 'story.end', translated: true }] }),
-                                    new GameOverEvent({ game, reason: '完美通关' })
+                                    new GameOverEvent({ game, reason: '完美通关' }),
                                 ],
-                                joints: [{ text: '结束了' }]
+                                joints: [{ text: '结束了', action: () => game.gameOver('结束了') }],
                             })),
                         }],
                     }))

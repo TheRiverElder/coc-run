@@ -1,6 +1,5 @@
 import { Game, Option } from "../interfaces/interfaces";
-import { Identical, Subopt, Unique } from "../interfaces/types";
-import { genUid } from "../utils/math";
+import { Identical, Unique } from "../interfaces/types";
 
 export interface GameEventData {
     game: Game;
@@ -9,7 +8,7 @@ export interface GameEventData {
     uid?: number;
 }
 
-export default class GameEvent implements Identical, Unique {
+export default class GameEvent {
     readonly game: Game;
     readonly uid: number;
     id: string;

@@ -1,5 +1,6 @@
 import { Option } from "../../interfaces/types";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import KeyComponent from "./KeyComponent";
 
 export type LockCore = string | number;
 
@@ -36,6 +37,14 @@ export default class LockCompoenent extends ComponentBase {
     // !this.locked
     get unlocked(): boolean {
         return !this._locked;
+    }
+
+    unlock(key: KeyComponent): boolean {
+        if (key.core === this.core) {
+            this.locked = false;
+            return true;
+        }
+        return false;
     }
 
     override getInteractions(): Option[] {

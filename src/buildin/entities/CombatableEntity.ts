@@ -1,11 +1,9 @@
 import { Entity } from "../../interfaces/interfaces";
 import Item from "../items/Item";
-import ItemEntity from "./ItemEntity";
 import HoldComponent from "../components/HoldComponent";
 import HealthComponent from "../components/HealthComponent";
 import CombatableComponent from "../components/CombatableComponent";
 import EmptyCombatAI from "../CombatAI/EmptyCombatAI";
-import { Hands } from "../Hands";
 import { EntityData } from "./Entity";
 
 export interface CombatableEntityData extends EntityData {

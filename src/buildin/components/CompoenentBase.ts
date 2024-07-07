@@ -46,4 +46,8 @@ export default abstract class ComponentBase implements GameComponent {
         return [];
     }
 
+    use(target?: GameObject): void {
+        
+    }
+
 }

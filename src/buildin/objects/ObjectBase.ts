@@ -34,6 +34,10 @@ export default class ObjectBase implements GameObject {
             .flatMap(component => component.getInteractions());
     }
 
+    use(target?: GameObject): void {
+        return Array.from(this.components.values()).forEach(component => component.use(target));
+    }
+
     private components = new Map<string, GameComponent>();
 
     addComponent(component: GameComponent): boolean {
