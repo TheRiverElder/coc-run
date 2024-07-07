@@ -39,16 +39,20 @@ export default class HoldComponent extends ComponentBase {
      * @param item 要持握的物品，为null则代表拿下物品
      * @returns 之前拿着的物品或者null
      */
-    hold(index: number, item: Item | null): Item | null {
+    hold(index: number, item?: Item | null): Item | null {
         if (index >= this.holderSize) throw new Error(`Index out of range: ${index} of ${this.holderSize}`);
 
         const previousItem = this._holders[index];
-        this._holders[index] = item;
+        this._holders[index] = item ?? null;
         return previousItem;
     }
 
     unhold(index: number) {
         this.hold(index, null);
     }
+
+    getHeldItem(index: number): Item | null {
+        return this._holders[index];
+    } 
     
 }

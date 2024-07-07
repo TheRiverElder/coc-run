@@ -10,8 +10,8 @@ export default abstract class ComponentBase implements GameComponent {
 
     abstract get id(): string;
 
-    constructor(data?: ComponentBaseData) {
-        this.hidden = (data ?? {}).hidden ?? false;
+    constructor(data: ComponentBaseData = {}) {
+        this.hidden = data.hidden ?? false;
     }
 
     private _host: GameObject | null = null;

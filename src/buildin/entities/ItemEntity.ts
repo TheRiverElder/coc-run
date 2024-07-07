@@ -2,13 +2,13 @@ import { Item, Option } from "../../interfaces/interfaces";
 import Entity, { EntityData } from "./Entity";
 import Site from "../Site";
 
-interface ItemEntityData extends Omit<EntityData, "game"> {
+export interface ItemEntityData extends Omit<EntityData, "game"> {
     site?: Site;
     item: Item;
     autoEquip?: boolean;
 }
 
-class ItemEntity extends Entity {
+export default class ItemEntity extends Entity {
 
     item: Item;
     autoEquip: boolean;
@@ -19,26 +19,20 @@ class ItemEntity extends Entity {
         this.autoEquip = data.autoEquip ?? false;
     }
 
-    getInteractions() {
+    override getObjectInteractions(): Option[] {
         return [{
             text: '捡起' + this.item.name,
             leftText: '💎',
             tag: [],
+            action: () => {
+                if (this.autoEquip) {
+                    this.game.getPlayer().holdItem(this.item);
+                } else {
+                    this.game.getPlayer().addItemToInventory(this.item);
+                }
+                this.site.removeEntity(this);
+                this.game.showPortOptions();
+            },
         }];
     }
-
-    onInteract(option: Option) {
-        if (this.autoEquip) {
-            this.game.getPlayer().holdItem(this.item);
-        } else {
-            this.game.getPlayer().addItemToInventory(this.item);
-        }
-        this.site.removeEntity(this);
-        this.game.showPortOptions();
-    }
-}
-
-export default ItemEntity;
-export type {
-    ItemEntityData,
 }

@@ -1,18 +1,24 @@
-import { Game, Option, Site } from "../../interfaces/interfaces";
+import { Option, Site } from "../../interfaces/interfaces";
 import LivingEntity, { LivingEntityData } from "./LivingEntity";
 import Item from "../items/Item";
 import ItemEntity from "./ItemEntity";
-import UniqueMap from "../UniqueMap";
 import { num2strWithSign } from "../../utils/strings";
+import StorageComponent from "../components/StorageComponent";
+import MoveComponent from "../components/MoveComponent";
+import HoldComponent from "../components/HoldComponent";
+import HealthComponent from "../components/HealthComponent";
+import CombatableComponent from "../components/CombatableComponent";
+import EmptyCombatAI from "../CombatAI/EmptyCombatAI";
+import { Hands } from "../Hands";
 
 export interface PlayerEntityData extends LivingEntityData {
     name: string;
     money: number;
     magic: number;
     insight: number;
-    holdingItem: Item | null;
-    inventory: Array<Item>;
-    prevSite?: Site;
+    defaultWeapon: Item;
+    holdingItem?: Item;
+    inventory?: Array<Item>;
 }
 
 export default class PlayerEntity extends LivingEntity {
@@ -22,18 +28,34 @@ export default class PlayerEntity extends LivingEntity {
     money: number;
     magic: number;
     insight: number;
-    holdingItem: Item | null;
-    inventory: UniqueMap<Item> = new UniqueMap<Item>();
+
+    defaultWeapon: Item;
+
+    readonly living: HealthComponent;
+    readonly storage: StorageComponent;
+    readonly movement: MoveComponent;
+    readonly hands: HoldComponent;
+    readonly combatable: CombatableComponent;
 
     constructor(data: PlayerEntityData) {
-        super({ ...data, id: 'player' });
+        super(data);
+
         this.name = data.name;
         this.money = data.money;
         this.magic = data.magic;
         this.insight = data.insight;
-        this.holdingItem = data.holdingItem;
-        data.inventory.forEach(e => this.inventory.add(e));
-        this.previousSite = data.prevSite;
+
+        this.defaultWeapon = data.defaultWeapon;
+
+        this.living = new HealthComponent({ maxHealth: data.maxHealth });
+        this.storage = new StorageComponent({ items: data.inventory ?? [], doDisplayMessage: true });
+        this.movement = new MoveComponent();
+        this.hands = new HoldComponent({ holderSize: 1, heldItems: [data.holdingItem ?? null] });
+        this.combatable = new CombatableComponent({
+            dexterity: data.dexterity,
+            baseDamage: data.baseDamage,
+            combatAI: new EmptyCombatAI(),
+        });
     }
 
     mutateValue(key: string, delta: number, reason?: string): void {
@@ -57,10 +79,9 @@ export default class PlayerEntity extends LivingEntity {
      * @param replaceOption 对原来的物品要怎么处理
      */
     holdItem(item: Item | null, replaceOption: ReplaceOption = 'restore'): void {
-        const prevItem = this.holdingItem;
-        this.holdingItem = item;
+        const prevItem = this.hands.hold(Hands.MAIN, item);
         if (item) {
-            this.inventory.remove(item);
+            this.storage.remove(item);
             this.game.appendText(`${this.name}拿起了${item.name}`, 'mutate');
         } else if (prevItem) {
             this.game.appendText(`${this.name}收起了${prevItem.name}`, 'mutate');
@@ -68,7 +89,7 @@ export default class PlayerEntity extends LivingEntity {
         if (!prevItem) return;
         switch (replaceOption) {
             case 'drop': this.site.addEntity(new ItemEntity({ item: prevItem })); break;
-            case 'restore': this.inventory.add(prevItem); break;
+            case 'restore': this.storage.add(prevItem); break;
             case 'delete': break;
         }
     }
@@ -78,62 +99,21 @@ export default class PlayerEntity extends LivingEntity {
         this.holdItem(null, replaceOption);
     }
 
-    // 用于“回去”功能
-    private previousSite?: Site;
+    removeItemFromInventory(item: Item, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
+        const [removedItem] = this.storage.remove(item);
+        if (!removedItem) return false;
 
-    get prevSite(): Site | null {
-        return this.previousSite ?? null;
-    }
-
-    /**
-     * PlayerEntity的这个方法会记录上一个地点，所以会覆写
-     * @param newSite 要去的新的地点
-     */
-    override goToSite(newSite: Site, silent: boolean = false): void {
-        this.previousSite = this.site;
-        super.goToSite(newSite, silent);
-    }
-
-    /**
-     * 回到上一个地点（如果存在的话）
-     * @returns 是否成功回到上一个地点
-     */
-    goBack(): boolean {
-        if (this.previousSite && this.previousSite !== Site.FAKE_SITE) {
-            const currentSite = this.site;
-            super.goToSite(this.previousSite);
-            this.previousSite = currentSite;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    addItemToInventory(item: Item): boolean {
-        if (this.inventory.add(item)) {
-            this.game.appendText(`${this.name}获得了${item.name}`, 'mutate');
-            return true;
-        }
-        return false;
-    }
-
-    removeItemFromInventory(item: Item | number, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
-        if (typeof item === 'number') {
-            const i = this.inventory.get(item);
-            if (!i) return false;
-            item = i;
-        }
-        if (!this.inventory.remove(item)) return false;
         switch (replaceOption) {
             case 'drop': this.site.addEntity(new ItemEntity({ item, site: this.site })); break;
             case 'delete': break;
         }
-        this.game.appendText(`${this.name}失去了${item.name}`, 'mutate');
         return true;
     }
 
-    getWeapon(): Item {
-        return this.holdingItem || super.getWeapon();
+    getWeapon(): WeaponComponent {
+        const heldWeapon = this.hands.getHeldItem(Hands.MAIN)?.tryGetComponent(WeaponComponent.ID);
+        if (heldWeapon) return heldWeapon;
+        return this.defaultWeapon.gtComponent(WeaponComponent.ID);
     }
 
     getInteractions(): Array<Option> {

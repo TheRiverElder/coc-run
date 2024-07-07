@@ -17,7 +17,7 @@ export default class StorageComponent extends ComponentBase {
 
     doDisplayMessage: boolean;
 
-    constructor(data: StorageComponentData) {
+    constructor(data: StorageComponentData = {}) {
         super(data);
         this._items = data.items ?? [];
         this.doDisplayMessage = data.doDisplayMessage ?? false;
@@ -41,13 +41,14 @@ export default class StorageComponent extends ComponentBase {
         }
     }
 
-    remove(...oldItems: Array<Item>) {
+    remove(...oldItems: Array<Item>): Array<Item> {
         const actualItems = intersection(oldItems, this._items);
         pullAll(this._items, oldItems);
 
         if (this.doDisplayMessage) {
             this.game.appendText(`失去了物品：${actualItems.map(it => it.name).join('、')}`);
         }
+        return actualItems;
     }
 
 }
