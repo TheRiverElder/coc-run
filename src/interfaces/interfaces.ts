@@ -1,10 +1,7 @@
 import Entity from "../buildin/entities/Entity";
 import GameEvent from "../buildin/GameEvent";
 import Item from "../buildin/items/Item";
-import MeleeWeapon from "../buildin/items/MeleeWeapon";
 import ItemEntity from "../buildin/entities/ItemEntity";
-import PortEntity from "../buildin/entities/PortEntity";
-import LivingEntity from "../buildin/entities/LivingEntity";
 import PlayerEntity from "../buildin/entities/PlayerEntity";
 import Site from "../buildin/Site";
 import { Damage, Dice, Option, Text } from "./types";
@@ -101,13 +98,10 @@ export {
     Site,
     
     Item,
-    MeleeWeapon,
 
     Entity,
-    LivingEntity,
     PlayerEntity,
     ItemEntity,
-    PortEntity,
 
     GameEvent,
     CombatEvent,

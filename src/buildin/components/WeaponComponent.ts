@@ -36,7 +36,7 @@ export default class WeaponComponent extends ComponentBase {
         };
     }
 
-    previewDamage(target: HealthComponent): string {
+    previewDamage(target?: HealthComponent): string {
         if (typeof this.damage === 'number') {
             return String(this.damage);
         } else {

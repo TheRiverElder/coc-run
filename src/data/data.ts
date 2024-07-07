@@ -1,4 +1,4 @@
-import { Game, GameData, Item, ItemEntity, MeleeWeapon, PlayerEntity, PortEntity, Site } from "../interfaces/interfaces";
+import { Entity, Game, GameData, Item, ItemEntity, PlayerEntity, Site } from "../interfaces/interfaces";
 import { chooseOne, randInt } from "../utils/math";
 import InvestigationEntity from "../buildin/entities/InvestigationEntity";
 import EventTriggerEntity from "../buildin/entities/EventTriggerEntity";
@@ -7,10 +7,15 @@ import SequenceEvent from "../buildin/events/SequenceEvent";
 import GameOverEvent from "../buildin/events/GameOverEvent";
 import translation from "./translation";
 import { findByPathStr } from "../utils/strings";
-import StrangeOldMan from "./entity/StrangeOldMan";
-import MonsterEntity from "./entity/MonsterEntity";
 import ChatEvent from "./event/ChatEvent";
-import NPCEntity from "./entity/NPCEntity";
+import PortComponent from "../buildin/components/PortComponent";
+import HumanEntity from "../buildin/entities/HumanEntity";
+import { createSimpleWeaponItem } from "../buildin/items/Item";
+import HealthComponent from "../buildin/components/HealthComponent";
+import CombatableComponent from "../buildin/components/CombatableComponent";
+import MonsterCombatAI from "../buildin/CombatAI/MonsterCombatAI";
+import ClueComponent, { createEntityClue, createItemClue, createItemClueAutoPick } from "../buildin/components/ClueComponent";
+import { createEntityWithComponents } from "../buildin/entities/Entity";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -18,43 +23,54 @@ function randValue(): number {
 
 const data = {
     initialize(game: Game) {
-        const villageWang = new NPCEntity({
+
+        function createPort(targetSiteId: string): Entity {
+            return new Entity({ game, components: [new PortComponent({ target: targetSiteId })] });
+        }
+
+        function createPorts(...targetSiteIdList: Array<string>): Array<Entity> {
+            return targetSiteIdList.map(target => new Entity({
+                game, components: [
+                    new PortComponent({ target }),
+                ]
+            }));
+        }
+
+        function createFist() {
+            return createSimpleWeaponItem(game, '拳头', 1);
+        }
+
+        const villager_王屠夫 = new HumanEntity({
             game,
             name: '王屠夫',
             health: 7,
             maxHealth: 7,
-            strength: 30,
             dexterity: 30,
-            baseDamage: 1,
-            baseWeaponName: '拳头',
-            talkText: { text: 'story.wang', translated: true },
+            defaultWeapon: createFist(),
+            // talkText: { text: 'story.wang', translated: true },
         });
-        const villageLiheng = new StrangeOldMan({
+        const villager_老者 = new HumanEntity({
             game,
             name: '老者',
             health: 7,
             maxHealth: 7,
-            strength: 30,
             dexterity: 30,
-            baseDamage: 1,
-            baseWeaponName: '拳头',
-            loots: [
-                new ItemEntity({ item: new Item({ game, name: '扭曲的木拐杖' }) }),
-                new ItemEntity({ item: new Item({ game, name: '磨损的铜钱' }) }),
+            defaultWeapon: createFist(),
+            inventory: [
+                new Item({ game, name: '扭曲的木拐杖' }),
+                new Item({ game, name: '磨损的铜钱' }),
             ],
-            talkText: { text: 'story.old_mans_talk', translated: true },
-            idleText: { text: 'idle.old_man', translated: true },
+            // talkText: { text: 'story.old_mans_talk', translated: true },
+            // idleText: { text: 'idle.old_man', translated: true },
         });
-        const elder = new NPCEntity({
+        const villager_廖族长 = new HumanEntity({
             game,
             name: '廖族长',
             health: 7,
             maxHealth: 7,
-            strength: 30,
             dexterity: 30,
-            baseDamage: 1,
-            baseWeaponName: '拳头',
-            talkText: '#story.elder.welcome',
+            defaultWeapon: createFist(),
+            // talkText: '#story.elder.welcome',
         });
 
 
@@ -77,7 +93,7 @@ const data = {
                 id: 'bus_stop',
                 name: '巴士车站',
                 entities: [
-                    new PortEntity({ game, target: 'ng_bridge' }),
+                    ...createPorts('ng_bridge'),
                     new EventTriggerEntity({
                         option: { text: '还是回城里吧', leftText: '🏙' },
                         event: new GameOverEvent({ game, reason: '因为你是头号玩家' }),
@@ -90,9 +106,8 @@ const data = {
                 id: 'ng_bridge',
                 name: '鼐沟桥',
                 entities: [
-                    new PortEntity({ game, target: 'hs_village' }),
-                    new PortEntity({ game, target: 'bus_stop' }),
-                    villageLiheng,
+                    ...createPorts('hs_village', 'bus_stop'),
+                    villager_老者,
                 ],
             }),
             new Site({
@@ -100,8 +115,7 @@ const data = {
                 id: 'hs_village',
                 name: '灴山村',
                 entities: [
-                    new PortEntity({ game, target: 'main_streat' }),
-                    new PortEntity({ game, target: 'ng_bridge' }),
+                    ...createPorts('main_streat', 'ng_bridge'),
                 ],
             }),
             new Site({
@@ -109,17 +123,10 @@ const data = {
                 id: 'main_streat',
                 name: '大路',
                 entities: [
-                    new PortEntity({ game, target: 'clan_hall' }),
-                    new PortEntity({ game, target: 'wang_house' }),
-                    new PortEntity({ game, target: 'home_house' }),
-                    new PortEntity({ game, target: 'ng_bridge' }),
+                    ...createPorts('clan_hall', 'wang_house', 'home_house', 'ng_bridge'),
                     new ItemEntity({
-                        item: new MeleeWeapon({
-                            game,
-                            id: 'bone',
-                            name: '猪骨',
-                            damage: 3,
-                        }), autoEquip: true
+                        item: createSimpleWeaponItem(game, '猪骨', 3), 
+                        autoEquip: true,
                     }),
                 ],
             }),
@@ -128,18 +135,17 @@ const data = {
                 id: 'wang_house',
                 name: '王屠户家',
                 entities: [
-                    new PortEntity({ game, target: 'main_streat' }),
-                    villageWang,
-                    new InvestigationEntity({
+                    ...createPorts('main_streat'),
+                    villager_王屠夫,
+                    createEntityWithComponents(
                         game,
-                        results: [new ItemEntity({
-                            item: new MeleeWeapon({
-                                game,
-                                name: '杀猪刀',
-                                damage: { faces: 3, times: 2, fix: -1 },
-                            }), autoEquip: true
-                        })]
-                    }),
+                        new ClueComponent({
+                            onDiscover: createEntityClue(new ItemEntity({
+                                item: createSimpleWeaponItem(game, '杀猪刀', { faces: 3, times: 2, fix: -1 }),
+                                autoEquip: true,
+                            })),
+                        }),
+                    ),
                 ],
             }),
             new Site({
@@ -147,9 +153,7 @@ const data = {
                 id: 'home_house',
                 name: '自己的老房子',
                 entities: [
-                    new PortEntity({ game, target: 'main_streat' }),
-                    new PortEntity({ game, target: 'mom_room' }),
-                    new PortEntity({ game, target: 'nanny_room' }),
+                    ...createPorts('main_streat', 'mom_room', 'nanny_room'),
                 ],
             }),
             new Site({
@@ -157,7 +161,7 @@ const data = {
                 id: 'mom_room',
                 name: '妈妈的房间',
                 entities: [
-                    new PortEntity({ game, target: 'home_house' }),
+                    ...createPorts('home_house'),
                 ],
             }),
             new Site({
@@ -165,13 +169,12 @@ const data = {
                 id: 'nanny_room',
                 name: '奶奶的房间',
                 entities: [
-                    new PortEntity({ game, target: 'home_house' }),
-                    new InvestigationEntity({
+                    ...createPorts('home_house'),
+                    new Entity({
                         game,
-                        results: [new PortEntity({
-                            game,
-                            target: 'nanny_secret_room',
-                        })]
+                        components: [
+                            new ClueComponent({ onDiscover: createEntityClue(createPort('nanny_secret_room')) }),
+                        ],
                     }),
                 ],
             }),
@@ -180,7 +183,7 @@ const data = {
                 id: 'nanny_secret_room',
                 name: '奶奶的密室',
                 entities: [
-                    new PortEntity({ game, target: 'nanny_room' }),
+                    ...createPorts('nanny_room'),
                     new InvestigationEntity({
                         game,
                         results: [new ItemEntity({
@@ -197,9 +200,8 @@ const data = {
                 id: 'clan_hall',
                 name: '祠堂',
                 entities: [
-                    new PortEntity({ game, target: 'clan_hall_basement' }),
-                    new PortEntity({ game, target: 'main_streat' }),
-                    elder,
+                    ...createPorts('clan_hall_basement', 'main_streat'),
+                    villager_廖族长,
                 ],
             }),
             new Site({
@@ -207,20 +209,22 @@ const data = {
                 id: 'clan_hall_basement',
                 name: '祠堂地下室',
                 entities: [
-                    new PortEntity({ game, target: 'clan_hall' }),
-                    new MonsterEntity({
+                    ...createPorts('clan_hall'),
+                    new Entity({
                         game,
                         name: '触手怪',
-                        baseDamage: { faces: 2, fix: 1 },
-                        baseWeaponName: '爪子',
-                        health: 10,
-                        maxHealth: 10,
-                        strength: 30,
-                        dexterity: 40,
-                        loots: [new PortEntity({
-                            game,
-                            target: 'dark_river'
-                        })]
+                        components: [
+                            new HealthComponent({
+                                maxHealth: 10, onDie: (host) => {
+                                    if (host instanceof Entity) host.site.addEntity(createPort('dark_river'));
+                                }
+                            }),
+                            new CombatableComponent({
+                                dexterity: 40,
+                                defaultWeapon: createSimpleWeaponItem(game, '爪子', { faces: 2, fix: 1 }),
+                                combatAI: new MonsterCombatAI(),
+                            }),
+                        ],
                     }),
                 ],
             }),
@@ -229,7 +233,7 @@ const data = {
                 id: 'dark_river',
                 name: '漆黑之河',
                 entities: [
-                    new PortEntity({ game, target: 'clan_hall_basement' }),
+                    ...createPorts('clan_hall_basement'),
                     new EventTriggerEntity({
                         option: { text: '跳入其中', leftText: '🏊‍' },
                         event: new SequenceEvent({
@@ -243,11 +247,6 @@ const data = {
                     }),
                 ],
             }),
-            new Site({
-                game,
-                id: 'old_house',
-                name: 'laofangzi',
-            }),
         ];
         const map = new Map<string, Site>();
         sites.map(s => map.set(s.id, s));
@@ -259,32 +258,25 @@ const data = {
             time: 0,
             player: new PlayerEntity({
                 game,
-                id: 'player',
                 name: '王二狗',
                 site: map.get('bus_stop') as Site,
-                money: randValue(),
+                money: 233,
                 health: playerMaxHealth,
                 maxHealth: playerMaxHealth,
                 magic: randValue(),
-                strength: randValue(),
                 dexterity: randValue(),
                 insight: randValue(),
-                holdingItem: null,
+                defaultWeapon: createFist(),
                 inventory: [
-                    new Item({
-                        game,
-                        name: '奇怪的簪子'
-                    }),
+                    new Item({ game, name: '奇怪的簪子' }),
                 ],
-                baseDamage: 1,
-                baseWeaponName: '拳头',
             }),
         };
     },
-    
+
     start: (game: Game) => {
         game.appendText({ text: 'story.start', translated: true });
-        game.getPlayer().goToSite(game.getMap().get('bus_stop') as Site);
+        game.getPlayer().site = (game.getMap().get('bus_stop') as Site);
     },
 
     translate(key: string): string {

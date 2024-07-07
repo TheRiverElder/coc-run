@@ -1,5 +1,6 @@
 import React, { RefObject } from 'react';
 import './App.css';
+import WeaponComponent from './buildin/components/WeaponComponent';
 import InventoryEvent from './buildin/events/InventoryEvent';
 import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
 import { DisplayText, Subopt } from './interfaces/types';
@@ -27,8 +28,9 @@ function OptionBtn(props: { option: Option, className: string }) {
   );
 }
 
-interface AppState extends GameState {
+interface AppState {
   textList: Array<Text>;
+  options: Array<Option>;
   showOptions: boolean;
 }
 
@@ -37,7 +39,7 @@ interface AppProps {
   debugMode?: boolean;
 }
 
-const values = ['magic', 'money', 'insight', 'strength', 'dexterity'];
+const values = ['magic', 'money', 'insight', 'dexterity'];
 
 class App extends React.Component<AppProps, AppState> implements Game {
 
@@ -70,20 +72,23 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
   render() {
     const s = this.state;
-    const p = s.player;
+    const player = this.getPlayer();
+    const heldItem = player.getItemOnMainHand();
+    const previewDamage = heldItem?.tryGetComponent<WeaponComponent>(WeaponComponent.ID)?.previewDamage() ?? 0;
+
     return (
       <div className="App">
         {/* 顶部栏，显示血量等状态 */}
         <header className="state-bar">
           <p>
-            <span>第{Math.floor(s.time / 24) + 1}天{s.time % 24}点钟，</span>
-            <span>在{p.site.name}，</span>
-            <span>{p.holdingItem ? `手持${p.holdingItem.name}(${p.holdingItem.previewDamage()})` : '两手空空'}</span>
+            {/* <span>第{Math.floor(this.time / 24) + 1}天{s.time % 24}点钟，</span> */}
+            <span>在{player.site.name}，</span>
+            <span>{heldItem ? `手持${heldItem.name}(${previewDamage})` : '两手空空'}</span>
           </p>
 
           <p className="values">
-            <span className="value">{`${this.translate('health')}:${p.health}/${p.maxHealth}`}</span>
-            {values.map(k => `${this.translate(k)}:${(p as any)[k]}`).map(s => (<span key={s} className="value">{s}</span>))}
+            <span className="value">{`${this.translate('health')}:${player.living.health}/${player.living.maxHealth}`}</span>
+            {values.map(k => `${this.translate(k)}:${(player as any)[k]}`).map(s => (<span key={s} className="value">{s}</span>))}
           </p>
         </header>
 
@@ -221,7 +226,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   // }
 
   applyChange() {
-    this.setState(this.currentState);
+    this.forceUpdate();
   }
 
   gameOver(reason?: string) {

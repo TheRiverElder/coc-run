@@ -36,12 +36,14 @@ export default class ObjectBase implements GameObject {
     addComponent(component: GameComponent): boolean {
         if (this.components.has(component.id)) return false;
         this.components.set(component.id, component);
+        component.mount(this);
         return true;
     }
 
     removeComponent(component: GameComponent): boolean {
         if (!this.components.has(component.id)) return false;
         this.components.delete(component.id);
+        component.unmount();
         return true;
     }
 

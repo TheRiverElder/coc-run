@@ -4,7 +4,7 @@ import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 
 
 export interface HoldComponentData extends ComponentBaseData {
-    holderSize: number;
+    holderSize?: number;
     heldItems?: Array<Item | null>; // 手持的物品，如果超过holderAmount的数量，则会忽略
 }
 
@@ -27,7 +27,7 @@ export default class HoldComponent extends ComponentBase {
     constructor(data: HoldComponentData) {
         super(data);
 
-        this._holders = Array(data.holderSize);
+        this._holders = Array(data.holderSize ?? data.heldItems?.length ?? 1);
         for (let index = 0; index < this._holders.length; index++) {
             this._holders[index] = data.heldItems?.[index] ?? null;
         }

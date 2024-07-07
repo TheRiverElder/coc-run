@@ -1,4 +1,4 @@
-import { Game, GameEvent, Option } from "../../interfaces/interfaces";
+import { GameEvent, Option } from "../../interfaces/interfaces";
 import Entity from "./Entity";
 
 export interface EventTriggerEntityData {
@@ -20,7 +20,6 @@ export default class EventTriggerEntity extends Entity {
     constructor(data: EventTriggerEntityData) {
         super({
             game: data.event.game,
-            id: 'event_trigger', 
         });
         this.event = data.event;
         this.option = data.option || { text: '...' };

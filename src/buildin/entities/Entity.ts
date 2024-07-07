@@ -1,13 +1,16 @@
-import { Option } from "../../interfaces/interfaces";
+import { Game, GameComponent, Option } from "../../interfaces/interfaces";
 import { Subopt } from "../../interfaces/types";
 import ObjectBase, { ObjectBaseData } from "../objects/ObjectBase";
 import Site from "../Site";
 
-interface EntityData extends ObjectBaseData {
+export interface EntityData extends ObjectBaseData {
     site?: Site;
+    name?: string;
 }
 
-abstract class Entity extends ObjectBase {
+export default class Entity extends ObjectBase {
+
+    public name: string;
 
     private _site: Site | null;
     public get site(): Site {
@@ -21,6 +24,7 @@ abstract class Entity extends ObjectBase {
     constructor(data: EntityData) {
         super(data);
         this._site = data.site ?? null;
+        this.name = data.name ?? '???';
     }
 
     /**
@@ -46,7 +50,6 @@ abstract class Entity extends ObjectBase {
     }
 }
 
-export default Entity;
-export type {
-    EntityData,
+export function createEntityWithComponents(game: Game, ...components: Array<GameComponent>): Entity {
+    return new Entity({ game, components });
 }

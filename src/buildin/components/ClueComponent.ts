@@ -73,33 +73,51 @@ export function createSequentialClues(clues: Array<(clue: ClueComponent) => void
 
 /**
  * 封装物品线索
- * @param item 发现的物品
+ * @param items 发现的物品
+ * @returns DiscoverListener
+ */
+export function createItemClue(...items: Array<Item>): DiscoverListener {
+    return doCreateItemClue(items, false);
+}
+
+/**
+ * 封装物品线索，发现后自动拾取
+ * @param items 发现的物品
+ * @returns DiscoverListener
+ */
+export function createItemClueAutoPick(...items: Array<Item>): DiscoverListener {
+    return doCreateItemClue(items, true);
+}
+
+/**
+ * 封装物品线索
+ * @param items 发现的物品
  * @param autoPick 是否直接拾起
  * @returns DiscoverListener
  */
-export function createItemClue(item: Item, autoPick: boolean = false): DiscoverListener {
+function doCreateItemClue(items: Array<Item>, autoPick: boolean): DiscoverListener {
     return (clue: ClueComponent) => {
         const host = clue.host;
         if (autoPick) {
-            clue.game.getPlayer().addItemToInventory(item);
+            clue.game.getPlayer().addItemToInventory(...items);
         } else if (host instanceof Entity) {
-            host.site.addEntity(new ItemEntity({ item }));
+            host.site.addEntities(items.map(it => it.toEntity()));
         } else if (host instanceof Item) {
-            clue.game.getPlayer().addItemToInventory(item);
+            clue.game.getPlayer().addItemToInventory(...items);
         }
     };
 }
 
 /**
  * 封装实体线索
- * @param entity 发现的实体
+ * @param entities 发现的实体
  * @returns DiscoverListener
  */
-export function createEntityClue(entity: Entity): DiscoverListener {
+export function createEntityClue(...entities: Array<Entity>): DiscoverListener {
     return (clue: ClueComponent) => {
         const host = clue.host;
         if (host instanceof Entity) {
-            host.site.addEntity(entity);
+            host.site.addEntities(entities);
         }
     };
 }

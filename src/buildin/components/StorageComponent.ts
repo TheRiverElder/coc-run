@@ -1,6 +1,9 @@
 import { difference, intersection, pullAll, slice } from "lodash";
+import Entity from "../entities/Entity";
+import ItemEntity from "../entities/ItemEntity";
 import Item from "../items/Item";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import HealthComponent from "./HealthComponent";
 
 export interface StorageComponentData extends ComponentBaseData {
     items?: Array<Item>;
@@ -51,4 +54,16 @@ export default class StorageComponent extends ComponentBase {
         return actualItems;
     }
 
+    onMount(): void {
+        this.host.tryGetComponent<HealthComponent>(HealthComponent.ID)?.onDieListeners.add(this.onDieListener);
+    }
+
+    onUnount(): void {
+        this.host.tryGetComponent<HealthComponent>(HealthComponent.ID)?.onDieListeners.delete(this.onDieListener);
+    }
+
+    private onDieListener = () => {
+        if (this.host instanceof Entity) 
+            this.host.site.addEntities(this._items.map(item => new ItemEntity({ item })), true);
+    };
 }

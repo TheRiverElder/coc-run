@@ -1,4 +1,4 @@
-import { Game } from "../../interfaces/interfaces";
+import { Game, ItemEntity } from "../../interfaces/interfaces";
 import { Dice } from "../../interfaces/types";
 import WeaponComponent from "../components/WeaponComponent";
 import ObjectBase, { ObjectBaseData } from "../objects/ObjectBase";
@@ -14,6 +14,10 @@ export default class Item extends ObjectBase {
     constructor(data: ItemData) {
         super(data);
         this.name = data.name;
+    }
+
+    toEntity(): ItemEntity {
+        return new ItemEntity({ item: this });
     }
 }
 

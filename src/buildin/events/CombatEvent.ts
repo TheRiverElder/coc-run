@@ -1,11 +1,11 @@
-import { Damage, GameEvent, LivingEntity, Option, PlayerEntity } from "../../interfaces/interfaces";
+import { Damage, Entity, GameEvent, Option, PlayerEntity } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 import CombatableComponent from "../components/CombatableComponent";
 import { EntityTags } from "../EntityTags";
 import { GameEventData } from "../GameEvent";
 
 interface CombatEntityData {
-    entity: LivingEntity;
+    entity: Entity;
     tag: any;
     dexFix?: number;
 }
@@ -56,12 +56,12 @@ export default class CombatEvent extends GameEvent {
         const escape: Option = {
             text: `逃跑`,
             leftText: '🏃‍',
-            rightText: `${player.dexterity}%`,
+            rightText: `${player.combatable.dexterity}%`,
             tag: 'escape',
             action: this.wrapPlayerAction(() => combatPlayer.escape()),
         };
 
-        const weapon = player.getWeapon();
+        const weapon = player.combatable.weapon;
         const options: Array<Option> = this.rivals.filter(e => e.tag !== EntityTags.CIVILIAN).map(enemy => ({
             text: `攻击【${enemy.name}】`,
             leftText: '🗡',
@@ -79,7 +79,7 @@ export default class CombatEvent extends GameEvent {
                 tag: 'one_punch',
                 action: this.wrapPlayerAction(() => this.rivals
                     .filter(e => e.tag === EntityTags.MONSTER)
-                    .forEach(e => e.combatable.living.mutate(-e.entity.health, '因为苟管理'))
+                    .forEach(e => e.combatable.living.mutate(-e.combatable.living.health, '因为苟管理'))
                 ),
             });
         }
@@ -87,7 +87,7 @@ export default class CombatEvent extends GameEvent {
     }
 
     displayRivalsInformation() {
-        this.game.appendText(`场上剩余（${this.rivals.length}）：` + this.rivals.map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
+        this.game.appendText(`场上剩余（${this.rivals.length}）：` + this.rivals.map(e => `${e.name}(${e.combatable.living.health}/${e.combatable.living.maxHealth})`).join('、'));
     }
 
     private wrapPlayerAction(action: () => void) {
@@ -115,7 +115,7 @@ export default class CombatEvent extends GameEvent {
 
     remanageRivals(): void {
         this.rivals = this.rivals.filter(e => e.combatable.living.alive);
-        this.rivals.sort((a, b) => a.entity.dexterity - b.entity.dexterity);
+        this.rivals.sort((a, b) => a.combatable.dexterity - b.combatable.dexterity);
         this.rivals.forEach((e, i) => e.ordinal = i);
     }
 
@@ -139,7 +139,7 @@ export default class CombatEvent extends GameEvent {
 class CombatEntity {
     constructor(
         public readonly combat: CombatEvent,
-        public readonly entity: LivingEntity,
+        public readonly entity: Entity,
         public tag: any,
         public dexFix: number,
         public ordinal: number,
