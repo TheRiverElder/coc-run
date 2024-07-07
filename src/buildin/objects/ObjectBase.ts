@@ -3,6 +3,7 @@ import { Game, GameComponent, GameObject, Option } from "../../interfaces/interf
 export interface ObjectBaseData {
     game: Game;
     uid?: number;
+    components?: Array<GameComponent>
 }
 
 export default class ObjectBase implements GameObject {
@@ -13,6 +14,7 @@ export default class ObjectBase implements GameObject {
     constructor(data: ObjectBaseData) {
         this.game = data.game;
         this.uid = data.uid ?? this.game.generateUid();
+        data.components?.forEach(component => this.addComponent(component));
     }
 
     getInteractions(): Option[] {
@@ -43,14 +45,14 @@ export default class ObjectBase implements GameObject {
         return true;
     }
 
-    getComponent(id: string): GameComponent {
+    getComponent<T extends GameComponent>(id: string): T {
         const component = this.components.get(id);
         if (!component) throw new Error(`Component not found: ${id}`);
-        return component;
+        return component as T;
     }
 
-    tryGetComponent(id: string): GameComponent | null {
-        return this.components.get(id) ?? null;
+    tryGetComponent<T extends GameComponent>(id: string): T | null {
+        return this.components.get(id) as T ?? null;
     }
 
 }

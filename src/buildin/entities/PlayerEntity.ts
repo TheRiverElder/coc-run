@@ -1,6 +1,6 @@
-import { Option, Site } from "../../interfaces/interfaces";
+import { Dice, Option, Site } from "../../interfaces/interfaces";
 import LivingEntity, { LivingEntityData } from "./LivingEntity";
-import Item from "../items/Item";
+import Item, { createSimpleWeaponItem } from "../items/Item";
 import ItemEntity from "./ItemEntity";
 import { num2strWithSign } from "../../utils/strings";
 import StorageComponent from "../components/StorageComponent";
@@ -10,13 +10,14 @@ import HealthComponent from "../components/HealthComponent";
 import CombatableComponent from "../components/CombatableComponent";
 import EmptyCombatAI from "../CombatAI/EmptyCombatAI";
 import { Hands } from "../Hands";
+import WeaponComponent from "../components/WeaponComponent";
 
 export interface PlayerEntityData extends LivingEntityData {
     name: string;
     money: number;
     magic: number;
     insight: number;
-    defaultWeapon: Item;
+    defaultDamage: Dice | number;
     holdingItem?: Item;
     inventory?: Array<Item>;
 }
@@ -28,8 +29,6 @@ export default class PlayerEntity extends LivingEntity {
     money: number;
     magic: number;
     insight: number;
-
-    defaultWeapon: Item;
 
     readonly living: HealthComponent;
     readonly storage: StorageComponent;
@@ -45,32 +44,15 @@ export default class PlayerEntity extends LivingEntity {
         this.magic = data.magic;
         this.insight = data.insight;
 
-        this.defaultWeapon = data.defaultWeapon;
-
         this.living = new HealthComponent({ maxHealth: data.maxHealth });
         this.storage = new StorageComponent({ items: data.inventory ?? [], doDisplayMessage: true });
         this.movement = new MoveComponent();
         this.hands = new HoldComponent({ holderSize: 1, heldItems: [data.holdingItem ?? null] });
         this.combatable = new CombatableComponent({
             dexterity: data.dexterity,
-            baseDamage: data.baseDamage,
+            defaultWeapon: createSimpleWeaponItem(this.game, "拳头", data.defaultDamage),
             combatAI: new EmptyCombatAI(),
         });
-    }
-
-    mutateValue(key: string, delta: number, reason?: string): void {
-        switch (key) {
-            case 'health': this.health += delta; break;
-            case 'magic': this.magic += delta; break;
-            case 'money': this.money += delta; break;
-            case 'strength': this.strength += delta; break;
-            case 'insight': this.insight += delta; break;
-            case 'dexterity': this.dexterity += delta; break;
-        }
-        this.game.appendText(`${this.name} ${reason || ''} ${this.game.translate(key)} ${num2strWithSign(delta)}`);
-        if (!this.isAlive()) {
-            this.game.gameOver('失血过多');
-        }
     }
 
     /**
@@ -99,6 +81,10 @@ export default class PlayerEntity extends LivingEntity {
         this.holdItem(null, replaceOption);
     }
 
+    addItemToInventory(...items: Array<Item>) {
+        this.storage.add(...items);
+    }
+
     removeItemFromInventory(item: Item, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
         const [removedItem] = this.storage.remove(item);
         if (!removedItem) return false;
@@ -111,13 +97,7 @@ export default class PlayerEntity extends LivingEntity {
     }
 
     getWeapon(): WeaponComponent {
-        const heldWeapon = this.hands.getHeldItem(Hands.MAIN)?.tryGetComponent(WeaponComponent.ID);
-        if (heldWeapon) return heldWeapon;
-        return this.defaultWeapon.gtComponent(WeaponComponent.ID);
-    }
-
-    getInteractions(): Array<Option> {
-        return [];
+        return this.combatable.weapon;
     }
 }
 

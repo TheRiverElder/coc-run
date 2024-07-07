@@ -32,6 +32,14 @@ export default class HealthComponent extends ComponentBase {
         return this.health / this.maxHealth;
     }
 
+    get alive(): boolean {
+        return this.health > 0;
+    }
+
+    get dead(): boolean {
+        return this.health <= 0;
+    }
+
     constructor(data: HealthComponentData) {
         super(data);
 

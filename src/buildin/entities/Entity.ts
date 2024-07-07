@@ -39,9 +39,9 @@ abstract class Entity extends ObjectBase {
         // empty
     }
 
-    // 把自己从场景中移除，此行为不会解除entity对site的引用
+    // 把自己从场景中移除
     removeSelf() {
-        this.site.removeEntity(this);
+        this._site?.removeEntity(this);
         this._site = null;
     }
 }

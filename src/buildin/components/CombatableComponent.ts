@@ -1,12 +1,16 @@
-import { Dice } from "../../interfaces/types";
 import CombatAI from "../CombatAI/CombatAI";
 import { CombatEntity } from "../events/CombatEvent";
+import { Hands } from "../Hands";
+import Item from "../items/Item";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 import HealthComponent from "./HealthComponent";
+import HoldComponent from "./HoldComponent";
+import WeaponComponent from "./WeaponComponent";
 
 export interface CombatableComponentData extends ComponentBaseData {
     dexterity: number;
-    baseDamage: Dice | number;
+    shield?: number;
+    defaultWeapon: Item;
     combatAI: CombatAI;
 }
 
@@ -19,13 +23,15 @@ export default class CombatableComponent extends ComponentBase {
     }
 
     dexterity: number;
-    baseDamage: Dice | number;
+    shield: number;
+    defaultWeapon: Item;
     combatAI: CombatAI;
 
     constructor(data: CombatableComponentData) {
         super(data);
         this.dexterity = data.dexterity;
-        this.baseDamage = data.baseDamage;
+        this.shield = data.shield ?? 0;
+        this.defaultWeapon = data.defaultWeapon;
         this.combatAI = data.combatAI;
     }
 
@@ -33,25 +39,15 @@ export default class CombatableComponent extends ComponentBase {
         return this.host.getComponent(HealthComponent.ID) as HealthComponent;
     }
 
-    // private _combat: CombatEvent | null = null;
-    // public get inCombat(): boolean {
-    //     return !!this._combat;
-    // }
-    // public get combat(): CombatEvent {
-    //     if (!this._combat) throw new Error("Not in combat");
-    //     return this._combat;
-    // }
-    // private set combat(value: CombatEvent | null) {
-    //     this._combat = value;
-    // }
+    get weapon(): WeaponComponent {
+        const hands = this.host.tryGetComponent<HoldComponent>(HoldComponent.ID);
+        if (hands) {
+            const weapon = hands.getHeldItem(Hands.MAIN)?.tryGetComponent<WeaponComponent>(WeaponComponent.ID);
+            if (weapon) return weapon;
+        }
 
-    // onEnterCombat(combat: CombatEvent) {
-    //     this.combat = combat;
-    // }
-
-    // onExitCombat() {
-    //     this.combat = null;
-    // }
+        return this.defaultWeapon.getComponent<WeaponComponent>(WeaponComponent.ID);
+    }
 
     onCombatStart(self: CombatEntity) {
         this.combatAI.onCombatStart(self);
@@ -64,7 +60,6 @@ export default class CombatableComponent extends ComponentBase {
     onCombatEnd(self: CombatEntity) {
         this.combatAI.onCombatEnd(self);
     }
-
 
 
 }

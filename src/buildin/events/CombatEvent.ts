@@ -1,6 +1,7 @@
-import { GameEvent, LivingEntity, Option, PlayerEntity } from "../../interfaces/interfaces";
+import { Damage, GameEvent, LivingEntity, Option, PlayerEntity } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 import CombatableComponent from "../components/CombatableComponent";
+import { EntityTags } from "../EntityTags";
 import { GameEventData } from "../GameEvent";
 
 interface CombatEntityData {
@@ -47,29 +48,39 @@ export default class CombatEvent extends GameEvent {
     override onRender(): Array<Option> {
         const player = this.game.getPlayer();
         const combatPlayer = this.rivals.find(e => e.entity.uid === player.uid);
+        if (!combatPlayer) {
+            this.game.endEvent(this);
+            return [];
+        }
+
         const escape: Option = {
             text: `逃跑`,
             leftText: '🏃‍',
             rightText: `${player.dexterity}%`,
             tag: 'escape',
+            action: this.wrapPlayerAction(() => combatPlayer.escape()),
         };
-        if (!combatPlayer) {
-            return [escape];
-        }
+
         const weapon = player.getWeapon();
-        const options: Array<Option> = this.rivals.filter(e => e.tag !== combatPlayer.tag).map(e => ({
-            text: `攻击${e.entity.name}`,
+        const options: Array<Option> = this.rivals.filter(e => e.tag !== EntityTags.CIVILIAN).map(enemy => ({
+            text: `攻击【${enemy.name}】`,
             leftText: '🗡',
-            rightText: `${weapon.previewDamage(e.entity)}♥`,
-            tag: e.entity.uid,
+            rightText: `${weapon.previewDamage(enemy.combatable.living)}♥`,
+            tag: enemy.entity.uid,
+            action: this.wrapPlayerAction(() => combatPlayer.attack(enemy)),
         }));
         options.push(escape);
+
         if (this.game.debugMode) {
-            options.push({
+            options.unshift({
                 text: `一击必杀`,
                 leftText: '💀',
                 rightText: `调试模式`,
                 tag: 'one_punch',
+                action: this.wrapPlayerAction(() => this.rivals
+                    .filter(e => e.tag === EntityTags.MONSTER)
+                    .forEach(e => e.combatable.living.mutate(-e.entity.health, '因为苟管理'))
+                ),
             });
         }
         return options;
@@ -79,29 +90,15 @@ export default class CombatEvent extends GameEvent {
         this.game.appendText(`场上剩余（${this.rivals.length}）：` + this.rivals.map(({ entity }) => `${entity.name}(${entity.health}/${entity.maxHealth})`).join('、'));
     }
 
-    override onInput(option: Option) {
-        const p = this.game.getPlayer();
-        const cp = this.rivals.find(e => e.entity.uid === p.uid);
-        if (!cp) {
-            this.game.endEvent(this);
-            return;
-        }
+    private wrapPlayerAction(action: () => void) {
+        return () => {
+            action();
 
-        if (option.tag === 'one_punch') {
-            this.rivals.filter(e => e.tag === cp.tag).forEach(e => e.entity.mutateValue('health', -e.entity.health, '因为苟管理'));
-        } else if (option.tag === 'escape') {
-            this.escape(p);
-        } else if (typeof option.tag === 'number') {
-            const enemy = this.rivals.find(e => e.entity.uid === option.tag);
-            if (enemy) {
-                p.attack(enemy.entity);
-            }
-        }
-
-        if (this.checkCombatEnd()) return;
-        this.turnNext();
-        this.runForPlayer();
-        this.displayRivalsInformation();
+            if (this.checkCombatEnd()) return;
+            this.turnNext();
+            this.runForPlayer();
+            this.displayRivalsInformation();
+        };
     }
 
     checkCombatEnd(): boolean {
@@ -110,21 +107,21 @@ export default class CombatEvent extends GameEvent {
         if (this.rivals.length <= 1 || this.rivals.every(e => e.tag === tag)) {
             this.game.appendText('战斗结束');
             this.game.endEvent(this);
-            this.rivals.forEach(e => e.entity.onCombatStart(this, e));
+            this.rivals.forEach(e => e.combatable.onCombatEnd(e));
             return true;
         }
         return false;
     }
 
     remanageRivals(): void {
-        this.rivals = this.rivals.filter(e => e.entity.isAlive());
+        this.rivals = this.rivals.filter(e => e.combatable.living.alive);
         this.rivals.sort((a, b) => a.entity.dexterity - b.entity.dexterity);
         this.rivals.forEach((e, i) => e.ordinal = i);
     }
 
     // let next one act
     nextAct(): void {
-        this.actingRival.entity.onCombatTurn(this, this.actingRival);
+        this.actingRival.combatable.onCombatTurn(this.actingRival);
         this.turnNext();
     }
 
@@ -136,28 +133,6 @@ export default class CombatEvent extends GameEvent {
         while (!this.checkCombatEnd() && !(this.actingRival.entity instanceof PlayerEntity)) {
             this.nextAct();
         }
-    }
-
-    public escape(rival: LivingEntity): void {
-        if (test(rival.dexterity)) {
-            this.game.appendText(`${rival.name}逃跑成功`, 'good');
-            this.game.endEvent(this);
-            const index = this.rivals.findIndex(e => e.entity.uid === rival.uid);
-            if (index >= 0) {
-                this.rivals.splice(index, 1);
-                if (rival.uid === this.actingRival.entity.uid) {
-                    this.actingRival = this.rivals[index % this.rivals.length];
-                }
-            }
-            this.remanageRivals();
-        } else {
-            this.game.appendText(`${rival.name}逃跑失败`, 'bad');
-        }
-    }
-
-    public attack(source: LivingEntity, target: LivingEntity): void {
-        this.game.appendText(`${source.name}使用${source.getWeapon().name}攻击${target.name}`, 'bad');
-        source.attack(target);
     }
 }
 
@@ -188,13 +163,46 @@ class CombatEntity {
         this.combatable.onCombatEnd(this);
     }
 
-    attack(target: CombatEntity) {
+    onCombatReceiveDamage(damage: Damage, source: CombatEntity, isFightBack: boolean = false) {
         const combatable = this.combatable;
         const game = combatable.game;
+        const dexterity = combatable.dexterity;
+
+        if (!isFightBack) { // 收到的伤害是主动发出而不是反击，因反击受到的伤害不能再反击
+            if (test(dexterity)) { // 成功躲避之后不会受伤
+                const message = `${self.name}躲过了${source.name}的进攻`;
+                if (test(dexterity)) { // 如果自己的敏捷够高就可以在此时反击回去
+                    game.appendText(message + `，并返回打一把`, 'good');
+                    this.attack(source, true);
+                } else {
+                    game.appendText(message, 'good');
+                }
+                return;
+            }
+        }
+
+        // 开始计算伤害
+        const actualDamageValue = Math.max(0, damage.value - combatable.shield); // 护甲可以减免部分伤害
+        damage.value = actualDamageValue;
+        if (actualDamageValue > 0) {
+            combatable.living.mutate(-actualDamageValue, `受到${source.name}攻击`);
+        } else {
+            game.appendText(`${self.name}的护甲防住了${source.name}的攻势`, 'good');
+        }
+    }
+
+    attack(target: CombatEntity, isFightBack = false) {
+        const combatable = this.combatable;
+        const game = combatable.game;
+        const weapon = combatable.weapon;
 
         // TODO
-        // game.appendText(`${this.name}使用${source.getWeapon().name}攻击${target.name}`, 'bad');
-        // source.attack(target);
+        game.appendText(`${this.name}使用${weapon.hostItem.name}攻击${target.name}`, 'bad');
+        const damage: Damage = weapon.onAttack(target.combatable.living);
+        if (damage.value) {
+            target.onCombatReceiveDamage(damage, this, isFightBack);
+        }
+        return damage;
     }
 
     escape() {

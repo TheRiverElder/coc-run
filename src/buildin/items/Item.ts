@@ -1,38 +1,22 @@
 import { Game } from "../../interfaces/interfaces";
-import { Damage, Identical, Named, Unique } from "../../interfaces/types";
-import { genUid } from "../../utils/math";
-import LivingEntity from "../entities/LivingEntity";
+import { Dice } from "../../interfaces/types";
+import WeaponComponent from "../components/WeaponComponent";
+import ObjectBase, { ObjectBaseData } from "../objects/ObjectBase";
 
-interface ItemData {
-    game: Game;
-    id?: string;
-    uid?: number;
+export interface ItemData extends ObjectBaseData {
     name: string;
 }
 
-class Item implements Identical, Unique, Named {
-    readonly game: Game;
-    readonly id: string;
-    readonly uid: number;
+export default class Item extends ObjectBase {
+
     name: string;
 
     constructor(data: ItemData) {
-        this.game = data.game;
-        this.id = data.id || 'item';
-        this.uid = data.uid || this.game.generateUid();
+        super(data);
         this.name = data.name;
-    }
-
-    onAttack(entity: LivingEntity): Damage {
-        return { value: 0, type: 'melee' };
-    }
-
-    previewDamage(entity?: LivingEntity): string {
-        return '0';
     }
 }
 
-export default Item;
-export type {
-    ItemData,
+export function createSimpleWeaponItem(game: Game, name: string, damage: Dice | number) {
+    return new Item({ game, name, components: [new WeaponComponent({ damage })] })
 }

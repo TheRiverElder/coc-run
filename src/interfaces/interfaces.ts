@@ -66,8 +66,8 @@ export interface GameObject {
 
     addComponent(component: GameComponent): boolean;
     removeComponent(component: GameComponent): boolean;
-    getComponent(id: string): GameComponent;
-    tryGetComponent(id: string): GameComponent | null;
+    getComponent<T extends GameComponent>(id: string): T;
+    tryGetComponent<T extends GameComponent>(id: string): T | null;
 }
 
 export interface GameComponent {
