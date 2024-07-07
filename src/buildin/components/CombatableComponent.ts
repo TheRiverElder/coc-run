@@ -1,5 +1,8 @@
+import { Option } from "../../interfaces/types";
 import CombatAI from "../CombatAI/CombatAI";
-import { CombatEntity } from "../events/CombatEvent";
+import Entity from "../entities/Entity";
+import { EntityTags } from "../EntityTags";
+import CombatEvent, { CombatEntity } from "../events/CombatEvent";
 import { Hands } from "../Hands";
 import Item from "../items/Item";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
@@ -47,6 +50,32 @@ export default class CombatableComponent extends ComponentBase {
         }
 
         return this.defaultWeapon.getComponent<WeaponComponent>(WeaponComponent.ID);
+    }
+
+    override getInteractions(): Option[] {
+        const player = this.game.getPlayer();
+        if (this.host === player) return [];
+        
+        return [{
+            text: `攻击 ${this.host.name}`,
+            leftText: '🗡',
+            action: () => {
+                this.game.triggerEvent(new CombatEvent({
+                    game: this.game, 
+                    rivals: [
+                        {
+                            entity: player,
+                            tag: EntityTags.CIVILIAN,
+                        },
+                        {
+                            entity: this.host as Entity,
+                            tag: EntityTags.MONSTER,
+                        },
+                    ],
+                    next: player.uid,
+                }));
+            },
+        }];
     }
 
     onCombatStart(self: CombatEntity) {

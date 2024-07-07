@@ -11,7 +11,6 @@ interface CombatEntityData {
 }
 
 interface CombatEventData extends GameEventData {
-    uid?: number;
     priority?: number;
     rivals: Array<CombatEntityData>;
     next?: number;

@@ -86,6 +86,24 @@ const data = {
             ],
         });
 
+        const monster_触手怪 = new Entity({
+            game,
+            name: '触手怪',
+            components: [
+                new HealthComponent({
+                    maxHealth: 10,
+                    onDie: (host) => {
+                        if (host instanceof Entity) host.site.addEntity(createPort('dark_river'));
+                    },
+                }),
+                new CombatableComponent({
+                    dexterity: 40,
+                    defaultWeapon: createSimpleWeaponItem(game, '爪子', { faces: 2, fix: 1 }),
+                    combatAI: new MonsterCombatAI(),
+                }),
+            ],
+        });
+
 
         const sites = [
             new Site({
@@ -223,22 +241,11 @@ const data = {
                 name: '祠堂地下室',
                 entities: [
                     ...createPorts('clan_hall'),
-                    new Entity({
-                        game,
-                        name: '触手怪',
-                        components: [
-                            new HealthComponent({
-                                maxHealth: 10, onDie: (host) => {
-                                    if (host instanceof Entity) host.site.addEntity(createPort('dark_river'));
-                                }
-                            }),
-                            new CombatableComponent({
-                                dexterity: 40,
-                                defaultWeapon: createSimpleWeaponItem(game, '爪子', { faces: 2, fix: 1 }),
-                                combatAI: new MonsterCombatAI(),
-                            }),
-                        ],
-                    }),
+                    createEntityWithComponents(game,
+                        new ClueComponent({
+                            discoverer: createEntityClue(monster_触手怪),
+                        }),
+                    ),
                 ],
             }),
             new Site({
