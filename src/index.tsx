@@ -9,9 +9,7 @@ import polyfill from './utils/polyfill'
 polyfill();
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App data={data} debugMode={new URLSearchParams(window.location.search).get('debug-mode') === 'true'} />
-  </React.StrictMode>,
+  <App data={data} debugMode={new URLSearchParams(window.location.search).get('debug-mode') === 'true'} />,
   document.getElementById('root')
 );
 

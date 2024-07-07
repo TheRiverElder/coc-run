@@ -1,11 +1,11 @@
 import { Game, GameEvent } from "../../interfaces/interfaces";
 import { GameEventData } from "../GameEvent";
 
-interface GameOverEventData extends GameEventData {
+export interface GameOverEventData extends GameEventData {
     reason: string;
 }
 
-class GameOverEvent extends GameEvent {
+export default class GameOverEvent extends GameEvent {
     reason: string;
 
     constructor(data: GameOverEventData) {
@@ -20,9 +20,4 @@ class GameOverEvent extends GameEvent {
     onStart() {
         this.game.gameOver(this.reason);
     }
-}
-
-export default GameOverEvent;
-export type {
-    GameOverEventData,
 }

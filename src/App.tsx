@@ -3,7 +3,7 @@ import './App.css';
 import WeaponComponent from './buildin/components/WeaponComponent';
 import InventoryEvent from './buildin/events/InventoryEvent';
 import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './interfaces/interfaces';
-import { DisplayText, Subopt } from './interfaces/types';
+import { DisplayText } from './interfaces/types';
 import { findByPath } from './utils/objects';
 
 function OptionBtn(props: { option: Option, className: string, handleClickOption: (text: Text | string, action: () => void) => void }) {
@@ -27,9 +27,8 @@ function OptionBtn(props: { option: Option, className: string, handleClickOption
           className="subopt"
           onClick={(e) => {
             e.stopPropagation();
-            suboption.action?.();
             if (suboption.action) {
-              handleClickOption(suboption.text, suboption.action);
+              handleClickOption(`${option.text} ${suboption.text}`, suboption.action);
             }
           }}
         >{suboption.text}</span>
@@ -287,6 +286,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   endEvent(event: GameEvent) {
     const index = this.currentState.events.findIndex(e => e.uid === event.uid);
     if (index >= 0) {
+      event.onEnd();
       this.currentState.events.splice(index, 1);
     }
     this.refreshOptions();

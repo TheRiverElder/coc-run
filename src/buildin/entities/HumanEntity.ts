@@ -32,11 +32,10 @@ export default class HumanEntity extends CombatableEntity {
      */
     holdItem(item: Item | null, replaceOption: ReplaceOption = 'restore'): void {
         const prevItem = this.hands.hold(Hands.MAIN, item);
+        const prev = this.storage.doDisplayMessage;
+        this.storage.doDisplayMessage = false;
         if (item) {
-            const prev = this.storage.doDisplayMessage;
-            this.storage.doDisplayMessage = false;
             this.storage.remove(item);
-            this.storage.doDisplayMessage = prev;
             this.game.appendText(`${this.name}装备了${item.name}`, 'mutate');
         } else if (prevItem) {
             this.game.appendText(`${this.name}收起了${prevItem.name}`, 'mutate');
@@ -47,6 +46,7 @@ export default class HumanEntity extends CombatableEntity {
             case 'restore': this.storage.add(prevItem); break;
             case 'delete': break;
         }
+        this.storage.doDisplayMessage = prev;
     }
 
     getItemOnMainHand(): Item | null {

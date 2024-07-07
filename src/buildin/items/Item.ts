@@ -21,6 +21,10 @@ export default class Item extends ObjectBase {
     }
 }
 
-export function createSimpleWeaponItem(game: Game, name: string, damage: Dice | number) {
-    return new Item({ game, name, components: [new WeaponComponent({ damage })] })
+export function createSimpleWeaponItem(game: Game, name: string, damage: Dice | number): Item {
+    return new Item({ game, name, components: [new WeaponComponent({ damage })] });
+}
+
+export function previewItemDamage(item: Item): string {
+    return item.tryGetComponent<WeaponComponent>(WeaponComponent.ID)?.previewDamage() ?? String(0);
 }

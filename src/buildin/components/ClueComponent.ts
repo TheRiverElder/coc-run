@@ -37,7 +37,7 @@ export default class ClueComponent extends ComponentBase {
     }
 
     override getInteractions(): Option[] {
-        if (this.counter >= this.chances) return [];
+        if (this.counter >= this.chances || !this.discoverer.hasMore(this.times)) return [];
 
         return [{
             text: `调查`,
@@ -133,7 +133,7 @@ function doCreateItemClue(items: Array<Item>, autoPick: boolean): Discoverer {
                 } else if (host instanceof Item) {
                     clue.game.getPlayer().addItemToInventory(...items);
                 }
-            }
+            };
         },
     };
 }
@@ -154,7 +154,7 @@ export function createEntityClue(...entities: Array<Entity>): Discoverer {
                 if (host instanceof Entity) {
                     host.site.addEntities(entities);
                 }
-            }
+            };
         },
     };
 }

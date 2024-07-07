@@ -11,26 +11,26 @@ export interface GameEventData {
 
 export default class GameEvent implements Identical, Unique {
     readonly game: Game;
+    readonly uid: number;
     id: string;
     priority: number;
-    uid: number;
 
     constructor(data: GameEventData) {
         this.game = data.game;
+        this.uid = data.uid || this.game.generateUid();
         this.id = data.id ?? "unknown";
         this.priority = data.priority || 0;
-        this.uid = data.uid || genUid();
     }
 
-    onStart(): void {
-        this.game.appendText(`事件[${this.id}]开始了`);
-    }
+    onStart(): void { }
 
     onRender(): Array<Option> {
         return [];
     }
 
-    onInput(option: Option, subopt: Subopt | null): void {
-        this.game.appendText(`来自事件[${this.id}]`);
+    onEnd(): void { }
+
+    endSelf() {
+        this.game.endEvent(this);
     }
 }

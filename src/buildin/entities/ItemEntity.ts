@@ -25,10 +25,11 @@ export default class ItemEntity extends Entity {
             leftText: '💎',
             tag: [],
             action: () => {
-                if (this.autoEquip) {
-                    this.game.getPlayer().holdItem(this.item);
+                const player = this.game.getPlayer();
+                if (this.autoEquip && !player.getItemOnMainHand()) {
+                    player.holdItem(this.item);
                 } else {
-                    this.game.getPlayer().addItemToInventory(this.item);
+                    player.addItemToInventory(this.item);
                 }
                 this.site.removeEntity(this);
                 this.game.showSiteOptions();
