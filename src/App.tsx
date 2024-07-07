@@ -13,7 +13,7 @@ function OptionBtn(props: { option: Option, className: string, handleClickOption
       className={className}
       onClick={() => {
         if (option.action) {
-          handleClickOption(option.text, option.action);
+          handleClickOption(option.messageText ?? option.text, option.action);
         }
       }}
     >

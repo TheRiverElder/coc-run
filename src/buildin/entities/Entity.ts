@@ -5,12 +5,9 @@ import Site from "../Site";
 
 export interface EntityData extends ObjectBaseData {
     site?: Site;
-    name?: string;
 }
 
 export default class Entity extends ObjectBase {
-
-    public name: string;
 
     private _site: Site | null;
     public get site(): Site {
@@ -24,7 +21,6 @@ export default class Entity extends ObjectBase {
     constructor(data: EntityData) {
         super(data);
         this._site = data.site ?? Site.FAKE_SITE;
-        this.name = data.name ?? '???';
     }
 
     /**

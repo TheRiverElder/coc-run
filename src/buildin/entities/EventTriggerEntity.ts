@@ -9,10 +9,6 @@ export interface EventTriggerEntityData {
 
 export default class EventTriggerEntity extends Entity {
 
-    get name(): string {
-        return this.event.id;
-    }
-
     event: GameEvent;
     option: Option;
     once: boolean; 

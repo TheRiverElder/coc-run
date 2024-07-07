@@ -20,6 +20,7 @@ export type DisplayText = Text | string;
 
 export interface Option {
     text: string;
+    messageText?: Text | string;
     leftText?: string;
     rightText?: string;
     subopts?: Array<Subopt>;

@@ -2,24 +2,25 @@ import GameEvent, { GameEventData } from "../../buildin/GameEvent";
 import IdMap from "../../buildin/IdMap";
 import { Identical, Option, Subopt, Text } from "../../interfaces/types";
 
-interface ChatOption {
+export interface ChatOption {
     text: string;
     target: string | null;
 }
 
-interface ChatBlock extends Identical {
+export interface ChatBlock {
+    id: string;
     text: Array<Text | string>;
     options?: Array<ChatOption>;
 }
 
-interface ChatEventData extends GameEventData {
+export interface ChatEventData extends GameEventData {
     blocks: Array<ChatBlock>;
     entry?: string;
 }
 
-class ChatEvent extends GameEvent {
-    blocks: IdMap<ChatBlock>;
-    currentBlockId: string;
+export default class ChatEvent extends GameEvent {
+    private blocks: IdMap<ChatBlock>;
+    private currentBlockId: string;
 
     constructor(data: ChatEventData) {
         super({
@@ -31,38 +32,33 @@ class ChatEvent extends GameEvent {
         this.currentBlockId = data.entry || data.blocks[0].id;
     }
 
-    onStart(): void {
+    override onStart(): void {
         this.displayTextAndCheckEnd();
     }
 
-    onRender(): Array<Option> {
+    override onRender(): Array<Option> {
         const block = this.blocks.get(this.currentBlockId);
-        return block?.options?.map(e => ({ text: e.text, tag: e.target })) || [];
+        return block?.options?.map(option => ({ 
+            text: option.text, 
+            tag: option.target,
+            action: () => {
+                if (option.target) {
+                    this.currentBlockId = option.target;
+                    this.displayTextAndCheckEnd();
+                } else {
+                    this.endSelf();
+                }
+            },
+        })) ?? [];
     }
 
-    onInput(option: Option, subopt: Subopt | null): void {
-        if (typeof option.tag === 'string') {
-            this.currentBlockId = option.tag;
-            this.displayTextAndCheckEnd();
-        } else {
-            this.game.endEvent(this);
-        }
-    }
-
-    displayTextAndCheckEnd() {
+    private displayTextAndCheckEnd() {
         const block = this.blocks.get(this.currentBlockId);
         if (block) {
             block.text.forEach(line => this.game.appendText(line));
             if (!block.options || !block.options.length) {
-                this.game.endEvent(this);
+                this.endSelf();
             }
         }
     }
-}
-
-export default ChatEvent;
-export type {
-    ChatEventData,
-    ChatBlock,
-    ChatOption,
 }

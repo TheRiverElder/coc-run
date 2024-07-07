@@ -56,6 +56,8 @@ export interface GameObject {
 
     readonly game: Game;
     readonly uid: number;
+
+    name: string;
     
     // new (game: Game, uid?: number): GameComponent;
 

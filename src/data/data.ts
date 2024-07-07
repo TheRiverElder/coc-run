@@ -16,6 +16,7 @@ import CombatableComponent from "../buildin/components/CombatableComponent";
 import MonsterCombatAI from "../buildin/CombatAI/MonsterCombatAI";
 import ClueComponent, { createEntityClue, createItemClue, createItemClueAutoPick } from "../buildin/components/ClueComponent";
 import { createEntityWithComponents } from "../buildin/entities/Entity";
+import ChatComponent from "../buildin/components/ChatComponent";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -47,7 +48,11 @@ const data = {
             maxHealth: 7,
             dexterity: 30,
             defaultWeapon: createFist(),
-            // talkText: { text: 'story.wang', translated: true },
+            components: [
+                new ChatComponent({
+                    talkText: { text: 'story.wang', translated: true },
+                }),
+            ],
         });
         const villager_老者 = new HumanEntity({
             game,
@@ -60,8 +65,12 @@ const data = {
                 new Item({ game, name: '扭曲的木拐杖' }),
                 new Item({ game, name: '磨损的铜钱' }),
             ],
-            // talkText: { text: 'story.old_mans_talk', translated: true },
-            // idleText: { text: 'idle.old_man', translated: true },
+            components: [
+                new ChatComponent({
+                    talkText: { text: 'story.old_mans_talk', translated: true },
+                    idleText: { text: 'idle.old_man', translated: true },
+                }),
+            ],
         });
         const villager_廖族长 = new HumanEntity({
             game,
@@ -70,7 +79,11 @@ const data = {
             maxHealth: 7,
             dexterity: 30,
             defaultWeapon: createFist(),
-            // talkText: '#story.elder.welcome',
+            components: [
+                new ChatComponent({
+                    talkText: '#story.elder.welcome',
+                }),
+            ],
         });
 
 
@@ -123,9 +136,9 @@ const data = {
                 id: 'main_streat',
                 name: '大路',
                 entities: [
-                    ...createPorts('clan_hall', 'wang_house', 'home_house', 'ng_bridge'),
+                    ...createPorts('clan_hall', 'wang_house', 'home_house', 'hs_village'),
                     new ItemEntity({
-                        item: createSimpleWeaponItem(game, '猪骨', 3), 
+                        item: createSimpleWeaponItem(game, '猪骨', 3),
                         autoEquip: true,
                     }),
                 ],

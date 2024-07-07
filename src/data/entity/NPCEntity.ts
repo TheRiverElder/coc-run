@@ -39,31 +39,6 @@ class NPCEntity extends LivingEntity {
         }
     }
 
-    getInteractions(): Array<Option> {
-        return [
-            {
-                text: this.name,
-                leftText: '👨‍🦲',
-                subopts: [
-                    { text: '对话', tag: 'talk' },
-                    { text: '攻击', tag: 'attack' },
-                ]
-            },
-        ];
-    }
-
-    onInteract(option: Option, subopt: Subopt) {
-        if (subopt.tag === 'talk') {
-            if (this.chat) {
-                this.game.triggerEvent(this.chat);
-            } else {
-                this.talk();
-            }
-        } else if (subopt.tag === 'attack') {
-            this.onBeAttack();
-        }
-    }
-
     onBeAttack(): void {
         this.game.triggerEvent(new CombatEvent({
             game: this.game,
@@ -72,16 +47,6 @@ class NPCEntity extends LivingEntity {
                 { entity: this, tag: 'angry_civilian' },
             ]
         }));
-    }
-
-    talk() {
-        if (!this.takled) {
-            this.game.appendText(`${this.name}说:`);
-            this.game.appendText(this.talkText, 'talk');
-            this.takled = true;
-        } else {
-            this.game.appendText(this.idleText);
-        }
     }
 
     onCombatTurn(combat: CombatEvent, self: CombatEntity) {

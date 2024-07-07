@@ -24,15 +24,16 @@ export default class PortComponent extends ComponentBase {
 
     get movement(): MoveComponent {
         return this.game.getPlayer().getComponent<MoveComponent>(MoveComponent.ID);
-    } 
+    }
 
-    getInteractions(): Option[] {
+    override getInteractions(): Option[] {
         const movement = this.movement;
         const target = this.game.getMap().get(this.target);
         if (!target) throw new Error(`Cannot find site: ${this.target}`);
 
         return [{
             text: `${target.name}`,
+            messageText: { text: `${this.game.getPlayer().name} 到了 ${target.name}`, types: ['mutate'] },
             leftText: movement.previousSite?.id === this.target ? '🔙' : '🚪',
             action: () => movement.goToSite(target),
         }];

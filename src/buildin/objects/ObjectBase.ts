@@ -3,6 +3,7 @@ import { Game, GameComponent, GameObject, Option } from "../../interfaces/interf
 export interface ObjectBaseData {
     game: Game;
     uid?: number;
+    name?: string;
     components?: Array<GameComponent>
 }
 
@@ -10,10 +11,12 @@ export default class ObjectBase implements GameObject {
 
     readonly game: Game;
     readonly uid: number;
+    name: string;
 
     constructor(data: ObjectBaseData) {
         this.game = data.game;
         this.uid = data.uid ?? this.game.generateUid();
+        this.name = data.name ?? '???';
         data.components?.forEach(component => this.addComponent(component));
     }
 

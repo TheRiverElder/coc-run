@@ -10,14 +10,11 @@ export interface HumanEntityData extends CombatableEntityData {
 
 export default class HumanEntity extends CombatableEntity {
 
-    name: string;
-
     readonly storage: StorageComponent;
 
     constructor(data: HumanEntityData) {
         super(data);
 
-        this.name = data.name;
         this.magic = data.magic ?? 0;
 
         this.storage = new StorageComponent({ items: data.inventory ?? [], doDisplayMessage: false });
@@ -36,7 +33,7 @@ export default class HumanEntity extends CombatableEntity {
         this.storage.doDisplayMessage = false;
         if (item) {
             this.storage.remove(item);
-            this.game.appendText(`${this.name}装备了${item.name}`, 'mutate');
+            this.game.appendText(`${this.name} 装备了 ${item.name}`, 'mutate');
         } else if (prevItem) {
             this.game.appendText(`${this.name}收起了${prevItem.name}`, 'mutate');
         }

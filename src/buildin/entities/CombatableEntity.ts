@@ -13,15 +13,12 @@ export interface CombatableEntityData extends EntityData {
     maxHealth: number;
     shield?: number;
     dexterity: number;
-    name: string;
     magic?: number;
     defaultWeapon: Item;
     holdingItem?: Item;
 }
 
 export default class CombatableEntity extends Entity {
-
-    name: string;
 
     magic: number;
 
@@ -32,7 +29,6 @@ export default class CombatableEntity extends Entity {
     constructor(data: CombatableEntityData) {
         super(data);
 
-        this.name = data.name;
         this.magic = data.magic ?? 0;
 
         this.living = new HealthComponent({ health: data.health, maxHealth: data.maxHealth });
