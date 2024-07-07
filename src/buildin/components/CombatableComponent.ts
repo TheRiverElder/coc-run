@@ -14,13 +14,13 @@ export default class CombatableComponent extends ComponentBase {
 
     public static readonly ID = "combatable";
 
-    dexterity: number;
-    baseDamage: Dice | number;
-    combatAI: CombatAI;
-
     override get id(): string {
         return CombatableComponent.ID;
     }
+
+    dexterity: number;
+    baseDamage: Dice | number;
+    combatAI: CombatAI;
 
     constructor(data: CombatableComponentData) {
         super(data);

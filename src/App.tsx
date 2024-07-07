@@ -5,15 +5,24 @@ import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './inte
 import { DisplayText, Subopt } from './interfaces/types';
 import { findByPath } from './utils/objects';
 
-function OptionBtn(props: { option: Option, className: string, onClick: (option: Option, subopt: Subopt | null) => void }) {
-  const { className, option, onClick } = props;
+function OptionBtn(props: { option: Option, className: string }) {
+  const { className, option } = props;
   return (
-    <button className={className} onClick={option.subopts ? undefined : () => onClick(option, null)}>
-      {option.leftText ? <span className="option-side-text left">{option.leftText}</span> : null}
-      {option.rightText ? <span className="option-side-text right">{option.rightText}</span> : null}
+    <button className={className} onClick={() => option.action?.()}>
+      {option.leftText && <span className="option-side-text left">{option.leftText}</span>}
+      {option.rightText && <span className="option-side-text right">{option.rightText}</span>}
 
       {option.text}
-      {option.subopts ? option.subopts.map((s, i) => (<span key={i} className="subopt" onClick={() => onClick(option, s)}>{s.text}</span>)) : null}
+      {option.subopts && option.subopts.map((suboption, i) => (
+        <span
+          key={i}
+          className="subopt"
+          onClick={(e) => {
+            e.stopPropagation();
+            suboption.action?.();
+          }}
+        >{suboption.text}</span>
+      ))}
     </button>
   );
 }
@@ -34,7 +43,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
   public debugMode: boolean;
 
-  private textListEl: RefObject<HTMLDivElement>;
+  private textListElement: RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
   private resetting: boolean = false;
   private textBuffer: Array<Text> = [];
   private pid: NodeJS.Timeout | null = null;
@@ -45,7 +54,6 @@ class App extends React.Component<AppProps, AppState> implements Game {
   constructor(props: AppProps) {
     super(props);
     this.debugMode = props.debugMode || false;
-    this.textListEl = React.createRef<HTMLDivElement>();
 
     this.currentState = props.data.initialize(this);
     this.state = Object.assign({}, this.currentState, {
@@ -65,6 +73,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
     const p = s.player;
     return (
       <div className="App">
+        {/* 顶部栏，显示血量等状态 */}
         <header className="state-bar">
           <p>
             <span>第{Math.floor(s.time / 24) + 1}天{s.time % 24}点钟，</span>
@@ -78,8 +87,10 @@ class App extends React.Component<AppProps, AppState> implements Game {
           </p>
         </header>
 
+        {/* 主界面 */}
         <div className="panel">
-          <div className="text-panel" ref={this.textListEl}>
+          {/* 消息文本都在这里 */}
+          <div className="text-panel" ref={this.textListElement}>
             {this.state.textList.map((t, i) => (
               <p key={i} className={'text ' + t.types?.join(' ') || ''}>
                 <span className="content">{t.text}</span>
@@ -87,15 +98,15 @@ class App extends React.Component<AppProps, AppState> implements Game {
             ))}
           </div>
 
+          {/* 选项栏 */}
           <div className="option-panel">
             <div className="fab" onClick={this.openInventory.bind(this)}>💰</div>
 
-            {this.state.showOptions ? this.state.options.map((o, i) => (
+            {this.state.showOptions ? this.state.options.map((option, i) => (
               <OptionBtn
                 key={i}
                 className="option"
-                option={o}
-                onClick={this.handleClickOption.bind(this)}
+                option={option}
               />
             )) : (
               <button className="option skip-btn" onClick={this.flushText.bind(this, true)}> ⏩ </button>
@@ -112,8 +123,8 @@ class App extends React.Component<AppProps, AppState> implements Game {
     const list = this.textBuffer.splice(0, all ? this.textBuffer.length : 1);
     this.setState(
       s => ({ textList: s.textList.concat(list).slice(-100) }),
-      () => this.textListEl.current?.scrollTo({
-        top: this.textListEl.current.scrollHeight,
+      () => this.textListElement.current?.scrollTo({
+        top: this.textListElement.current.scrollHeight,
         behavior: 'smooth',
       }),
     );
@@ -149,15 +160,15 @@ class App extends React.Component<AppProps, AppState> implements Game {
     text = translated ? this.translate(text) : text;
     const packs: Array<Text> = text.split('\n')
       .map(s => s.trim())
-      .filter(s => !/^\s*$/.test(s))
-      .map(s => {
-        const r = /@\s*([^@]+)\s*@$/.exec(s);
-        let t = types;
-        if (r) {
-          s = s.slice(0, r.index).trim();
-          t = r[1].trim().split(/\s+/);
+      .filter(s => !/^\s*$/.test(s)) // 去除空字符串
+      .map(str => { // 解析样式
+        const result = /@\s*([^@]+)\s*@$/.exec(str);
+        let finalTypes = types;
+        if (result) {
+          str = str.slice(0, result.index).trim();
+          finalTypes = result[1].trim().split(/\s+/);
         }
-        return { text: s, types: t };
+        return { text: str, types: finalTypes };
       });
     this.textBuffer.push(...packs);
     this.flushLoop();
