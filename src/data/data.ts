@@ -17,6 +17,7 @@ import MonsterCombatAI from "../buildin/CombatAI/MonsterCombatAI";
 import ClueComponent, { createEntityClue, createItemClue, createItemClueAutoPick } from "../buildin/components/ClueComponent";
 import { createEntityWithComponents } from "../buildin/entities/Entity";
 import ChatComponent from "../buildin/components/ChatComponent";
+import CustomComponent from "../buildin/components/CustomComponent";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -95,6 +96,7 @@ const data = {
                     onDie: (host) => {
                         if (host instanceof Entity) host.site.addEntity(createPort('dark_river'));
                     },
+                    doRemoveEntityOnDie: true,
                 }),
                 new CombatableComponent({
                     dexterity: 40,
@@ -254,17 +256,21 @@ const data = {
                 name: '漆黑之河',
                 entities: [
                     ...createPorts('clan_hall_basement'),
-                    new EventTriggerEntity({
-                        option: { text: '跳入其中', leftText: '🏊‍' },
-                        event: new SequenceEvent({
-                            game,
-                            events: [
-                                new TextDisplayEvent({ game, texts: [{ text: 'story.end', translated: true }] }),
-                                new GameOverEvent({ game, reason: '完美通关' })
-                            ],
-                            joints: [{ text: '结束了' }]
-                        })
-                    }),
+                    createEntityWithComponents(game, new CustomComponent({
+                        id: 'dark_river',
+                        getInteractions: () => [{
+                            text: '跳入其中',
+                            leftText: '🏊‍',
+                            action: () => game.triggerEvent(new SequenceEvent({
+                                game,
+                                events: [
+                                    new TextDisplayEvent({ game, texts: [{ text: 'story.end', translated: true }] }),
+                                    new GameOverEvent({ game, reason: '完美通关' })
+                                ],
+                                joints: [{ text: '结束了' }]
+                            })),
+                        }],
+                    }))
                 ],
             }),
         ];

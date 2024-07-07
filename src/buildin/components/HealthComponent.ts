@@ -46,7 +46,7 @@ export default class HealthComponent extends ComponentBase {
         this.health = data.health ?? data.maxHealth;
         this.maxHealth = data.maxHealth;
         this.onDieListeners = new Set(data.onDie ? [data.onDie] : []);
-        if (data.doRemoveEntityOnDie) {
+        if (data.doRemoveEntityOnDie ?? true) {
             this.onDieListeners.add(REMOVE_ON_DIE);
         }
     }
@@ -65,13 +65,16 @@ export default class HealthComponent extends ComponentBase {
         }
 
         if (this.health <= 0) {
-            this.onDie();
+            this.onDie(reason);
         }
 
     }
 
-    private onDie() {
+    private onDie(reason?: string) {
         this.onDieListeners.forEach(it => it(this.host));
+        if (this.game.getPlayer() === this.host) {
+            this.game.gameOver(reason);
+        }
     }
 
     public get hostName(): string {
