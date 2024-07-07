@@ -1,4 +1,6 @@
-import { Game, GameComponent, GameObject, Option } from "../../interfaces/interfaces";
+import { find } from "lodash";
+import { Constructor, Game, GameComponent, GameObject, Option } from "../../interfaces/interfaces";
+import ComponentBase from "../components/CompoenentBase";
 
 export interface ObjectBaseData {
     game: Game;
@@ -62,6 +64,22 @@ export default class ObjectBase implements GameObject {
 
     tryGetComponent<T extends GameComponent>(id: string): T | null {
         return this.components.get(id) as T ?? null;
+    }
+
+    getComponentsByType<T extends GameComponent>(type: Constructor<T>): Array<T> {
+        return Array.from(this.components.values()).filter(component => (component instanceof type)) as T[];
+    }
+
+    getComponentByType<T extends GameComponent>(type: Constructor<T>): T {
+        const component = Array.from(this.components.values()).find(component => (component instanceof type));
+        if (!component) throw new Error(`Component type not found: ${type.name}`);
+        return component as T;
+    }
+
+    tryGetComponentByType<T extends GameComponent>(type: Constructor<T>): T | null {
+        const component = Array.from(this.components.values()).find(component => (component instanceof type));
+        if (!component) return null;
+        return component as T;
     }
 
 }

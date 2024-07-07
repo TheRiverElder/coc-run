@@ -68,7 +68,13 @@ export interface GameObject {
     removeComponent(component: GameComponent): boolean;
     getComponent<T extends GameComponent>(id: string): T;
     tryGetComponent<T extends GameComponent>(id: string): T | null;
+
+    getComponentByType<T extends GameComponent>(type: Constructor<T>): T;
+    tryGetComponentByType<T extends GameComponent>(type: Constructor<T>): T | null;
+    getComponentsByType<T extends GameComponent>(type: Constructor<T>): Array<T>;
 }
+
+export type Constructor<T> = abstract new (...args: any) => T;
 
 export interface GameComponent {
     

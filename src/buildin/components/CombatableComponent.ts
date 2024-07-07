@@ -43,9 +43,9 @@ export default class CombatableComponent extends ComponentBase {
     }
 
     get weapon(): WeaponComponent {
-        const hands = this.host.tryGetComponent<HoldComponent>(HoldComponent.ID);
+        const hands = this.host.tryGetComponentByType(HoldComponent);
         if (hands) {
-            const weapon = hands.getHeldItem(Hands.MAIN)?.tryGetComponent<WeaponComponent>(WeaponComponent.ID);
+            const weapon = hands.getHeldItem(Hands.MAIN)?.tryGetComponentByType(WeaponComponent);
             if (weapon) return weapon;
         }
 
