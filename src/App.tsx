@@ -6,10 +6,17 @@ import { Game, GameState, Option, Text, GameEvent, GameData, Site } from './inte
 import { DisplayText, Subopt } from './interfaces/types';
 import { findByPath } from './utils/objects';
 
-function OptionBtn(props: { option: Option, className: string }) {
-  const { className, option } = props;
+function OptionBtn(props: { option: Option, className: string, handleClickOption: (text: Text | string, action: () => void) => void }) {
+  const { className, option, handleClickOption } = props;
   return (
-    <button className={className} onClick={() => option.action?.()}>
+    <button
+      className={className}
+      onClick={() => {
+        if (option.action) {
+          handleClickOption(option.text, option.action);
+        }
+      }}
+    >
       {option.leftText && <span className="option-side-text left">{option.leftText}</span>}
       {option.rightText && <span className="option-side-text right">{option.rightText}</span>}
 
@@ -21,6 +28,9 @@ function OptionBtn(props: { option: Option, className: string }) {
           onClick={(e) => {
             e.stopPropagation();
             suboption.action?.();
+            if (suboption.action) {
+              handleClickOption(suboption.text, suboption.action);
+            }
           }}
         >{suboption.text}</span>
       ))}
@@ -112,6 +122,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
                 key={i}
                 className="option"
                 option={option}
+                handleClickOption={this.handleClickOption}
               />
             )) : (
               <button className="option skip-btn" onClick={this.flushText.bind(this, true)}> ⏩ </button>
@@ -180,7 +191,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
   }
 
   setOptions(options: Array<Option>) {
-    this.currentState.options = options;
+    this.setState({ options });
   }
 
   //#endregion
@@ -235,25 +246,13 @@ class App extends React.Component<AppProps, AppState> implements Game {
   }
 
   // 相当于游戏的主循环
-  handleClickOption(option: Option, subopt: Subopt | null) {
-    this.appendText(option.text, 'self');
-    // this.takeScreenshot();
-    this.showPortOptions();
-    const s = this.currentState;
+  private handleClickOption = (text: Text | string, action: () => void) => {
+    this.appendText(text, 'self');
 
-    if (option.tag === '__reset__') {
-      this.reset();
-    } else if (s.events.length > 0) {
-      const event = s.events[0];
-      event.onInput(option, subopt);
-    } else if (option.entityUid) {
-      const entity = s.player.site.entities.get(option.entityUid);
-      if (entity) {
-        entity.onInteract(option, subopt);
-      }
-    } else if (Array.isArray(option.tag)) {
-      this.execCmd(option.tag);
-    }
+    action();
+
+    // this.takeScreenshot();
+    this.showSiteOptions();
 
     this.refreshOptions();
 
@@ -261,12 +260,12 @@ class App extends React.Component<AppProps, AppState> implements Game {
       this.appendText(this.gameOverMessage, 'system');
       this.setOptions([{
         text: '重来',
-        tag: '__reset__'
+        action: () => this.reset(),
       }]);
     }
 
     this.applyChange();
-  }
+  };
 
   execCmd(cmd: Array<string>) {
     const path = cmd.slice(0, cmd.length - 1);
@@ -312,7 +311,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
       const event = s.events[s.events.length - 1];
       this.setOptions(event.onRender());
     } else {
-      this.showPortOptions();
+      this.showSiteOptions();
     }
   }
 
@@ -324,9 +323,9 @@ class App extends React.Component<AppProps, AppState> implements Game {
     }
   }
 
-  showPortOptions() {
-    const p = this.currentState.player;
-    const site: Site = p.site;
+  showSiteOptions() {
+    const player = this.currentState.player;
+    const site: Site = player.site;
     const options = Array.from(site.entities.values(), e => e.getInteractions().map(o => Object.assign(o, { entityUid: e.uid }))).flat();
     this.setOptions(options);
   }

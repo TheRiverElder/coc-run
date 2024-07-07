@@ -31,7 +31,7 @@ export default class ItemEntity extends Entity {
                     this.game.getPlayer().addItemToInventory(this.item);
                 }
                 this.site.removeEntity(this);
-                this.game.showPortOptions();
+                this.game.showSiteOptions();
             },
         }];
     }

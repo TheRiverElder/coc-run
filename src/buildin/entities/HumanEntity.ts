@@ -1,39 +1,18 @@
-import { Entity } from "../../interfaces/interfaces";
 import Item from "../items/Item";
 import ItemEntity from "./ItemEntity";
 import StorageComponent from "../components/StorageComponent";
-import MoveComponent from "../components/MoveComponent";
-import HoldComponent from "../components/HoldComponent";
-import HealthComponent from "../components/HealthComponent";
-import CombatableComponent from "../components/CombatableComponent";
-import EmptyCombatAI from "../CombatAI/EmptyCombatAI";
 import { Hands } from "../Hands";
-import WeaponComponent from "../components/WeaponComponent";
-import { EntityData } from "./Entity";
+import CombatableEntity, { CombatableEntityData } from "./CombatableEntity";
 
-export interface HumanEntityData extends EntityData {
-    health: number;
-    maxHealth: number;
-    shield?: number;
-    dexterity: number;
-    name: string;
-    magic?: number;
-    defaultWeapon: Item;
-    holdingItem?: Item;
+export interface HumanEntityData extends CombatableEntityData {
     inventory?: Array<Item>;
 }
 
-export default class HumanEntity extends Entity {
+export default class HumanEntity extends CombatableEntity {
 
     name: string;
 
-    magic: number;
-
-    readonly living: HealthComponent;
     readonly storage: StorageComponent;
-    readonly movement: MoveComponent;
-    readonly hands: HoldComponent;
-    readonly combatable: CombatableComponent;
 
     constructor(data: HumanEntityData) {
         super(data);
@@ -41,15 +20,9 @@ export default class HumanEntity extends Entity {
         this.name = data.name;
         this.magic = data.magic ?? 0;
 
-        this.living = new HealthComponent({ maxHealth: data.maxHealth });
-        this.storage = new StorageComponent({ items: data.inventory ?? [], doDisplayMessage: true });
-        this.movement = new MoveComponent();
-        this.hands = new HoldComponent({ holderSize: 1, heldItems: [data.holdingItem ?? null] });
-        this.combatable = new CombatableComponent({
-            dexterity: data.dexterity,
-            defaultWeapon: data.defaultWeapon,
-            combatAI: new EmptyCombatAI(),
-        });
+        this.storage = new StorageComponent({ items: data.inventory ?? [], doDisplayMessage: false });
+
+        this.addComponent(this.storage);
     }
 
     /**
@@ -60,8 +33,11 @@ export default class HumanEntity extends Entity {
     holdItem(item: Item | null, replaceOption: ReplaceOption = 'restore'): void {
         const prevItem = this.hands.hold(Hands.MAIN, item);
         if (item) {
+            const prev = this.storage.doDisplayMessage;
+            this.storage.doDisplayMessage = false;
             this.storage.remove(item);
-            this.game.appendText(`${this.name}拿起了${item.name}`, 'mutate');
+            this.storage.doDisplayMessage = prev;
+            this.game.appendText(`${this.name}装备了${item.name}`, 'mutate');
         } else if (prevItem) {
             this.game.appendText(`${this.name}收起了${prevItem.name}`, 'mutate');
         }
@@ -83,7 +59,10 @@ export default class HumanEntity extends Entity {
     }
 
     addItemToInventory(...items: Array<Item>) {
+        const prev = this.storage.doDisplayMessage;
+        this.storage.doDisplayMessage = false;
         this.storage.add(...items);
+        this.storage.doDisplayMessage = prev;
     }
 
     removeItemFromInventory(item: Item, replaceOption: 'drop' | 'delete' = 'drop'): boolean {

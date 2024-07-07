@@ -23,7 +23,7 @@ export default class Entity extends ObjectBase {
 
     constructor(data: EntityData) {
         super(data);
-        this._site = data.site ?? null;
+        this._site = data.site ?? Site.FAKE_SITE;
         this.name = data.name ?? '???';
     }
 

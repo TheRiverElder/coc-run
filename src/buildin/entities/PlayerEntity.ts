@@ -22,5 +22,7 @@ export default class PlayerEntity extends HumanEntity {
         this.movement = new MoveComponent();
 
         this.addComponent(this.movement);
+
+        this.storage.doDisplayMessage = true;
     }
 }

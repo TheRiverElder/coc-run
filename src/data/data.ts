@@ -140,7 +140,7 @@ const data = {
                     createEntityWithComponents(
                         game,
                         new ClueComponent({
-                            onDiscover: createEntityClue(new ItemEntity({
+                            discoverer: createEntityClue(new ItemEntity({
                                 item: createSimpleWeaponItem(game, '杀猪刀', { faces: 3, times: 2, fix: -1 }),
                                 autoEquip: true,
                             })),
@@ -173,7 +173,7 @@ const data = {
                     new Entity({
                         game,
                         components: [
-                            new ClueComponent({ onDiscover: createEntityClue(createPort('nanny_secret_room')) }),
+                            new ClueComponent({ discoverer: createEntityClue(createPort('nanny_secret_room')) }),
                         ],
                     }),
                 ],

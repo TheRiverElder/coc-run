@@ -11,7 +11,7 @@ interface SiteData extends Identical, Named {
 
 class Site implements Identical, Named {
 
-    static FAKE_SITE = new Site({
+    static readonly FAKE_SITE = new Site({
         game: null as unknown as Game,
         id: '__fake_site__',
         name: 'Fake Site',

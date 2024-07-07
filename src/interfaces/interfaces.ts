@@ -29,7 +29,7 @@ export interface Game {
     appendText(text: Text | string, ...types: Array<string>): void;
     setOptions(options: Array<Option>): void;
     refreshOptions(): void;
-    showPortOptions(): void;
+    showSiteOptions(): void;
 
     triggerEvent(event: GameEvent): void;
     endEvent(event: GameEvent): void;

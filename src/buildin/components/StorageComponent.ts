@@ -37,19 +37,23 @@ export default class StorageComponent extends ComponentBase {
 
     add(...newItems: Array<Item>) {
         const actualItems = difference(newItems, this._items);
+        if (actualItems.length === 0) return;
+
         this._items.push(...actualItems);
 
         if (this.doDisplayMessage) {
-            this.game.appendText(`获取了物品：${actualItems.map(it => it.name).join('、')}`);
+            this.game.appendText(`获得了：${actualItems.map(it => it.name).join('、')}`);
         }
     }
 
     remove(...oldItems: Array<Item>): Array<Item> {
         const actualItems = intersection(oldItems, this._items);
+        if (actualItems.length === 0) return [];
+
         pullAll(this._items, oldItems);
 
         if (this.doDisplayMessage) {
-            this.game.appendText(`失去了物品：${actualItems.map(it => it.name).join('、')}`);
+            this.game.appendText(`丢弃了：${actualItems.map(it => it.name).join('、')}`);
         }
         return actualItems;
     }
