@@ -21,7 +21,7 @@ export default class ItemEntity extends Entity {
 
     override getObjectInteractions(): Option[] {
         return [{
-            text: '捡起' + this.item.name,
+            text: `捡起【${this.item.name}】`,
             leftText: '💎',
             tag: [],
             action: () => {

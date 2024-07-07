@@ -22,19 +22,19 @@ export default class PortComponent extends ComponentBase {
         this.target = data.target;
     }
 
-    get comonentMove(): MoveComponent {
-        return this.game.getPlayer().getComponent(MoveComponent.ID) as MoveComponent;
+    get movement(): MoveComponent {
+        return this.game.getPlayer().getComponent<MoveComponent>(MoveComponent.ID);
     } 
 
     getInteractions(): Option[] {
-        const comonentMove = this.comonentMove;
+        const movement = this.movement;
         const target = this.game.getMap().get(this.target);
         if (!target) throw new Error(`Cannot find site: ${this.target}`);
 
         return [{
-            text: `去往${target.name}`,
-            leftText: comonentMove.previousSite?.id === this.target ? '←' : '→',
-            action: () => comonentMove.goToSite(target),
+            text: `${target.name}`,
+            leftText: movement.previousSite?.id === this.target ? '🔙' : '🚪',
+            action: () => movement.goToSite(target),
         }];
     }
 }
