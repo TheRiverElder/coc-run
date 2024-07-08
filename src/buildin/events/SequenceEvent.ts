@@ -36,10 +36,6 @@ class SequenceEvent extends GameEvent {
     override onRender(): Array<Option> {
         return [this.joints[this.pointer - 1]];
     }
-
-    override onInput(option: Option): void {
-        this.nextEvent();
-    }
 }
 
 export default SequenceEvent;

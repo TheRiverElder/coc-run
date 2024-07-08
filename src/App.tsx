@@ -142,10 +142,10 @@ class App extends React.Component<AppProps, AppState> implements Game {
     const list = this.textBuffer.splice(0, all ? this.textBuffer.length : 1);
     this.setState(
       s => ({ textList: s.textList.concat(list).slice(-100) }),
-      () => this.textListElement.current?.scrollTo({
+      () => setTimeout(() => this.textListElement.current?.scrollTo({
         top: this.textListElement.current.scrollHeight,
         behavior: 'smooth',
-      }),
+      }), 0),
     );
   }
 

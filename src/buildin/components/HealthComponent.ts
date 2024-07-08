@@ -6,14 +6,8 @@ export interface HealthComponentData extends ComponentBaseData {
     health?: number;
     maxHealth: number;
     onDie?: (host: GameObject) => void;
-    doRemoveEntityOnDie?: boolean;
+    removeEntityOnDie?: boolean;
 }
-
-const REMOVE_ON_DIE = (host: GameObject) => {
-    if (host instanceof Entity) {
-        host.removeSelf();
-    }
-};
 
 export default class HealthComponent extends ComponentBase {
 
@@ -46,21 +40,18 @@ export default class HealthComponent extends ComponentBase {
         this.health = data.health ?? data.maxHealth;
         this.maxHealth = data.maxHealth;
         this.onDieListeners = new Set(data.onDie ? [data.onDie] : []);
-        if (data.doRemoveEntityOnDie ?? true) {
-            this.onDieListeners.add(REMOVE_ON_DIE);
-        }
     }
 
     mutate(delta: number, reason?: string) {
         const newHealth = clamp(this.health + delta, 0, this.maxHealth);
-        this.health = newHealth;
 
         const actualDelta = newHealth - this.health;
+        this.health = newHealth;
         if (actualDelta !== 0) {
             if (reason) {
-                this.game.appendText(`【${this.hostName}】${reason}，血量 ${toSignedString(actualDelta)}`);
+                this.game.appendText(`【${this.hostName}】${reason}，血量 ${toSignedString(actualDelta)}`, 'bad');
             } else {
-                this.game.appendText(`【${this.hostName}】的血量 ${toSignedString(actualDelta)}`);
+                this.game.appendText(`【${this.hostName}】的血量 ${toSignedString(actualDelta)}`, 'good');
             }
         }
 
@@ -74,6 +65,8 @@ export default class HealthComponent extends ComponentBase {
         this.onDieListeners.forEach(it => it(this.host));
         if (this.game.getPlayer() === this.host) {
             this.game.gameOver(reason);
+        } else if (this.host instanceof Entity) {
+            this.host.removeSelf();
         }
     }
 

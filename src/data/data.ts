@@ -101,7 +101,7 @@ const data = {
                     onDie: (host) => {
                         if (host instanceof Entity) host.site.addEntity(createPort('dark_river'));
                     },
-                    doRemoveEntityOnDie: true,
+                    removeEntityOnDie: true,
                 }),
                 new CombatableComponent({
                     dexterity: 40,

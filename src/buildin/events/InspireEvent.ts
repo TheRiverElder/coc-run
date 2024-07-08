@@ -1,7 +1,8 @@
 import { Game, GameEvent, Item, Option } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
+import { GameEventData } from "../GameEvent";
 
-interface InspireEventData {
+interface InspireEventData extends GameEventData {
     item: Item;
 }
 
@@ -10,15 +11,16 @@ class InspireEvent extends GameEvent {
 
     constructor(data: InspireEventData) {
         super({
+            ...data,
             id: 'inspire',
             priority: 10,
         });
         this.item = data.item;
     }
 
-    onStart(game: Game) {
-        game.appendText('你感受到了附近有什么值得注意的东西');
-        game.setOptions([
+    override onStart() {
+        this.game.appendText('你感受到了附近有什么值得注意的东西');
+        this.game.setOptions([
             { text: '探索周围', tag: 'investigate' },
             { text: '无视', tag: 'ignore' },
         ]);
@@ -33,7 +35,7 @@ class InspireEvent extends GameEvent {
         if (opt.tag === 'investigate') {
             if (test(p.insight)) {
                 game.appendText('你发现了一个看起来有意思的东西');
-                p.holdItem(game, this.item);
+                p.holdItem(this.item);
             } else {
                 game.appendText('可惜啥都没发现');
             }

@@ -77,12 +77,19 @@ export default class CombatEvent extends GameEvent {
                 rightText: `调试模式`,
                 tag: 'one_punch',
                 action: this.wrapPlayerAction(() => this.rivals
-                    .filter(e => e.tag === EntityTags.MONSTER)
+                    .filter(e => e.entity !== player && e.tag === EntityTags.MONSTER)
                     .forEach(e => e.combatable.living.mutate(-e.combatable.living.health, '因为苟管理'))
                 ),
             });
         }
         return options;
+    }
+
+    displayDiedRivalsInRound() {
+        const diedRivals = this.rivals.filter(e => !e.combatable.living.alive);
+        if (diedRivals.length > 0) {
+            this.game.appendText(`${diedRivals.map(it => it.name).join('、')} 阵亡`, 'bad');
+        }
     }
 
     displayRivalsInformation() {
@@ -93,6 +100,7 @@ export default class CombatEvent extends GameEvent {
         return () => {
             action();
 
+            this.displayDiedRivalsInRound();
             if (this.checkCombatEnd()) return;
             this.turnNext();
             this.runForPlayer();
@@ -131,6 +139,7 @@ export default class CombatEvent extends GameEvent {
     runForPlayer(): void {
         while (!this.checkCombatEnd() && !(this.actingRival.entity instanceof PlayerEntity)) {
             this.nextAct();
+            this.displayDiedRivalsInRound();
         }
     }
 }
@@ -198,8 +207,10 @@ class CombatEntity {
         // TODO
         game.appendText(`${this.name}使用${weapon.hostItem.name}攻击${target.name}`, 'bad');
         const damage: Damage = weapon.onAttack(target.combatable.living);
-        if (damage.value) {
+        if (damage.value > 0) {
             target.onCombatReceiveDamage(damage, this, isFightBack);
+        } else {
+            game.appendText(`没有造成伤害`, 'good');
         }
         return damage;
     }
