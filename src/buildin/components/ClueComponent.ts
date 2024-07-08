@@ -37,7 +37,9 @@ export default class ClueComponent extends ComponentBase {
     }
 
     override getInteractions(): Option[] {
-        if (this.counter >= this.chances || !this.discoverer.hasMore(this.times)) return [];
+        const chances = this.game.debugMode ? Number.POSITIVE_INFINITY : this.chances;
+        if (this.counter >= chances) return [];
+        if (!this.discoverer.hasMore(this.times)) return [];
 
         return [{
             text: `调查`,

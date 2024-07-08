@@ -17,6 +17,8 @@ import ClueComponent, { createEntityClue, createItemClue, createItemClueAutoPick
 import { createEntityWithComponents } from "../buildin/entities/Entity";
 import ChatComponent from "../buildin/components/ChatComponent";
 import CustomComponent from "../buildin/components/CustomComponent";
+import KeyComponent from "../buildin/components/KeyComponent";
+import LockCompoenent from "../buildin/components/LockComponent";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -24,6 +26,10 @@ function randValue(): number {
 
 const data = {
     initialize(game: Game) {
+
+        const lockCores = {
+            "nanny_chest": "nanny_chest",
+        };
 
         function createPort(targetSiteId: string): Entity {
             return new Entity({ game, components: [new PortComponent({ target: targetSiteId })] });
@@ -220,6 +226,16 @@ const data = {
                         discoverer: createItemClue(new Item({
                             game,
                             name: '黑木盒',
+                            components: [
+                                new LockCompoenent({ 
+                                    locked: true, 
+                                    core: lockCores["nanny_chest"] ,
+                                    onUnlock: () => {
+                                        const item = new Item({ game, name: '偏心切割的宝石' });
+                                        game.getPlayer().addItemToInventory(item);
+                                    },
+                                }),
+                            ],
                         })),
                     })),
                 ],
@@ -290,7 +306,9 @@ const data = {
                 insight: randValue(),
                 defaultWeapon: createFist(),
                 inventory: [
-                    new Item({ game, name: '奇怪的簪子' }),
+                    new Item({ game, name: '奇怪的簪子', components: [
+                        new KeyComponent({ core: lockCores["nanny_chest"] }),
+                    ] }),
                 ],
             }),
         };

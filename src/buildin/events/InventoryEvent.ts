@@ -32,25 +32,21 @@ class InventoryEvent extends GameEvent {
             });
         }
 
-        options.push(...player.storage.items.map(item => {
-            const subopts: Subopt[] = [
-                { text: '装备', tag: 'hold', action: () => player.holdItem(item) },
-                { text: '丢弃', tag: 'drop', action: () => player.removeItemFromInventory(item, 'drop') },
-            ];
-            if (itemOnMeinHand) {
-                subopts.push({
-                    text: '对它使用',
-                    action: () => itemOnMeinHand.use(item),
-                });
-            }
-            return {
-                text: item.name,
-                leftText: '🤜',
-                rightText: previewItemDamage(item),
-                subopts,
-                tag: item.uid,
-            };
-        }));
+        for (const item of player.storage.items) {
+            options.push(
+                {
+                    text: item.name,
+                    leftText: '🤜',
+                    rightText: previewItemDamage(item),
+                    subopts: [
+                        { text: '装备', tag: 'hold', action: () => player.holdItem(item) },
+                        { text: '丢弃', tag: 'drop', action: () => player.removeItemFromInventory(item, 'drop') },
+                    ],
+                    tag: item.uid,
+                },
+                ...item.getInteractions(),
+            );
+        }
         return options;
     }
 }
