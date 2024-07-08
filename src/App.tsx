@@ -146,7 +146,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
     this.storeScrollState();
     const list = this.textBuffer.splice(0, all ? this.textBuffer.length : 1);
     this.setState(
-      s => ({ textList: s.textList.concat(list).slice(-100) }),
+      s => ({ textList: s.textList.concat(list).slice(-20) }),
       () => this.scrollToLatestMessageList(),
     );
   }
@@ -194,8 +194,8 @@ class App extends React.Component<AppProps, AppState> implements Game {
       text = { text: text.slice(1), translated: true };
     }
     if (typeof text !== 'string') {
-      translated = text.translated || false;
-      types = text.types || types;
+      translated = text.translated ?? false;
+      types = text.types ?? types;
       text = text.text;
     }
     text = translated ? this.translate(text) : text;

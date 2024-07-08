@@ -8,7 +8,7 @@ export type LockCore = string | number;
 export interface LockCompoenentData extends ComponentBaseData {
     core?: LockCore;
     locked?: boolean;
-    onUnlock?: (host: GameObject) => void;
+    onUnlock?: (host: GameObject, key: KeyComponent) => void;
 }
 
 
@@ -23,12 +23,12 @@ export default class LockCompoenent extends ComponentBase {
         return LockCompoenent.ID;
     }
 
-    readonly onUnlockListeners = new Set<(host: GameObject) => void>();
+    readonly onUnlockListeners = new Set<(host: GameObject, key: KeyComponent) => void>();
 
     constructor(data: LockCompoenentData) {
         super(data);
         this.core = data.core ?? null;
-        this._locked = data.locked ?? false;
+        this._locked = data.locked ?? true;
         
         if (data.onUnlock) this.onUnlockListeners.add(data.onUnlock);
     }
@@ -75,7 +75,7 @@ export default class LockCompoenent extends ComponentBase {
             action: () => {
                 this.locked = false;
                 this.game.appendText(`${this.host.name} 已解锁！`, 'good');
-                this.onUnlockListeners.forEach(l => l(this.host));
+                this.onUnlockListeners.forEach(l => l(this.host, heldKey));
                 this.unmount();
             },
         }];

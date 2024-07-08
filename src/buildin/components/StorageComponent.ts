@@ -59,11 +59,11 @@ export default class StorageComponent extends ComponentBase {
     }
 
     onMount(): void {
-        this.host.tryGetComponent<HealthComponent>(HealthComponent.ID)?.onDieListeners.add(this.onDieListener);
+        this.host.tryGetComponentByType(HealthComponent)?.onDieListeners.add(this.onDieListener);
     }
 
     onUnount(): void {
-        this.host.tryGetComponent<HealthComponent>(HealthComponent.ID)?.onDieListeners.delete(this.onDieListener);
+        this.host.tryGetComponentByType(HealthComponent)?.onDieListeners.delete(this.onDieListener);
     }
 
     private onDieListener = () => {

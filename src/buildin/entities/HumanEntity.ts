@@ -51,8 +51,10 @@ export default class HumanEntity extends CombatableEntity {
     }
 
     // holdItem(null, replaceOption) 的简写
-    unholdItem(replaceOption: ReplaceOption = 'restore') {
+    unholdItem(replaceOption: ReplaceOption = 'restore'): boolean {
+        const prevItem = this.getItemOnMainHand();
         this.holdItem(null, replaceOption);
+        return !!prevItem;
     }
 
     addItemToInventory(...items: Array<Item>) {
@@ -62,9 +64,33 @@ export default class HumanEntity extends CombatableEntity {
         this.storage.doDisplayMessage = prev;
     }
 
+
+    /**
+     * 只在物品栏寻找物品并移除，不包括手上
+     * @param item 要移除的物品
+     * @param replaceOption 掉落选项
+     * @returns 是否移除成功
+     */
     removeItemFromInventory(item: Item, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
         const [removedItem] = this.storage.remove(item);
         if (!removedItem) return false;
+
+        switch (replaceOption) {
+            case 'drop': this.site.addEntity(new ItemEntity({ item, site: this.site })); break;
+            case 'delete': break;
+        }
+        return true;
+    }
+
+    /**
+     * 全身寻找物品并移除，包括手上
+     * @param item 要移除的物品
+     * @param replaceOption 掉落选项
+     * @returns 是否移除成功
+     */
+    removeItemFromBody(item: Item, replaceOption: 'drop' | 'delete' = 'drop'): boolean {
+        const [removedItem] = this.storage.remove(item);
+        if (!removedItem) return this.unholdItem(replaceOption);
 
         switch (replaceOption) {
             case 'drop': this.site.addEntity(new ItemEntity({ item, site: this.site })); break;

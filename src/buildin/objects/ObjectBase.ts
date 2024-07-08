@@ -82,4 +82,8 @@ export default class ObjectBase implements GameObject {
         return component as T;
     }
 
+    toString() {
+        return this.name || ((this as any)?.__proto__?.constructor?.name ?? "<Unknown GameObject>");    
+    }
+
 }

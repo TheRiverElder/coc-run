@@ -1,6 +1,9 @@
 import { slice } from "lodash";
+import Entity from "../entities/Entity";
+import ItemEntity from "../entities/ItemEntity";
 import Item from "../items/Item";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import HealthComponent from "./HealthComponent";
 
 
 export interface HoldComponentData extends ComponentBaseData {
@@ -54,5 +57,18 @@ export default class HoldComponent extends ComponentBase {
     getHeldItem(index: number): Item | null {
         return this._holders[index];
     } 
+
+    onMount(): void {
+        this.host.tryGetComponentByType(HealthComponent)?.onDieListeners.add(this.onDieListener);
+    }
+
+    onUnount(): void {
+        this.host.tryGetComponentByType(HealthComponent)?.onDieListeners.delete(this.onDieListener);
+    }
+
+    private onDieListener = () => {
+        if (this.host instanceof Entity) 
+            this.host.site.addEntities(this.heldItems.filter(item => !!item).map(item => new ItemEntity({ item: item! })), true);
+    };
     
 }

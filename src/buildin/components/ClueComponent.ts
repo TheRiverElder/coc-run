@@ -12,6 +12,7 @@ export interface Discoverer {
 export interface ClueComponentData extends ComponentBaseData {
     counter?: number; // 已经调查过的次数
     chances?: number; // 总共能调查几次
+    forSite?: boolean; 
     discoverer: Discoverer; // 调查结果，times: 第几次成功调查的结果，从0开始
 }
 
@@ -25,6 +26,7 @@ export default class ClueComponent extends ComponentBase {
 
     counter: number; // 已经调查过的次数
     chances: number; // 总共能调查几次
+    forSite?: boolean; 
     discoverer: Discoverer; // 调查结果
     private times = 0;
 
@@ -33,6 +35,7 @@ export default class ClueComponent extends ComponentBase {
 
         this.counter = data.counter ?? 0;
         this.chances = data.chances ?? 2;
+        this.forSite = data.forSite ?? false;
         this.discoverer = data.discoverer;
     }
 
@@ -42,17 +45,14 @@ export default class ClueComponent extends ComponentBase {
         if (!this.discoverer.hasMore(this.times)) return [];
 
         return [{
-            text: `调查`,
+            text: `调查 ${(this.forSite && this.host instanceof Entity) ? this.host.site.name : this.host.name }`,
             leftText: '💡',
             rightText: `第${this.counter + 1}次`,
             action: () => {
                 const succeeded = test(this.game.getPlayer().insight);
                 if (succeeded) {
                     this.game.appendText('你似乎察觉到了什么');
-                    if (this.discoverer.hasMore(this.times)) {
-                        this.discoverer.next(this.times)?.(this);
-                    }
-                    this.times++;
+                    this.reveal();
                 } else {
                     if (this.counter >= this.chances) {
                         this.game.appendText('好像没发现什么，放弃吧');
@@ -65,6 +65,13 @@ export default class ClueComponent extends ComponentBase {
             },
         }];
 
+    }
+
+    reveal() {
+        if (this.discoverer.hasMore(this.times)) {
+            this.discoverer.next(this.times)?.(this);
+        }
+        this.times++;
     }
 
 }
@@ -157,6 +164,17 @@ export function createEntityClue(...entities: Array<Entity>): Discoverer {
                     host.site.addEntities(entities);
                 }
             };
+        },
+    };
+}
+
+export function createSimpleClue(action: (clue: ClueComponent) => void): Discoverer {
+    return {
+        hasMore(times) {
+            return times === 0;
+        },
+        next(times) {
+            return action;
         },
     };
 }
