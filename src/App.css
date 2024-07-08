@@ -95,6 +95,7 @@ html, body, #root, .App {
 .text-panel {
   padding: .5em;
   flex: 1;
+  scroll-behavior: smooth;
 }
 
 .option-panel {

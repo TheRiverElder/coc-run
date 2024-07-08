@@ -54,7 +54,8 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
   public debugMode: boolean;
 
-  private textListElement: RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
+  private textListElement = React.createRef<HTMLDivElement>();
+  private textListSpaceHolderElement = React.createRef<HTMLDivElement>();
   private resetting: boolean = false;
   private textBuffer: Array<Text> = [];
   private pid: NodeJS.Timeout | null = null;
@@ -106,6 +107,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
         <div className="panel">
           {/* 消息文本都在这里 */}
           <div className="text-panel" ref={this.textListElement}>
+            <div className="spaceholder" ref={this.textListSpaceHolderElement}/>
             {this.state.textList.map((t, i) => (
               <p key={i} className={'text ' + t.types?.join(' ') || ''}>
                 <span className="content">
@@ -138,15 +140,35 @@ class App extends React.Component<AppProps, AppState> implements Game {
 
   //#region text
 
+  private previousScrollState: [number, number] = [0, 0];
+
   private flushText(all: boolean = false) {
+    this.storeScrollState();
     const list = this.textBuffer.splice(0, all ? this.textBuffer.length : 1);
     this.setState(
       s => ({ textList: s.textList.concat(list).slice(-100) }),
-      () => setTimeout(() => this.textListElement.current?.scrollTo({
-        top: this.textListElement.current.scrollHeight,
-        behavior: 'smooth',
-      }), 0),
+      () => this.scrollToLatestMessageList(),
     );
+  }
+
+  private storeScrollState() {
+    const element = this.textListElement.current;
+    if (!element) return;
+    this.previousScrollState = [element.scrollHeight, element.scrollTop];
+  }
+
+  private scrollToLatestMessageList() {
+    // const spaceHolder = this.textListSpaceHolderElement.current;
+    const element = this.textListElement.current;
+    if (!element) return;
+    const targetScrollTop = element.scrollHeight - element.clientHeight;
+    // if (spaceHolder) {
+    //   spaceHolder.style.height = Math.max(0, targetScrollTop - this.previousScrollState[1]) + 'px';
+    // }
+    element.scrollTo({
+      top: targetScrollTop,
+      behavior: 'smooth',
+    });
   }
 
   private flushLoop(isInInterval: boolean = false) {
