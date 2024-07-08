@@ -93,6 +93,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
             {/* <span>第{Math.floor(this.time / 24) + 1}天{s.time % 24}点钟，</span> */}
             <span>在{player.site.name}，</span>
             <span>{heldItem ? `手持${heldItem.name}(${previewDamage})` : '两手空空'}</span>
+            {this.debugMode && (<span>（调试模式）</span>)}
           </p>
 
           <p className="values">
@@ -107,7 +108,10 @@ class App extends React.Component<AppProps, AppState> implements Game {
           <div className="text-panel" ref={this.textListElement}>
             {this.state.textList.map((t, i) => (
               <p key={i} className={'text ' + t.types?.join(' ') || ''}>
-                <span className="content">{t.text}</span>
+                <span className="content">
+                  {this.debugMode && (<span>{i} - </span>)}
+                  {t.text}
+                </span>
               </p>
             ))}
           </div>
