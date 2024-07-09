@@ -49,9 +49,9 @@ export default class HealthComponent extends ComponentBase {
         this.health = newHealth;
         if (actualDelta !== 0) {
             if (reason) {
-                this.game.appendText(`【${this.hostName}】${reason}，血量 ${toSignedString(actualDelta)}`, 'bad');
+                this.game.appendText(`${this.host.name} ${reason}，血量 ${toSignedString(actualDelta)}`, 'bad');
             } else {
-                this.game.appendText(`【${this.hostName}】的血量 ${toSignedString(actualDelta)}`, 'good');
+                this.game.appendText(`${this.host.name} 的血量 ${toSignedString(actualDelta)}`, 'good');
             }
         }
 
@@ -68,12 +68,6 @@ export default class HealthComponent extends ComponentBase {
         } else if (this.host instanceof Entity) {
             this.host.removeSelf();
         }
-    }
-
-    public get hostName(): string {
-        const name = (this.host as any).name;
-        if (typeof name === 'string') return name;
-        return "???";
     }
 
 }

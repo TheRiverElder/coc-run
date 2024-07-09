@@ -56,12 +56,18 @@ export default class ObjectBase implements GameObject {
         return true;
     }
 
+    /**
+     * @depratured
+     */
     getComponent<T extends GameComponent>(id: string): T {
         const component = this.components.get(id);
         if (!component) throw new Error(`Component not found: ${id}`);
         return component as T;
     }
 
+    /**
+     * @depratured
+     */
     tryGetComponent<T extends GameComponent>(id: string): T | null {
         return this.components.get(id) as T ?? null;
     }

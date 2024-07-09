@@ -1,6 +1,7 @@
 import { Damage, Entity, GameEvent, Option, PlayerEntity } from "../../interfaces/interfaces";
 import { test } from "../../utils/math";
 import CombatableComponent from "../components/CombatableComponent";
+import HealthComponent from "../components/HealthComponent";
 import { EntityTags } from "../EntityTags";
 import { GameEventData } from "../GameEvent";
 
@@ -155,8 +156,12 @@ class CombatEntity {
 
     }
 
+    get living(): HealthComponent {
+        return this.combatable.living;
+    }
+
     get combatable(): CombatableComponent {
-        return this.entity.getComponent(CombatableComponent.ID) as CombatableComponent;
+        return this.entity.getComponentByType(CombatableComponent);
     }
 
     onCombatStart() {
@@ -178,7 +183,7 @@ class CombatEntity {
 
         if (!isFightBack) { // 收到的伤害是主动发出而不是反击，因反击受到的伤害不能再反击
             if (test(dexterity)) { // 成功躲避之后不会受伤
-                const message = `${self.name}躲过了${source.name}的进攻`;
+                const message = `${this.name}躲过了${source.name}的进攻`;
                 if (test(dexterity)) { // 如果自己的敏捷够高就可以在此时反击回去
                     game.appendText(message + `，并返回打一把`, 'good');
                     this.attack(source, true);
@@ -195,7 +200,7 @@ class CombatEntity {
         if (actualDamageValue > 0) {
             combatable.living.mutate(-actualDamageValue, `受到${source.name}攻击`);
         } else {
-            game.appendText(`${self.name}的护甲防住了${source.name}的攻势`, 'good');
+            game.appendText(`${this.name}的护甲防住了${source.name}的攻势`, 'good');
         }
     }
 
@@ -236,7 +241,7 @@ class CombatEntity {
     }
 
     get name(): string {
-        return this.combatable.living.hostName;
+        return this.entity.name;
     }
 }
 

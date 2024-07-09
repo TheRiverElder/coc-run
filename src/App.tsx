@@ -1,4 +1,5 @@
 import React, { RefObject } from 'react';
+import './styles/text-style.css';
 import './App.css';
 import WeaponComponent from './buildin/components/WeaponComponent';
 import InventoryEvent from './buildin/events/InventoryEvent';

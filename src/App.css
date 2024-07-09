@@ -1,258 +1,229 @@
-html, body, #root, .App {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+html,
+body,
+#root,
+.App {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .App {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 @keyframes glitter {
-  0% {
-    filter: invert(0%)
-  }
-  20% {
-    filter: invert(100%)
-  }
-  50% {
-    filter: invert(50%)
-  }
-  100% {
-    filter: invert(0)
-  }
+    0% {
+        filter: invert(0%)
+    }
+
+    20% {
+        filter: invert(100%)
+    }
+
+    50% {
+        filter: invert(50%)
+    }
+
+    100% {
+        filter: invert(0)
+    }
 }
 
 @keyframes slideUp {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .state-bar {
-  padding: .5em 1em;
-  font-size: 0.8em;
-  flex: 0 0 0;
-  border-bottom: .1em dashed black;
-  box-shadow: #0000002f 0 .2em .2em;
-  z-index: 1;
+    padding: .5em 1em;
+    font-size: 0.8em;
+    flex: 0 0 0;
+    border-bottom: .1em dashed black;
+    box-shadow: #0000002f 0 .2em .2em;
+    z-index: 1;
+    font-family: "胡晓波真帅体";
 }
 
 .state-bar .values {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
-.state-bar .values > .value {
-  padding: .1em .5em;
-  margin: .1em .5em;
-  background-color: #eeeeee;
-  border-radius: .2em;
-  border: 1px solid #dddddd;
+.state-bar .values>.value {
+    padding: .1em .5em;
+    margin: .1em .5em;
+    background-color: #eeeeee;
+    border-radius: .2em;
+    border: 1px solid #dddddd;
 }
 
 .panel {
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .text-panel,
 .option-panel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 1em;
-  overflow: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 1em;
+    overflow: auto;
 }
 
 .text-panel {
-  padding: .5em;
-  flex: 1;
-  scroll-behavior: smooth;
+    padding: .5em;
+    flex: 1;
+    scroll-behavior: smooth;
 }
 
 .option-panel {
-  padding: .5em 1em;
-  flex-basis: 1;
-  flex-shrink: 0;
-  flex-grow: 0;
-  height: 30%;
-  overflow: auto;
-  background-color: #282c34;
-  box-shadow: #0000002f 0 -0.2em .2em;
-  position: relative;
-  z-index: 1;
+    padding: .5em 1em;
+    flex-basis: 1;
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: 30%;
+    overflow: auto;
+    background-color: #282c34;
+    box-shadow: #0000002f 0 -0.2em .2em;
+    position: relative;
+    z-index: 1;
 }
 
 .fab {
-  position: absolute;
-  bottom: 1em;
-  right: .5em;
-  background-color: white;
-  height: 2em;
-  width: 2em;
-  padding: 0;
-  margin: 0;
-  border-radius: 1em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    position: absolute;
+    bottom: 1em;
+    right: .5em;
+    background-color: white;
+    height: 2em;
+    width: 2em;
+    padding: 0;
+    margin: 0;
+    border-radius: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.text, .option {
-  box-sizing: border-box;
-  text-align: center;
-  margin: .2em 0;
-  padding: .2em 1em;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+.text,
+.option {
+    box-sizing: border-box;
+    text-align: center;
+    padding: .2em 1em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .text {
-  text-align: start;
-  width: 100%;
-  word-break: break-all;
+    margin: 0;
+    text-align: start;
+    width: 100%;
+    word-break: break-all;
+    font-family: "杨任东竹石体-Regular";
 }
 
-.text > .content {
-  font-family: 'Times New Roman', Times, serif;
-  padding: .2em .5em;
-  border-radius: .2em;
-  /* background-color: white; */
-  animation: .618s slideUp;
+.text>.content {
+    /* font-family: 'Times New Roman', Times, serif; */
+    padding: .2em .5em;
+    border-radius: .2em;
+    /* background-color: white; */
+    animation: .618s slideUp;
 }
 
 .option {
-  flex-shrink: 0;
-  font-size: 1.2em;
-  border-radius: 1em;
-  border-width: 0;
-  width: 80%;
-  padding-top: 0.2em;
-  padding-bottom: 0.3em;
-  background-color: white;
-  transition: all 300ms;
-  position: relative
+    flex-shrink: 0;
+    font-size: 1.2em;
+    border-radius: 1em;
+    border-width: 0;
+    width: 80%;
+    margin: .2em 0;
+    padding-top: 0.2em;
+    padding-bottom: 0.3em;
+    background-color: white;
+    transition: all 300ms;
+    position: relative;
+    font-family: "杨任东竹石体-Regular";
 }
 
 .option:hover {
-  transform: scale(1.05);
-  background-color: #eeeeee;
-  box-shadow: #000000 0 0.1em 0.1em;
-  transition: all 300ms;
+    transform: scale(1.05);
+    background-color: #eeeeee;
+    box-shadow: #000000 0 0.1em 0.1em;
+    transition: all 300ms;
 }
 
 .option.skip-btn {
-  background-color: #282c34;
-  color: white;
-  border-color: white;
-  border-width: .1em;
+    background-color: #282c34;
+    color: white;
+    border-color: white;
+    border-width: .1em;
 }
 
-.option > .subopt {
-  color: #282c34;
-  font-size: 0.8em;
-  margin: 0 0 0 0.5em;
-  padding: 0 0.5em;
-  border-left: #282c34 solid 1px;
+.option>.subopt {
+    color: #282c34;
+    font-size: 0.8em;
+    margin: 0 0 0 0.5em;
+    padding: 0 0.5em;
+    border-left: #282c34 solid 1px;
 }
 
-.option > .subopt + .subopt {
-  margin-left: 0;
+.option>.subopt+.subopt {
+    margin-left: 0;
 }
 
-.option > .option-side-text {
-  height: 100%;
-  font-size: 0.8em;
-  color: gray;
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 0;
+.option>.option-side-text {
+    height: 100%;
+    font-size: 0.8em;
+    color: gray;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
 }
 
-.option > .option-side-text.left {
-  left: .5em;
+.option>.option-side-text.left {
+    left: .5em;
 }
 
-.option > .option-side-text.right {
-  right: .5em;
-}
-
-.text.self {
-  text-align: end;
-  color: #282c34;
-}
-
-.text.good {
-  color: rgb(64, 148, 64);
-}
-
-.text.bad {
-  color: rgb(255, 82, 82);
-}
-
-.text.mutate {
-  text-align: center;
-  font-size: .8em;
-  opacity: 0.5;
-  margin-top: -0.5em;
-  padding-top: 0;
-}
-
-.text.self + .text.mutate {
-  margin-top: -0.5em;
-  padding-right: 2em;
-  text-align: right;
-}
-
-.text.system {
-  text-align: center;
-  border-top: rgb(204, 204, 204) solid 1px;
-  border-bottom: rgb(204, 204, 204) solid 1px;
-}
-
-.text.talk {
-  border-left: rgb(100, 97, 112) solid 0.1em;
-  font-style: italic;
-  color: #555c69;
-  margin-top: 0;
-  margin-bottom: 0;
+.option>.option-side-text.right {
+    right: .5em;
 }
 
 .no-break {
-  word-break: unset;
-  white-space: unset;
-  word-wrap: none;
+    word-break: unset;
+    white-space: unset;
+    word-wrap: none;
 }
 
 p {
-  padding: .5em 0;
-  margin: 0;
+    padding: .5em 0;
+    margin: 0;
 }

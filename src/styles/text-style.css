@@ -1,0 +1,42 @@
+.text.self {
+    text-align: end;
+    color: #282c34;
+}
+
+.text.good {
+    color: rgb(64, 148, 64);
+}
+
+.text.bad {
+    color: rgb(255, 82, 82);
+}
+
+.text.mutate {
+    text-align: center;
+    font-size: .8em;
+    opacity: 0.5;
+    margin-top: -0.5em;
+    padding-top: 0;
+}
+
+.text.self+.text.mutate {
+    margin-top: -0.5em;
+    padding-right: 2em;
+    text-align: right;
+}
+
+.text.system {
+    font-family: "胡晓波真帅体";
+    text-align: center;
+    border-top: rgb(204, 204, 204) solid 1px;
+    border-bottom: rgb(204, 204, 204) solid 1px;
+}
+
+.text.talk {
+    border-left: rgb(100, 97, 112) solid 0.1em;
+    font-family: "沐瑶随心手写体";
+    font-style: italic;
+    color: #555c69;
+    margin-top: 0;
+    margin-bottom: 0;
+}
