@@ -180,6 +180,24 @@ const data = {
             ],
         });
 
+        const player = new PlayerEntity({
+            game,
+            name: '王二狗',
+            money: 233,
+            maxHealth: randInt(10) + 5,
+            magic: randValue(),
+            dexterity: randValue(),
+            insight: randValue(),
+            defaultWeapon: createFist(),
+            inventory: [
+                new Item({
+                    game, name: '奇怪的簪子', components: [
+                        new KeyComponent({ core: lockCores["nanny_chest"] }),
+                    ]
+                }),
+            ],
+        });
+
 
         const sites = [
             new Site({
@@ -206,6 +224,7 @@ const data = {
                         event: new GameOverEvent({ game, reason: '因为你是头号玩家' }),
                         once: true,
                     }),
+                    player,
                 ],
             }),
             new Site({
@@ -417,31 +436,12 @@ const data = {
         ];
         const map = new Map<string, Site>();
         sites.map(s => map.set(s.id, s));
-        const playerMaxHealth = randInt(10) + 5;
         return {
             events: [],
             map,
             options: [],
             time: 0,
-            player: new PlayerEntity({
-                game,
-                name: '王二狗',
-                site: map.get('bus_stop') as Site,
-                money: 233,
-                health: playerMaxHealth,
-                maxHealth: playerMaxHealth,
-                magic: randValue(),
-                dexterity: randValue(),
-                insight: randValue(),
-                defaultWeapon: createFist(),
-                inventory: [
-                    new Item({
-                        game, name: '奇怪的簪子', components: [
-                            new KeyComponent({ core: lockCores["nanny_chest"] }),
-                        ]
-                    }),
-                ],
-            }),
+            player,
         };
     },
 
