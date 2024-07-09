@@ -12,7 +12,7 @@ import HumanEntity from "../buildin/entities/HumanEntity";
 import { createSimpleWeaponItem } from "../buildin/items/Item";
 import HealthComponent from "../buildin/components/HealthComponent";
 import CombatableComponent from "../buildin/components/CombatableComponent";
-import MonsterCombatAI from "../buildin/CombatAI/MonsterCombatAI";
+import SimpleCombatAI from "../buildin/CombatAI/SimpleCombatAI";
 import ClueComponent, { createEntityClue, createItemClue, createItemClueAutoPick, createSimpleClue } from "../buildin/components/ClueComponent";
 import { createEntityWithComponents } from "../buildin/entities/Entity";
 import ChatComponent from "../buildin/components/ChatComponent";
@@ -23,6 +23,7 @@ import HintComponent from "../buildin/components/HintComponent";
 import WeaponComponent from "../buildin/components/WeaponComponent";
 import HoldComponent from "../buildin/components/HoldComponent";
 import { getSiteOrNull } from "../buildin/objects/ObjectBase";
+import { EntityTags } from "../buildin/EntityTags";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -52,6 +53,16 @@ const data = {
             return createSimpleWeaponItem(game, '拳头', 1);
         }
 
+        const combatAI_monster = new SimpleCombatAI({
+            escapeHealth: 0,
+            targetTags: [EntityTags.CIVILIAN],
+        });
+        const combatAI_villager = new SimpleCombatAI({
+            escapeHealth: 5,
+            targetTags: [EntityTags.CIVILIAN],
+            whiteListMode: true,
+        });
+
         const villager_王屠夫 = new HumanEntity({
             game,
             name: '王屠夫',
@@ -59,6 +70,7 @@ const data = {
             maxHealth: 7,
             dexterity: 30,
             defaultWeapon: createFist(),
+            combatAI: combatAI_villager,
             components: [
                 new ChatComponent({
                     greetingText: { text: 'story.wang', translated: true },
@@ -71,6 +83,7 @@ const data = {
             health: 7,
             maxHealth: 7,
             dexterity: 30,
+            combatAI: combatAI_villager,
             defaultWeapon: createFist(),
             inventory: [
                 new Item({ game, name: '扭曲的木拐杖' }),
@@ -90,6 +103,7 @@ const data = {
             maxHealth: 7,
             dexterity: 30,
             defaultWeapon: createFist(),
+            combatAI: combatAI_villager,
             components: [
                 new ChatComponent({
                     greetingText: '#story.elder.welcome',
@@ -111,7 +125,7 @@ const data = {
                 new CombatableComponent({
                     dexterity: 40,
                     defaultWeapon: createSimpleWeaponItem(game, '爪子', { faces: 2, fix: 1 }),
-                    combatAI: new MonsterCombatAI(),
+                    combatAI: combatAI_monster,
                 }),
             ],
         });
@@ -125,21 +139,19 @@ const data = {
                 new HealthComponent({
                     maxHealth: 20,
                     onDie: (host) => {
-                        if (host instanceof Entity) {
-                            for (const entity of host.site.entities.values()) {
-                                if (entity === game.getPlayer() || host) continue;
-                                const clue = entity.tryGetComponentByType(ClueComponent);
-                                if (!clue) continue;
-                                clue.reveal();
-                            }
-                        }
+                        game.appendText(`${host.name} 死后，一条路浮现了出来。`);
+                        getSiteOrNull(host)?.tryGetComponentByType(ClueComponent)?.reveal();
                     },
                     removeEntityOnDie: true,
                 }),
                 new CombatableComponent({
                     dexterity: 40,
                     defaultWeapon: createFist(),
-                    combatAI: new MonsterCombatAI(),
+                    combatAI: new SimpleCombatAI({
+                        escapeHealth: 3,
+                        targetTags: [],
+                        whiteListMode: true,
+                    }),
                 }),
             ],
         });
@@ -163,7 +175,7 @@ const data = {
                 new CombatableComponent({
                     dexterity: 60,
                     defaultWeapon: createSimpleWeaponItem(game, '爪子', { faces: 2, fix: 1 }),
-                    combatAI: new MonsterCombatAI(),
+                    combatAI: combatAI_monster,
                 }),
             ],
         });
@@ -360,7 +372,7 @@ const data = {
             new Site({
                 game,
                 id: 'curved_cave',
-                name: '雕造过的山洞',
+                name: '雕凿过的山洞',
                 components: [
                     new ClueComponent({
                         discoverer: createEntityClue(createPort('altar_in_cave'))

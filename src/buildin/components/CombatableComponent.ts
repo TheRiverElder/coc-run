@@ -36,7 +36,6 @@ export default class CombatableComponent extends ComponentBase {
         this.shield = data.shield ?? 0;
         this.defaultWeapon = data.defaultWeapon;
         this.combatAI = data.combatAI;
-        this.combatAI.bind(this);
     }
 
     get living(): HealthComponent {

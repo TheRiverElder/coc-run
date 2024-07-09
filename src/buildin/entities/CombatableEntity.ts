@@ -5,6 +5,7 @@ import HealthComponent from "../components/HealthComponent";
 import CombatableComponent from "../components/CombatableComponent";
 import EmptyCombatAI from "../CombatAI/EmptyCombatAI";
 import { EntityData } from "./Entity";
+import CombatAI from "../CombatAI/CombatAI";
 
 export interface CombatableEntityData extends EntityData {
     health?: number;
@@ -14,6 +15,7 @@ export interface CombatableEntityData extends EntityData {
     magic?: number;
     defaultWeapon: Item;
     holdingItem?: Item;
+    combatAI?: CombatAI;
 }
 
 export default class CombatableEntity extends Entity {
@@ -34,7 +36,7 @@ export default class CombatableEntity extends Entity {
         this.combatable = new CombatableComponent({
             dexterity: data.dexterity,
             defaultWeapon: data.defaultWeapon,
-            combatAI: new EmptyCombatAI(),
+            combatAI: data.combatAI ?? EmptyCombatAI.INSTANCE,
             shield: data.shield,
         });
 

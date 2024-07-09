@@ -56,7 +56,7 @@ export default class ChatComponent extends ComponentBase {
             this.talked = true;
         } else {
             if (this.idleText) {
-                this.game.appendText(this.idleText);
+                this.game.appendText(this.idleText, 'talk');
             }
         }
     }
