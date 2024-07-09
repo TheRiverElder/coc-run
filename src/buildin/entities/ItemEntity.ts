@@ -32,7 +32,7 @@ export default class ItemEntity extends Entity {
                     player.addItemToInventory(this.item);
                 }
                 this.site.removeEntity(this);
-                this.game.showSiteOptions();
+                this.game.showSceneOptions();
             },
         }];
     }

@@ -2,6 +2,7 @@ import { difference, intersection, pullAll, slice } from "lodash";
 import Entity from "../entities/Entity";
 import ItemEntity from "../entities/ItemEntity";
 import Item from "../items/Item";
+import { getSiteOrNull } from "../objects/ObjectBase";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 import HealthComponent from "./HealthComponent";
 
@@ -67,7 +68,6 @@ export default class StorageComponent extends ComponentBase {
     }
 
     private onDieListener = () => {
-        if (this.host instanceof Entity) 
-            this.host.site.addEntities(this._items.map(item => new ItemEntity({ item })), true);
+        getSiteOrNull(this.host)?.addEntities(this._items.map(item => new ItemEntity({ item })), true);
     };
 }

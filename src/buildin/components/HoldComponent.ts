@@ -2,6 +2,7 @@ import { slice } from "lodash";
 import Entity from "../entities/Entity";
 import ItemEntity from "../entities/ItemEntity";
 import Item from "../items/Item";
+import { getSiteOrNull } from "../objects/ObjectBase";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 import HealthComponent from "./HealthComponent";
 
@@ -67,8 +68,7 @@ export default class HoldComponent extends ComponentBase {
     }
 
     private onDieListener = () => {
-        if (this.host instanceof Entity) 
-            this.host.site.addEntities(this.heldItems.filter(item => !!item).map(item => new ItemEntity({ item: item! })), true);
+        getSiteOrNull(this.host)?.addEntities(this.heldItems.filter(item => !!item).map(item => new ItemEntity({ item: item! })), true);
     };
     
 }

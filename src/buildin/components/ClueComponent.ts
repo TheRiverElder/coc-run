@@ -2,6 +2,7 @@ import { Option } from "../../interfaces/types";
 import { test } from "../../utils/math";
 import Entity from "../entities/Entity";
 import Item from "../items/Item";
+import { getSiteOrNull } from "../objects/ObjectBase";
 import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
 
 export interface Discoverer {
@@ -12,7 +13,6 @@ export interface Discoverer {
 export interface ClueComponentData extends ComponentBaseData {
     counter?: number; // 已经调查过的次数
     chances?: number; // 总共能调查几次
-    forSite?: boolean; 
     discoverer: Discoverer; // 调查结果，times: 第几次成功调查的结果，从0开始
 }
 
@@ -26,7 +26,6 @@ export default class ClueComponent extends ComponentBase {
 
     counter: number; // 已经调查过的次数
     chances: number; // 总共能调查几次
-    forSite?: boolean; 
     discoverer: Discoverer; // 调查结果
     private times = 0;
 
@@ -35,7 +34,6 @@ export default class ClueComponent extends ComponentBase {
 
         this.counter = data.counter ?? 0;
         this.chances = data.chances ?? 2;
-        this.forSite = data.forSite ?? false;
         this.discoverer = data.discoverer;
     }
 
@@ -45,7 +43,7 @@ export default class ClueComponent extends ComponentBase {
         if (!this.discoverer.hasMore(this.times)) return [];
 
         return [{
-            text: `调查 ${(this.forSite && this.host instanceof Entity) ? this.host.site.name : this.host.name }`,
+            text: `调查 ${this.host.name}`,
             leftText: '💡',
             rightText: `第${this.counter + 1}次`,
             action: () => {
@@ -135,12 +133,10 @@ function doCreateItemClue(items: Array<Item>, autoPick: boolean): Discoverer {
         next(times) {
             return (clue: ClueComponent) => {
                 const host = clue.host;
-                if (autoPick) {
+                if (autoPick || host instanceof Item) {
                     clue.game.getPlayer().addItemToInventory(...items);
-                } else if (host instanceof Entity) {
-                    host.site.addEntities(items.map(it => it.toEntity()));
-                } else if (host instanceof Item) {
-                    clue.game.getPlayer().addItemToInventory(...items);
+                } else {
+                    getSiteOrNull(host)?.addEntities(items.map(it => it.toEntity()));
                 }
             };
         },
@@ -159,10 +155,7 @@ export function createEntityClue(...entities: Array<Entity>): Discoverer {
         },
         next(times) {
             return (clue: ClueComponent) => {
-                const host = clue.host;
-                if (host instanceof Entity) {
-                    host.site.addEntities(entities);
-                }
+                getSiteOrNull(clue.host)?.addEntities(entities);
             };
         },
     };

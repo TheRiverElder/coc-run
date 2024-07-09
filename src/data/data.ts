@@ -22,6 +22,7 @@ import LockComponent from "../buildin/components/LockComponent";
 import HintComponent from "../buildin/components/HintComponent";
 import WeaponComponent from "../buildin/components/WeaponComponent";
 import HoldComponent from "../buildin/components/HoldComponent";
+import { getSiteOrNull } from "../buildin/objects/ObjectBase";
 
 function randValue(): number {
     return 5 * randInt(7, 1, 3);
@@ -60,7 +61,7 @@ const data = {
             defaultWeapon: createFist(),
             components: [
                 new ChatComponent({
-                    talkText: { text: 'story.wang', translated: true },
+                    greetingText: { text: 'story.wang', translated: true },
                 }),
             ],
         });
@@ -77,7 +78,7 @@ const data = {
             ],
             components: [
                 new ChatComponent({
-                    talkText: { text: 'story.old_mans_talk', translated: true },
+                    greetingText: { text: 'story.old_mans_talk', translated: true },
                     idleText: { text: 'idle.old_man', translated: true },
                 }),
             ],
@@ -91,7 +92,7 @@ const data = {
             defaultWeapon: createFist(),
             components: [
                 new ChatComponent({
-                    talkText: '#story.elder.welcome',
+                    greetingText: '#story.elder.welcome',
                 }),
             ],
         });
@@ -228,19 +229,17 @@ const data = {
                 game,
                 id: 'wang_house',
                 name: '王屠户家',
+                components: [
+                    new ClueComponent({
+                        discoverer: createEntityClue(new ItemEntity({
+                            item: createSimpleWeaponItem(game, '杀猪刀', { faces: 3, times: 2, fix: -1 }),
+                            autoEquip: true,
+                        })),
+                    }),
+                ],
                 entities: [
                     ...createPorts('main_streat'),
                     villager_王屠夫,
-                    createEntityWithComponents(
-                        game,
-                        new ClueComponent({
-                            forSite: true,
-                            discoverer: createEntityClue(new ItemEntity({
-                                item: createSimpleWeaponItem(game, '杀猪刀', { faces: 3, times: 2, fix: -1 }),
-                                autoEquip: true,
-                            })),
-                        }),
-                    ),
                 ],
             }),
             new Site({
@@ -263,24 +262,19 @@ const data = {
                 game,
                 id: 'nanny_room',
                 name: '奶奶的房间',
+                components: [
+                    new ClueComponent({ discoverer: createEntityClue(createPort('nanny_secret_room')) }),
+                ],
                 entities: [
                     ...createPorts('home_house'),
-                    new Entity({
-                        game,
-                        components: [
-                            new ClueComponent({ forSite: true, discoverer: createEntityClue(createPort('nanny_secret_room')) }),
-                        ],
-                    }),
                 ],
             }),
             new Site({
                 game,
                 id: 'nanny_secret_room',
                 name: '奶奶的密室',
-                entities: [
-                    ...createPorts('nanny_room'),
-                    createEntityWithComponents(game, new ClueComponent({
-                        forSite: true,
+                components: [
+                    new ClueComponent({
                         discoverer: createItemClue(new Item({
                             game,
                             name: '黑木盒',
@@ -288,20 +282,20 @@ const data = {
                                 new LockComponent({
                                     locked: true,
                                     core: lockCores["nanny_chest"],
-                                    onUnlock: () => {
-                                        const item = new Item({
-                                            game,
-                                            name: '偏心切割的宝石',
-                                            components: [
-                                                new KeyComponent({ core: lockCores["alter"] }),
-                                            ],
-                                        });
-                                        game.getPlayer().addItemToInventory(item);
-                                    },
+                                    onUnlock: () => game.getPlayer().addItemToInventory(new Item({
+                                        game,
+                                        name: '偏心切割的宝石',
+                                        components: [
+                                            new KeyComponent({ core: lockCores["alter"] }),
+                                        ],
+                                    })),
                                 }),
                             ],
                         })),
-                    })),
+                    })
+                ],
+                entities: [
+                    ...createPorts('nanny_room'),
                 ],
             }),
             new Site({
@@ -317,14 +311,13 @@ const data = {
                 game,
                 id: 'clan_hall_basement',
                 name: '祠堂地下室',
+                components: [
+                    new ClueComponent({
+                        discoverer: createEntityClue(monster_触手怪),
+                    }),
+                ],
                 entities: [
                     ...createPorts('clan_hall'),
-                    createEntityWithComponents(game,
-                        new ClueComponent({
-                            forSite: true,
-                            discoverer: createEntityClue(monster_触手怪),
-                        }),
-                    ),
                 ],
             }),
             new Site({
@@ -354,25 +347,27 @@ const data = {
                 game,
                 id: 'hs_forest',
                 name: '灴山林',
+                components: [
+                    new ClueComponent({
+                        discoverer: createEntityClue(createPort('curved_cave')),
+                    }),
+                ],
                 entities: [
                     ...createPorts('hs_village'),
                     human_萨满,
-                    createEntityWithComponents(game, new ClueComponent({
-                        forSite: true,
-                        discoverer: createEntityClue(createPort('curved_cave')),
-                    })),
                 ],
             }),
             new Site({
                 game,
                 id: 'curved_cave',
                 name: '雕造过的山洞',
+                components: [
+                    new ClueComponent({
+                        discoverer: createEntityClue(createPort('altar_in_cave'))
+                    }),
+                ],
                 entities: [
                     ...createPorts('hs_forest'),
-                    createEntityWithComponents(game, new ClueComponent({
-                        forSite: true,
-                        discoverer: createEntityClue(createPort('altar_in_cave'))
-                    })),
                 ],
             }),
             new Site({
@@ -387,7 +382,6 @@ const data = {
                         components: [
                             new HintComponent(),
                             new ClueComponent({
-                                forSite: false,
                                 discoverer: createSimpleClue((clue: ClueComponent) => {
                                     clue.host.getComponentByType(LockComponent).hidden = false;
                                     clue.host.name = '带凹槽的祭坛';
@@ -401,9 +395,7 @@ const data = {
                                         host.game.getPlayer().removeItemFromBody(key.host, 'delete');
                                     }
                                     host.game.appendText(`随着祭坛的解锁，眼前出现了一个形容腐朽的神婆外形的人。`);
-                                    if (host instanceof Entity) {
-                                        host.site.addEntity(monster_神婆);
-                                    }
+                                    getSiteOrNull(host)?.addEntity(monster_神婆);
                                 },
                             }),
                         ],

@@ -277,7 +277,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
     action();
 
     // this.takeScreenshot();
-    this.showSiteOptions();
+    this.showSceneOptions();
 
     this.refreshOptions();
 
@@ -337,7 +337,7 @@ class App extends React.Component<AppProps, AppState> implements Game {
       const event = s.events[s.events.length - 1];
       this.setOptions(event.onRender());
     } else {
-      this.showSiteOptions();
+      this.showSceneOptions();
     }
   }
 
@@ -349,10 +349,10 @@ class App extends React.Component<AppProps, AppState> implements Game {
     }
   }
 
-  showSiteOptions() {
+  showSceneOptions() {
     const player = this.currentState.player;
     const site: Site = player.site;
-    const options = Array.from(site.entities.values(), e => e.getInteractions().map(o => Object.assign(o, { entityUid: e.uid }))).flat();
+    const options = [site, ...site.entities.values()].flatMap(it => it.getInteractions());
     this.setOptions(options);
   }
 

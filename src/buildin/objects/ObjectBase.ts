@@ -1,5 +1,5 @@
 import { find } from "lodash";
-import { Constructor, Game, GameComponent, GameObject, Option } from "../../interfaces/interfaces";
+import { Constructor, Entity, Game, GameComponent, GameObject, Item, Option, Site } from "../../interfaces/interfaces";
 import ComponentBase from "../components/CompoenentBase";
 
 export interface ObjectBaseData {
@@ -83,7 +83,43 @@ export default class ObjectBase implements GameObject {
     }
 
     toString() {
-        return this.name || ((this as any)?.__proto__?.constructor?.name ?? "<Unknown GameObject>");    
+        return this.name || ((this as any)?.__proto__?.constructor?.name ?? "<Unknown GameObject>");
     }
 
+}
+
+export function asEntityOrNull(host: GameObject): Entity | null {
+    if (host instanceof Entity) return host;
+    return null;
+}
+
+export function asItemOrNull(host: GameObject): Item | null {
+    if (host instanceof Item) return host;
+    return null;
+}
+
+export function asSiteOrNull(host: GameObject): Site | null {
+    if (host instanceof Site) return host;
+    return null;
+}
+
+export function asEntity(host: GameObject): Entity {
+    if (host instanceof Entity) return host;
+    throw new Error(`Cannot cast to Entity: ${host.name} #${host.uid}`);
+}
+
+export function asItem(host: GameObject): Item {
+    if (host instanceof Item) return host;
+    throw new Error(`Cannot cast to Item: ${host.name} #${host.uid}`);
+}
+
+export function asSite(host: GameObject): Site {
+    if (host instanceof Site) return host;
+    throw new Error(`Cannot cast to Site: ${host.name} #${host.uid}`);
+}
+
+export function getSiteOrNull(host: GameObject): Site | null {
+    if (host instanceof Site) return host;
+    if (host instanceof Entity) return host.site;
+    return null;
 }
