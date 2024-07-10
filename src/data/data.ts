@@ -412,6 +412,7 @@ const data = {
                     new Entity({
                         game,
                         name: '祭坛',
+                        alwaysShowName: true,
                         components: [
                             // new HintComponent(),
                             new ClueComponent({
