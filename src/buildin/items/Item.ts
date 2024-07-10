@@ -1,19 +1,34 @@
 import { Game, ItemEntity } from "../../interfaces/interfaces";
-import { Dice } from "../../interfaces/types";
+import { Dice, Option } from "../../interfaces/types";
 import WeaponComponent from "../components/WeaponComponent";
 import ObjectBase, { ObjectBaseData } from "../objects/ObjectBase";
 
 export interface ItemData extends ObjectBaseData {
-    name: string;
 }
 
 export default class Item extends ObjectBase {
 
-    name: string;
 
     constructor(data: ItemData) {
         super(data);
-        this.name = data.name;
+    }
+    
+    // 只会在物品栏中被调用
+    override getObjectInteractions(): Option[] {
+        const player = this.game.getPlayer();
+
+        const appendantInteractions = super.getObjectInteractions()[0]?.subOptions ?? [];
+
+        return [{
+            text: this.name,
+            leftText: '🤜',
+            rightText: previewItemDamage(this),
+            subOptions: [
+                { text: '装备', action: () => player.holdItem(this) },
+                { text: '丢弃', action: () => player.removeItemFromInventory(this, 'drop') },
+                ...appendantInteractions,
+            ],
+        }];
     }
 
     toEntity(): ItemEntity {

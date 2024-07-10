@@ -1,6 +1,6 @@
 import { GameObject } from "../../interfaces/interfaces";
-import { Option } from "../../interfaces/types";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import { Option, SubOption } from "../../interfaces/types";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 import KeyComponent from "./KeyComponent";
 
 export type LockCore = string | number;
@@ -57,7 +57,31 @@ export default class LockCompoenent extends ComponentBase {
         return false;
     }
 
-    override getInteractions(): Option[] {
+    // override getInteractions(): Option[] {
+    //     if (!this.locked) return [];
+
+    //     const heldItem = this.game.getPlayer().getItemOnMainHand();
+    //     if (!heldItem) return [];
+
+    //     const heldKey = heldItem?.tryGetComponentByType(KeyComponent);
+    //     if (!heldKey) return [];
+
+    //     if (heldKey.core !== this.core) return [];
+
+    //     return [{
+    //         text: `用 ${heldItem.name} 解锁 ${this.host.name}`,
+    //         leftText: '🔓',
+    //         rightText: '🔑',
+    //         action: () => {
+    //             this.locked = false;
+    //             this.game.appendText(`${this.host.name} 已解锁！`, 'good');
+    //             this.onUnlockListeners.forEach(l => l(this.host, heldKey));
+    //             this.removeSelf();
+    //         },
+    //     }];
+    // }
+
+    override getAppendantInteractions(): Array<SubOption> {
         if (!this.locked) return [];
 
         const heldItem = this.game.getPlayer().getItemOnMainHand();
@@ -66,17 +90,20 @@ export default class LockCompoenent extends ComponentBase {
         const heldKey = heldItem?.tryGetComponentByType(KeyComponent);
         if (!heldKey) return [];
 
-        if (heldKey.core !== this.core) return [];
+        // if (heldKey.core !== this.core) return [];
 
         return [{
-            text: `用 ${heldItem.name} 解锁 ${this.host.name}`,
-            leftText: '🔓',
-            rightText: '🔑',
+            text: '解锁',
             action: () => {
+                if (heldKey.core !== this.core) {
+                    this.game.appendText(`${this.host.name} 纹丝不动。`);
+                    return;
+                }
+
                 this.locked = false;
                 this.game.appendText(`${this.host.name} 已解锁！`, 'good');
                 this.onUnlockListeners.forEach(l => l(this.host, heldKey));
-                this.unmount();
+                this.removeSelf();
             },
         }];
     }

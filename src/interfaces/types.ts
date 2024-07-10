@@ -23,15 +23,12 @@ export interface Option {
     messageText?: Text | string;
     leftText?: string;
     rightText?: string;
-    subopts?: Array<Subopt>;
-    tag?: any;
-    entityUid?: number;
+    subOptions?: Array<SubOption>;
     action?: () => void;
 }
 
-export interface Subopt {
+export interface SubOption {
     text: string;
-    tag?: any;
     action?: () => void;
 }
 

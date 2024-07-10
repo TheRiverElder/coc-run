@@ -1,6 +1,6 @@
 import GameEvent, { GameEventData } from "../../buildin/GameEvent";
 import IdMap from "../../buildin/IdMap";
-import { Identical, Option, Subopt, Text } from "../../interfaces/types";
+import { Option, Text } from "../../interfaces/types";
 
 export interface ChatOption {
     text: string;

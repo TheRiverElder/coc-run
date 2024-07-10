@@ -1,6 +1,6 @@
 import Entity from "../entities/Entity";
 import Site from "../Site";
-import ComponentBase from "./CompoenentBase";
+import ComponentBase from "./ComponentBase";
 
 export default class MoveComponent extends ComponentBase {
 

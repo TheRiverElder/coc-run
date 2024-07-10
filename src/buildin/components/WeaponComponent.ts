@@ -1,7 +1,7 @@
 import { Damage, Dice } from "../../interfaces/types";
 import { rollDice } from "../../utils/math";
 import Item from "../items/Item";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 import HealthComponent, { toSignedString } from "./HealthComponent";
 
 export interface WeaponComponentData extends ComponentBaseData {

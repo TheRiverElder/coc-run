@@ -1,5 +1,5 @@
 import { Game, GameEvent, Option } from "../../interfaces/interfaces";
-import { Subopt } from "../../interfaces/types";
+import { SubOption } from "../../interfaces/types";
 import { previewItemDamage } from "../items/Item";
 
 class InventoryEvent extends GameEvent {
@@ -27,25 +27,12 @@ class InventoryEvent extends GameEvent {
                 text: '收起' + itemOnMeinHand.name,
                 leftText: '🤚',
                 rightText: previewItemDamage(itemOnMeinHand),
-                tag: itemOnMeinHand.uid,
                 action: () => player.unholdItem(),
             });
         }
 
         for (const item of player.storage.items) {
-            options.push(
-                {
-                    text: item.name,
-                    leftText: '🤜',
-                    rightText: previewItemDamage(item),
-                    subopts: [
-                        { text: '装备', tag: 'hold', action: () => player.holdItem(item) },
-                        { text: '丢弃', tag: 'drop', action: () => player.removeItemFromInventory(item, 'drop') },
-                    ],
-                    tag: item.uid,
-                },
-                ...item.getInteractions(),
-            );
+            options.push(...item.getInteractions());
         }
         return options;
     }

@@ -1,5 +1,5 @@
 import { Option } from "../../interfaces/types";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 import MoveComponent from "./MoveComponent";
 
 export interface PortComponentData extends ComponentBaseData {

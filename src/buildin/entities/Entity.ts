@@ -1,5 +1,5 @@
 import { Game, GameComponent, Option } from "../../interfaces/interfaces";
-import { Subopt } from "../../interfaces/types";
+import { SubOption } from "../../interfaces/types";
 import ObjectBase, { ObjectBaseData } from "../objects/ObjectBase";
 import Site from "../Site";
 
@@ -21,22 +21,6 @@ export default class Entity extends ObjectBase {
     constructor(data: EntityData) {
         super(data);
         this._site = data.site ?? Site.FAKE_SITE;
-    }
-
-    /**
-     * @depratured
-     */
-    onInteract(option: Option, subopt: Subopt | null): void {
-        // if (option.tag === this.uid) {
-        //     game.appendText(this.name);
-        // }
-    }
-
-    /**
-     * @depratured
-     */
-    onDetect(entity: Entity, site: Site) {
-        // empty
     }
 
     // 把自己从场景中移除

@@ -1,9 +1,9 @@
-import { Option } from "../../interfaces/types";
+import { Option, SubOption } from "../../interfaces/types";
 import { test } from "../../utils/math";
 import Entity from "../entities/Entity";
 import Item from "../items/Item";
 import { getSiteOrNull } from "../objects/ObjectBase";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 
 export interface Discoverer {
     hasMore(times: number): boolean;
@@ -38,6 +38,8 @@ export default class ClueComponent extends ComponentBase {
     }
 
     override getInteractions(): Option[] {
+        if (this.counter <= 0) return [];
+
         const chances = this.game.debugMode ? Number.POSITIVE_INFINITY : this.chances;
         if (this.counter >= chances) return [];
         if (!this.discoverer.hasMore(this.times)) return [];
@@ -63,6 +65,28 @@ export default class ClueComponent extends ComponentBase {
             },
         }];
 
+    }
+
+    override getAppendantInteractions(): Array<SubOption> {
+        if (this.counter > 0) return [];
+        return [{
+            text: `调查`,
+            action: () => {
+                const succeeded = test(this.game.getPlayer().insight);
+                if (succeeded) {
+                    this.game.appendText('你似乎察觉到了什么');
+                    this.reveal();
+                } else {
+                    if (this.counter >= this.chances) {
+                        this.game.appendText('好像没发现什么，放弃吧');
+                        this.game.appendText(`你失去了对的兴趣`, 'mutate');
+                    } else {
+                        this.game.appendText('没什么特别的');
+                    }
+                }
+                this.counter++;
+            },
+        }];
     }
 
     reveal() {

@@ -1,5 +1,5 @@
 import { Option } from "../../interfaces/interfaces";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 
 export interface HintComponentData extends ComponentBaseData {
     hint?: string;

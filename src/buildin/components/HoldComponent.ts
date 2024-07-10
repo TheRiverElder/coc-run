@@ -1,9 +1,8 @@
 import { slice } from "lodash";
-import Entity from "../entities/Entity";
 import ItemEntity from "../entities/ItemEntity";
 import Item from "../items/Item";
 import { getSiteOrNull } from "../objects/ObjectBase";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 import HealthComponent from "./HealthComponent";
 
 

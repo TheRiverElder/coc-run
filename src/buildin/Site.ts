@@ -37,9 +37,6 @@ class Site extends ObjectBase {
         this.entities.add(entity);
         if (entity.site !== this) {
             entity.site = this;
-            if (!silent) {
-                this.entities.values().forEach(e => e.onDetect(entity, this));
-            }
         }
         return this;
     }

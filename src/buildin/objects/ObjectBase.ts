@@ -1,6 +1,4 @@
-import { find } from "lodash";
 import { Constructor, Entity, Game, GameComponent, GameObject, Item, Option, Site } from "../../interfaces/interfaces";
-import ComponentBase from "../components/CompoenentBase";
 
 export interface ObjectBaseData {
     game: Game;
@@ -27,17 +25,20 @@ export default class ObjectBase implements GameObject {
     }
 
     getObjectInteractions(): Option[] {
-        return [];
+        const subOptions = Array.from(this.components.values())
+            .filter(it => !it.hidden)
+            .flatMap(component => component.getAppendantInteractions());
+        if (subOptions.length === 0) return [];
+        return [{
+            text: this.name,
+            subOptions,
+        }];
     }
 
     getComponentInteractions(): Option[] {
         return Array.from(this.components.values())
             .filter(it => !it.hidden)
             .flatMap(component => component.getInteractions());
-    }
-
-    use(target?: GameObject): void {
-        return Array.from(this.components.values()).forEach(component => component.use(target));
     }
 
     private components = new Map<string, GameComponent>();

@@ -1,11 +1,11 @@
-import { Option } from "../../interfaces/types";
+import { Option, SubOption } from "../../interfaces/types";
 import CombatAI from "../CombatAI/CombatAI";
 import Entity from "../entities/Entity";
 import { EntityTags } from "../EntityTags";
 import CombatEvent, { CombatEntity } from "../events/CombatEvent";
 import { Hands } from "../Hands";
 import Item from "../items/Item";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 import HealthComponent from "./HealthComponent";
 import HoldComponent from "./HoldComponent";
 import WeaponComponent from "./WeaponComponent";
@@ -52,13 +52,38 @@ export default class CombatableComponent extends ComponentBase {
         return this.defaultWeapon.getComponent<WeaponComponent>(WeaponComponent.ID);
     }
 
-    override getInteractions(): Option[] {
+    // override getInteractions(): Option[] {
+    //     const player = this.game.getPlayer();
+    //     if (this.host === player) return [];
+        
+    //     return [{
+    //         text: `攻击 ${this.host.name}`,
+    //         leftText: '🗡',
+    //         action: () => {
+    //             this.game.triggerEvent(new CombatEvent({
+    //                 game: this.game, 
+    //                 rivals: [
+    //                     {
+    //                         entity: player,
+    //                         tag: EntityTags.CIVILIAN,
+    //                     },
+    //                     {
+    //                         entity: this.host as Entity,
+    //                         tag: EntityTags.MONSTER,
+    //                     },
+    //                 ],
+    //                 next: player.uid,
+    //             }));
+    //         },
+    //     }];
+    // }
+
+    override getAppendantInteractions(): SubOption[] {
         const player = this.game.getPlayer();
         if (this.host === player) return [];
         
         return [{
-            text: `攻击 ${this.host.name}`,
-            leftText: '🗡',
+            text: `攻击`,
             action: () => {
                 this.game.triggerEvent(new CombatEvent({
                     game: this.game, 

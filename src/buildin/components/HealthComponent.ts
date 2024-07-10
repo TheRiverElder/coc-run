@@ -1,6 +1,6 @@
 import { clamp, toString } from "lodash";
 import { Entity, GameObject } from "../../interfaces/interfaces";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 
 export interface HealthComponentData extends ComponentBaseData {
     health?: number;

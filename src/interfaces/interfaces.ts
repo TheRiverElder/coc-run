@@ -4,7 +4,7 @@ import Item from "../buildin/items/Item";
 import ItemEntity from "../buildin/entities/ItemEntity";
 import PlayerEntity from "../buildin/entities/PlayerEntity";
 import Site from "../buildin/Site";
-import { Damage, Dice, Option, Text } from "./types";
+import { Damage, Dice, Option, SubOption, Text } from "./types";
 import CombatEvent from "../buildin/events/CombatEvent";
 import UniqueMap from "../buildin/UniqueMap";
 
@@ -62,7 +62,6 @@ export interface GameObject {
     // new (game: Game, uid?: number): GameComponent;
 
     getInteractions(): Array<Option>;
-    use(target?: GameObject): void;
 
     addComponent(component: GameComponent): boolean;
     removeComponent(component: GameComponent): boolean;
@@ -91,15 +90,17 @@ export interface GameComponent {
     mount(host: GameObject): void;
     unmount(): void;
 
-    // 由开发者覆写
+    // mount()和unmount()由开发者覆写
     onMount(): void;
     onUnount(): void;
 
     // this.host.removeComponent(this);
     removeSelf(): void;
 
+    // 会显示成单独的一个按钮
     getInteractions(): Array<Option>;
-    use(target?: GameObject): void; // 作为物品时候调用
+    // 会体现为一个附属按钮（子选项）
+    getAppendantInteractions(): Array<SubOption>;
 }
 
 export {

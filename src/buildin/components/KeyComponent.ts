@@ -1,5 +1,5 @@
 import { GameObject } from "../../interfaces/interfaces";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 import LockCompoenent, { LockCore } from "./LockComponent";
 
 export interface KeyComponentData extends ComponentBaseData {

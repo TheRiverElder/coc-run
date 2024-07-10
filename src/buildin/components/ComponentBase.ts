@@ -1,4 +1,5 @@
 import { Game, GameComponent, GameObject, Option } from "../../interfaces/interfaces";
+import { SubOption } from "../../interfaces/types";
 
 export interface ComponentBaseData {
     hidden?: boolean;
@@ -46,8 +47,8 @@ export default abstract class ComponentBase implements GameComponent {
         return [];
     }
 
-    use(target?: GameObject): void {
-        
+    getAppendantInteractions(): Array<SubOption> {
+        return [];
     }
 
 }

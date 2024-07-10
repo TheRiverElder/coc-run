@@ -13,7 +13,7 @@ import { createSimpleWeaponItem } from "../buildin/items/Item";
 import HealthComponent from "../buildin/components/HealthComponent";
 import CombatableComponent from "../buildin/components/CombatableComponent";
 import SimpleCombatAI from "../buildin/CombatAI/SimpleCombatAI";
-import ClueComponent, { createEntityClue, createItemClue, createItemClueAutoPick, createSimpleClue } from "../buildin/components/ClueComponent";
+import ClueComponent, { createEntityClue, createItemClue, createSimpleClue } from "../buildin/components/ClueComponent";
 import { createEntityWithComponents } from "../buildin/entities/Entity";
 import ChatComponent from "../buildin/components/ChatComponent";
 import CustomComponent from "../buildin/components/CustomComponent";
@@ -191,9 +191,11 @@ const data = {
             defaultWeapon: createFist(),
             inventory: [
                 new Item({
-                    game, name: '奇怪的簪子', components: [
+                    game, 
+                    name: '奇怪的簪子', 
+                    components: [
                         new KeyComponent({ core: lockCores["nanny_chest"] }),
-                    ]
+                    ],
                 }),
             ],
         });
@@ -323,7 +325,7 @@ const data = {
                                 }),
                             ],
                         })),
-                    })
+                    }),
                 ],
                 entities: [
                     ...createPorts('nanny_room'),

@@ -1,6 +1,6 @@
 import ChatEvent from "../../data/event/ChatEvent";
-import { DisplayText, Option } from "../../interfaces/types";
-import ComponentBase, { ComponentBaseData } from "./CompoenentBase";
+import { DisplayText, Option, SubOption } from "../../interfaces/types";
+import ComponentBase, { ComponentBaseData } from "./ComponentBase";
 
 export interface ChatComponentData extends ComponentBaseData {
     greetingText?: DisplayText; // 只说一遍的话
@@ -28,14 +28,28 @@ export default class ChatComponent extends ComponentBase {
         this.chat = data.chat ?? null;
     }
 
-    override getInteractions(): Array<Option> {
+    // override getInteractions(): Array<Option> {
+    //     if (!(this.greetingText ?? this.idleText ?? this.chat)) return [];
+
+    //     return [
+    //         {
+    //             text: `与 ${this.host.name} 对话`,
+    //             leftText: '👋🏻',
+    //             rightText: this.chat ? '🗨' : '',
+    //             action: () => {
+    //                 if (this.chat) this.game.triggerEvent(this.chat);
+    //                 else this.talk();
+    //             },
+    //         },
+    //     ];
+    // }
+
+    override getAppendantInteractions(): Array<SubOption> {
         if (!(this.greetingText ?? this.idleText ?? this.chat)) return [];
 
         return [
             {
-                text: `与 ${this.host.name} 对话`,
-                leftText: '👋🏻',
-                rightText: this.chat ? '🗨' : '',
+                text: `对话`,
                 action: () => {
                     if (this.chat) this.game.triggerEvent(this.chat);
                     else this.talk();

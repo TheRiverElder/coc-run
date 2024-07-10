@@ -22,7 +22,7 @@ function OptionBtn(props: { option: Option, className: string, handleClickOption
             {option.rightText && <span className="option-side-text right">{option.rightText}</span>}
 
             {option.text}
-            {option.subopts && option.subopts.map((suboption, i) => (
+            {option.subOptions && option.subOptions.map((suboption, i) => (
                 <span
                     key={i}
                     className="subopt"
