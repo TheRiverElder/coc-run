@@ -4,6 +4,7 @@ export interface ObjectBaseData {
     game: Game;
     uid?: number;
     name?: string;
+    alwaysShowName?: boolean;
     components?: Array<GameComponent>
 }
 
@@ -11,12 +12,14 @@ export default class ObjectBase implements GameObject {
 
     readonly game: Game;
     readonly uid: number;
+    alwaysShowName: boolean;
     name: string;
 
     constructor(data: ObjectBaseData) {
         this.game = data.game;
         this.uid = data.uid ?? this.game.generateUid();
         this.name = data.name ?? '???';
+        this.alwaysShowName = data.alwaysShowName ?? false;
         data.components?.forEach(component => this.addComponent(component));
     }
 
@@ -28,7 +31,7 @@ export default class ObjectBase implements GameObject {
         const subOptions = Array.from(this.components.values())
             .filter(it => !it.hidden)
             .flatMap(component => component.getAppendantInteractions());
-        if (subOptions.length === 0) return [];
+        if (subOptions.length === 0 && !this.alwaysShowName) return [];
         return [{
             text: this.name,
             subOptions,

@@ -413,7 +413,7 @@ const data = {
                         game,
                         name: '祭坛',
                         components: [
-                            new HintComponent(),
+                            // new HintComponent(),
                             new ClueComponent({
                                 discoverer: createSimpleClue((clue: ClueComponent) => {
                                     clue.host.getComponentByType(LockComponent).hidden = false;
