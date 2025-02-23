@@ -31,10 +31,12 @@ export default class PortComponent extends ComponentBase {
         const target = this.game.getMap().get(this.target);
         if (!target) throw new Error(`Cannot find site: ${this.target}`);
 
+        const isBack = movement.previousSite?.id === this.target;
+
         return [{
-            text: `${target.name}`,
+            text: `${isBack ? "回" : "去"}【${target.name}】`,
             messageText: { text: `${this.game.getPlayer().name} 到了 ${target.name}`, types: ['mutate'] },
-            leftText: movement.previousSite?.id === this.target ? '🔙' : '🚪',
+            leftText: isBack ? '🔙' : '🚪',
             action: () => movement.goToSite(target),
         }];
     }
